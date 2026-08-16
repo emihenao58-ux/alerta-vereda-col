@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AvisosRouteImport } from './routes/avisos'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
+import { Route as ReportarRouteImport } from './routes/reportar'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as ViasRouteImport } from './routes/vias'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AvisosRoute = AvisosRouteImport.update({
@@ -28,6 +35,11 @@ const AvisosRoute = AvisosRouteImport.update({
 const EmergenciasRoute = EmergenciasRouteImport.update({
   id: '/emergencias',
   path: '/emergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportarRoute = ReportarRouteImport.update({
+  id: '/reportar',
+  path: '/reportar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServiciosRoute = ServiciosRouteImport.update({
@@ -43,38 +55,68 @@ const ViasRoute = ViasRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/avisos'
+    | '/emergencias'
+    | '/reportar'
+    | '/servicios'
+    | '/vias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
-  id: '__root__' | '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
+  to:
+    | '/'
+    | '/auth'
+    | '/avisos'
+    | '/emergencias'
+    | '/reportar'
+    | '/servicios'
+    | '/vias'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/avisos'
+    | '/emergencias'
+    | '/reportar'
+    | '/servicios'
+    | '/vias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   AvisosRoute: typeof AvisosRoute
   EmergenciasRoute: typeof EmergenciasRoute
+  ReportarRoute: typeof ReportarRoute
   ServiciosRoute: typeof ServiciosRoute
   ViasRoute: typeof ViasRoute
 }
@@ -86,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/avisos': {
@@ -100,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/emergencias'
       fullPath: '/emergencias'
       preLoaderRoute: typeof EmergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reportar': {
+      id: '/reportar'
+      path: '/reportar'
+      fullPath: '/reportar'
+      preLoaderRoute: typeof ReportarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/servicios': {
@@ -121,8 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   AvisosRoute: AvisosRoute,
   EmergenciasRoute: EmergenciasRoute,
+  ReportarRoute: ReportarRoute,
   ServiciosRoute: ServiciosRoute,
   ViasRoute: ViasRoute,
 }
