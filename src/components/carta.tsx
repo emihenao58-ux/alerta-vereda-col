@@ -27,11 +27,11 @@ export function Carta({
   acento,
 }: {
   titulo: string;
-  meta?: string;
+  meta?: string | undefined;
   children?: ReactNode;
-  severidad?: Severidad;
-  etiqueta?: string;
-  acento?: string;
+  severidad?: Severidad | undefined;
+  etiqueta?: string | undefined;
+  acento?: string | undefined;
 }) {
   return (
     <article className="carta chinche mt-4" style={acento ? { borderLeft: `4px solid ${acento}` } : undefined}>

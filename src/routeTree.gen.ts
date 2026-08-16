@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AvisosRouteImport } from './routes/avisos'
+import { Route as EmergenciasRouteImport } from './routes/emergencias'
+import { Route as ServiciosRouteImport } from './routes/servicios'
+import { Route as ViasRouteImport } from './routes/vias'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AvisosRoute = AvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmergenciasRoute = EmergenciasRouteImport.update({
+  id: '/emergencias',
+  path: '/emergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiciosRoute = ServiciosRouteImport.update({
+  id: '/servicios',
+  path: '/servicios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViasRoute = ViasRouteImport.update({
+  id: '/vias',
+  path: '/vias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/avisos': typeof AvisosRoute
+  '/emergencias': typeof EmergenciasRoute
+  '/servicios': typeof ServiciosRoute
+  '/vias': typeof ViasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/avisos': typeof AvisosRoute
+  '/emergencias': typeof EmergenciasRoute
+  '/servicios': typeof ServiciosRoute
+  '/vias': typeof ViasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/avisos': typeof AvisosRoute
+  '/emergencias': typeof EmergenciasRoute
+  '/servicios': typeof ServiciosRoute
+  '/vias': typeof ViasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
+  id: '__root__' | '/' | '/avisos' | '/emergencias' | '/servicios' | '/vias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AvisosRoute: typeof AvisosRoute
+  EmergenciasRoute: typeof EmergenciasRoute
+  ServiciosRoute: typeof ServiciosRoute
+  ViasRoute: typeof ViasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/avisos': {
+      id: '/avisos'
+      path: '/avisos'
+      fullPath: '/avisos'
+      preLoaderRoute: typeof AvisosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emergencias': {
+      id: '/emergencias'
+      path: '/emergencias'
+      fullPath: '/emergencias'
+      preLoaderRoute: typeof EmergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicios': {
+      id: '/servicios'
+      path: '/servicios'
+      fullPath: '/servicios'
+      preLoaderRoute: typeof ServiciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vias': {
+      id: '/vias'
+      path: '/vias'
+      fullPath: '/vias'
+      preLoaderRoute: typeof ViasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AvisosRoute: AvisosRoute,
+  EmergenciasRoute: EmergenciasRoute,
+  ServiciosRoute: ServiciosRoute,
+  ViasRoute: ViasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
