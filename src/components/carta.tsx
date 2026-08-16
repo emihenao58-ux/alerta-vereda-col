@@ -1,7 +1,13 @@
 import type { ReactNode } from "react";
 import { COLOR_SEVERIDAD, LABEL_SEVERIDAD, type Severidad } from "@/lib/alerta";
 
-export function ChipSeveridad({ severidad, texto }: { severidad: Severidad; texto?: string }) {
+export function ChipSeveridad({
+  severidad,
+  texto,
+}: {
+  severidad: Severidad;
+  texto?: string | undefined;
+}) {
   return (
     <span
       className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold text-[color:var(--card)]"
