@@ -4,17 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type Perfil = {
   id: string;
-  nombre: string;
-  telefono: string | null;
+  nombre: string | null;
   vereda_id: string | null;
+  rol: string;
 };
 
 export type Rol = "habitante" | "admin";
 
 /**
- * Sesión + perfil + roles del usuario.
- * NOTA: esto es sólo UX. La autorización real vive en las políticas de la base
- * de datos (RLS); un habitante no puede publicar aunque manipule el frontend.
+ * Sesión + perfil del usuario.
+ * La autorización real vive en las políticas RLS de Supabase.
  */
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,13 +22,16 @@ export function useAuth() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_evento, nuevaSesion) => {
-      setSession(nuevaSesion);
-      if (!nuevaSesion) {
-        setPerfil(null);
-        setRoles([]);
-      }
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (_evento, nuevaSesion) => {
+        setSession(nuevaSesion);
+
+        if (!nuevaSesion) {
+          setPerfil(null);
+          setRoles([]);
+        }
+      },
+    );
 
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -41,19 +43,42 @@ export function useAuth() {
 
   useEffect(() => {
     const userId = session?.user.id;
-    if (!userId) return;
+  
+    if (!userId) {
+      setPerfil(null);
+      setRoles([]);
+      return;
+    }
+  
     let activo = true;
-
+  
     void (async () => {
-      const [{ data: p }, { data: r }] = await Promise.all([
-        supabase.from("profiles").select("id, nombre, telefono, vereda_id").eq("id", userId).maybeSingle(),
-        supabase.from("user_roles").select("role").eq("user_id", userId),
-      ]);
+      const { data: p, error } = await supabase
+        .from("perfiles")
+        .select("id, nombre, vereda_id, rol")
+        .eq("id", userId)
+        .maybeSingle();
+  
       if (!activo) return;
-      setPerfil((p as Perfil) ?? null);
-      setRoles((r ?? []).map((x) => x.role as Rol));
+  
+      if (error) {
+        console.error("Error cargando perfil:", error);
+        setPerfil(null);
+        setRoles([]);
+        return;
+      }
+  
+      setPerfil(p);
+  
+      if (p?.rol === "superadmin") {
+        setRoles(["admin"]);
+      } else if (p?.rol === "administrador") {
+        setRoles(["admin"]);
+      } else {
+        setRoles(["habitante"]);
+      }
     })();
-
+  
     return () => {
       activo = false;
     };

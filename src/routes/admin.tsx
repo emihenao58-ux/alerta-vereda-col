@@ -5,22 +5,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { useAuth } from "@/hooks/use-auth";
-import { LABEL_TIPO_REPORTE, fecha } from "@/lib/alerta";
+import { fecha } from "@/lib/alerta";
 import type { Database } from "@/integrations/supabase/types";
 
 type Reporte = Database["public"]["Tables"]["reportes"]["Row"] & {
   veredas: { nombre: string } | null;
 };
 
+const LABEL_CATEGORIA: Record<string, string> = {
+  emergencia: "Emergencia",
+  via: "Vía",
+  servicio: "Servicio",
+  otro: "Aviso",
+};
+
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Panel de la JAC · AlertaVereda Ebéjico" },
+      { title: "Panel de administración · AlertaVereda Ebéjico" },
       {
         name: "description",
         content: "Revisión y publicación de los reportes enviados por los habitantes de la vereda.",
       },
-      { property: "og:title", content: "Panel de la JAC · AlertaVereda" },
+      { property: "og:title", content: "Panel de administración · AlertaVereda" },
       { property: "og:description", content: "Verifica reportes y publícalos en la cartelera." },
     ],
   }),
@@ -31,42 +38,53 @@ export const Route = createFileRoute("/admin")({
 async function publicar(r: Reporte, revisorId: string) {
   let tabla: "emergencias" | "vias" | "servicios" | "avisos" = "emergencias";
   let fila: Record<string, unknown>;
+  const nivel = r.nivel ?? "normal";
 
-  if (r.tipo === "via") {
+  const estadoSegunNivel = (urgente: string, precaucion: string, normal: string) =>
+    r.nivel === "urgente" ? urgente : r.nivel === "precaucion" ? precaucion : normal;
+
+  if (r.categoria === "via") {
     tabla = "vias";
-    fila = {
-      vereda_id: r.vereda_id,
-      nombre: r.titulo,
-      detalle: r.descripcion,
-      estado_via: r.severidad === "urgente" ? "cerrada" : r.severidad === "precaucion" ? "afectada" : "habilitada",
-      autor_id: revisorId,
-    };
-  } else if (r.tipo === "servicio") {
-    tabla = "servicios";
-    fila = {
-      vereda_id: r.vereda_id,
-      tipo: "agua",
-      estado_servicio: r.severidad === "urgente" ? "suspendido" : "intermitente",
-      descripcion: `${r.titulo}. ${r.descripcion}`,
-      autor_id: revisorId,
-    };
-  } else if (r.tipo === "aviso") {
-    tabla = "avisos";
-    fila = {
-      vereda_id: r.vereda_id,
-      titulo: r.titulo,
-      cuerpo: r.descripcion,
-      lugar: r.ubicacion,
-      autor_id: revisorId,
-    };
-  } else {
     fila = {
       vereda_id: r.vereda_id,
       titulo: r.titulo,
       descripcion: r.descripcion,
-      severidad: r.severidad,
-      ubicacion: r.ubicacion,
-      autor_id: revisorId,
+      lugar: r.lugar,
+      nivel,
+      estado: estadoSegunNivel("Cerrada", "Precaución", "Habilitada"),
+      creado_por: revisorId,
+    };
+  } else if (r.categoria === "servicio") {
+    tabla = "servicios";
+    fila = {
+      vereda_id: r.vereda_id,
+      titulo: r.titulo,
+      descripcion: r.descripcion,
+      lugar: r.lugar,
+      nivel,
+      tipo: "agua",
+      estado: estadoSegunNivel("Interrumpido", "Intermitente", "Normal"),
+      creado_por: revisorId,
+    };
+  } else if (r.categoria === "otro") {
+    tabla = "avisos";
+    fila = {
+      vereda_id: r.vereda_id,
+      titulo: r.titulo,
+      descripcion: r.descripcion,
+      lugar: r.lugar,
+      creado_por: revisorId,
+    };
+  } else {
+    tabla = "emergencias";
+    fila = {
+      vereda_id: r.vereda_id,
+      titulo: r.titulo,
+      descripcion: r.descripcion,
+      lugar: r.lugar,
+      nivel,
+      estado: estadoSegunNivel("Activa", "En observación", "Activa"),
+      creado_por: revisorId,
     };
   }
 
@@ -78,7 +96,7 @@ async function publicar(r: Reporte, revisorId: string) {
     .update({
       estado: "aprobado",
       revisado_por: revisorId,
-      revisado_at: new Date().toISOString(),
+      revisado_en: new Date().toISOString(),
       publicacion_tabla: tabla,
       publicacion_id: data.id,
     })
@@ -98,8 +116,12 @@ function Admin() {
         .from("reportes")
         .select("*, veredas(nombre)")
         .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as Reporte[];
+        console.log("REPORTES ADMIN:", data);
+console.log("ERROR REPORTES ADMIN:", error);
+console.log("REPORTES ADMIN DETALLE:", JSON.stringify(data, null, 2));
+
+if (error) throw error;
+return data as Reporte[];
     },
   });
 
@@ -112,7 +134,7 @@ function Admin() {
         .update({
           estado: "rechazado",
           revisado_por: usuario.id,
-          revisado_at: new Date().toISOString(),
+          revisado_en: new Date().toISOString(),
         })
         .eq("id", r.id);
       if (error) throw error;
@@ -135,7 +157,7 @@ function Admin() {
   if (!usuario) {
     return (
       <AppShell>
-        <TituloModulo titulo="Panel de la JAC" bajada="Solo para administradores." />
+        <TituloModulo titulo="Panel de administración" bajada="Solo para administradores." />
         <p className="carta mt-4 text-sm">
           <Link to="/auth" className="font-semibold underline underline-offset-4">
             Inicia sesión
@@ -149,7 +171,7 @@ function Admin() {
   if (!esAdmin) {
     return (
       <AppShell>
-        <TituloModulo titulo="Panel de la JAC" bajada="Solo para administradores." />
+        <TituloModulo titulo="Panel de administración" bajada="Solo para administradores." />
         <Vacio texto="Tu cuenta es de habitante. Puedes consultar la cartelera y enviar reportes." />
       </AppShell>
     );
@@ -158,10 +180,12 @@ function Admin() {
   const pendientes = reportes?.filter((r) => r.estado === "pendiente") ?? [];
   const revisados = reportes?.filter((r) => r.estado !== "pendiente") ?? [];
 
+  console.log("PENDIENTES:", pendientes);
+console.log("REVISADOS:", revisados);
   return (
     <AppShell>
       <TituloModulo
-        titulo="Panel de la JAC"
+        titulo="Panel de administración"
         bajada="Verifica los reportes de los habitantes antes de publicarlos en la cartelera."
       />
 
@@ -171,11 +195,12 @@ function Admin() {
         <Carta
           key={r.id}
           titulo={r.titulo}
-          severidad={r.severidad}
-          meta={`${LABEL_TIPO_REPORTE[r.tipo]} · ${r.veredas?.nombre ?? ""} · ${fecha(r.created_at)}`}
+          severidad={undefined}
+          meta={`${LABEL_CATEGORIA[r.categoria] ?? r.categoria} · ${r.veredas?.nombre ?? ""} · ${fecha(r.created_at)}${r.nombre_reportante ? ` · ${r.nombre_reportante}` : ""}`}
         >
           <p>{r.descripcion}</p>
-          {r.ubicacion && <p className="mt-1">Lugar: {r.ubicacion}</p>}
+          {r.lugar && <p className="mt-1">Lugar: {r.lugar}</p>}
+          {r.foto_url && <p className="mt-1 text-xs opacity-70">Foto adjunta: {r.foto_url}</p>}
           <div className="mt-3 flex gap-2">
             <button
               onClick={() => revisar.mutate({ r, aprobar: true })}
@@ -199,7 +224,7 @@ function Admin() {
         <Carta
           key={r.id}
           titulo={r.titulo}
-          meta={`${r.estado === "aprobado" ? "Publicado" : "Rechazado"} · ${fecha(r.revisado_at)}`}
+          meta={`${r.estado === "aprobado" ? "Publicado" : "Rechazado"} · ${fecha(r.revisado_en)}`}
         >
           {r.descripcion}
         </Carta>
