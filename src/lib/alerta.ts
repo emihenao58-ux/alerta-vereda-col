@@ -64,6 +64,41 @@ export const LABEL_TIPO_REPORTE: Record<TipoReporte, string> = {
   aviso: "Aviso comunitario",
 };
 
+/**
+ * Mapea el texto de estado publicado de una vía al tipo `EstadoVia`.
+ * Las publicaciones se crean con `vias.estado` = "Habilitada" / "Precaución" / "Cerrada";
+ * cualquier valor no reconocido cae en "afectada" (el chip muestra solo el color de severidad). */
+export function estadoDeVia(estado: string | null | undefined): EstadoVia {
+  const e = (estado ?? "").trim().toLowerCase();
+  if (e === "habilitada") return "habilitada";
+  if (e === "precaución" || e === "precaucion") return "precaucion";
+  if (e === "cerrada") return "cerrada";
+  return "afectada";
+}
+
+/**
+ * Mapea el texto de estado publicado de un servicio al tipo `EstadoServicio`.
+ * Las publicaciones se crean con `servicios.estado` = "Normal" / "Intermitente" / "Interrumpido";
+ * "Restablecido" se reconoce por si un admin lo escribe a mano. Cualquier otro valor cae en "intermitente". */
+export function estadoDeServicio(estado: string | null | undefined): EstadoServicio {
+  const e = (estado ?? "").trim().toLowerCase();
+  if (e === "normal") return "normal";
+  if (e === "intermitente") return "intermitente";
+  if (e === "suspendido" || e === "interrumpido") return "suspendido";
+  if (e === "restablecido") return "restablecido";
+  return "intermitente";
+}
+
+/**
+ * Mapea el texto de estado publicado de una emergencia al tipo `Severidad`.
+ * Las publicaciones se crean con `emergencias.estado` = "Activa" / "En observación";
+ * una emergencia ya no vigente se puede marcar con "Resuelta" y en ese caso cae en "normal". */
+export function severidadDeEmergencia(estado: string | null | undefined): Severidad {
+  const e = (estado ?? "").trim().toLowerCase();
+  if (e === "resuelta" || e === "solucionada" || e === "cerrada") return "normal";
+  return "urgente";
+}
+
 export function fecha(valor: string | null | undefined) {
   if (!valor) return "";
   return new Date(valor).toLocaleString("es-CO", {

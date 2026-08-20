@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import { fecha } from "@/lib/alerta";
+import { severidadDeEmergencia, fecha } from "@/lib/alerta";
 
 export const Route = createFileRoute("/emergencias")({
   head: () => ({
@@ -49,9 +49,9 @@ function Emergencias() {
         <Carta
           key={e.id}
           titulo={e.titulo}
-          severidad={e.severidad}
-          etiqueta={e.activa ? undefined : "Solucionado"}
-          meta={`${e.veredas?.nombre ?? ""} · ${e.ubicacion ?? "sin ubicación"} · ${fecha(e.created_at)}`}
+          severidad={severidadDeEmergencia(e.estado)}
+          etiqueta={e.estado?.toLowerCase().trim() === "resuelta" || e.estado?.toLowerCase().trim() === "solucionada" ? "Solucionado" : undefined}
+          meta={`${e.veredas?.nombre ?? ""} · ${e.lugar ?? "sin ubicación"} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
         </Carta>

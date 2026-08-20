@@ -47,10 +47,10 @@ function Avisos() {
           titulo={a.titulo}
           acento="#C99A2E"
           meta={`${a.veredas?.nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${
-            a.fecha_evento ? ` · ${fecha(a.fecha_evento)}` : ""
+            a.fecha ? ` · ${fecha(a.fecha)}` : ""
           }`}
         >
-          {a.cuerpo}
+          {a.descripcion}
         </Carta>
       ))}
     </AppShell>
