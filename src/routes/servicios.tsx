@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import { LABEL_TIPO_SERVICIO, severidadDeNivel, fecha } from "@/lib/alerta";
+import { LABEL_TIPO_SERVICIO, URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
 
 export const Route = createFileRoute("/servicios")({
   head: () => ({
@@ -51,7 +51,7 @@ function Servicios() {
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
-          {s.foto_url && <img src={s.foto_url} alt={s.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(s.foto_url) && <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />}
         </Carta>
       ))}
     </AppShell>

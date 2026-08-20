@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { useAuth } from "@/hooks/use-auth";
-import { fecha, LABEL_RESULTADO_CIERRE, type ResultadoCierre } from "@/lib/alerta";
+import { fecha, LABEL_RESULTADO_CIERRE, URL_FOTO, type ResultadoCierre } from "@/lib/alerta";
 import type { Database } from "@/integrations/supabase/types";
 
 type Reporte = Database["public"]["Tables"]["reportes"]["Row"] & {
@@ -252,10 +252,10 @@ console.log("REVISADOS:", revisados);
         >
           <p>{r.descripcion}</p>
           {r.lugar && <p className="mt-1">Lugar: {r.lugar}</p>}
-          {r.foto_url && (
+          {URL_FOTO(r.foto_url) && (
             <div className="mt-2">
               <img
-                src={r.foto_url}
+                src={URL_FOTO(r.foto_url)!}
                 alt="Foto del reporte"
                 className="max-h-64 w-auto rounded-md border border-[color:var(--border)]"
               />

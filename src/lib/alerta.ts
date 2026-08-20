@@ -80,3 +80,13 @@ export function fecha(valor: string | null | undefined) {
     minute: "2-digit",
   });
 }
+
+/**
+ * Convierte un path relativo de Storage (ej.: "vereda_id/archivo.png", guardado en
+ * `foto_url`) en la URL pública completa de Supabase Storage.
+ * Si el valor ya es una URL absoluta, se devuelve tal cual. */
+export function URL_FOTO(foto_url: string | null | undefined): string | null {
+  if (!foto_url) return null;
+  if (foto_url.startsWith("http")) return foto_url;
+  return `https://bajsmsuxuwkxlctukyvv.supabase.co/storage/v1/object/public/reportes-fotos/${foto_url}`;
+}
