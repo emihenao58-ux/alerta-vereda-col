@@ -1,10 +1,14 @@
 import type { Database } from "@/integrations/supabase/types";
 
-export type Severidad = Database["public"]["Enums"]["severidad"];
-export type EstadoVia = Database["public"]["Enums"]["estado_via"];
-export type TipoServicio = Database["public"]["Enums"]["tipo_servicio"];
-export type EstadoServicio = Database["public"]["Enums"]["estado_servicio"];
-export type TipoReporte = Database["public"]["Enums"]["tipo_reporte"];
+export type Severidad = "urgente" | "precaucion" | "normal";
+
+export type EstadoVia = "habilitada" | "precaucion" | "afectada" | "cerrada";
+
+export type TipoServicio = "agua" | "luz" | "senal";
+
+export type EstadoServicio = "normal" | "intermitente" | "suspendido" | "restablecido";
+
+export type TipoReporte = "emergencia" | "via" | "servicio" | "aviso";
 
 /** Colores oficiales de severidad (documento de identidad, sección 4.4). */
 export const COLOR_SEVERIDAD: Record<Severidad, string> = {
