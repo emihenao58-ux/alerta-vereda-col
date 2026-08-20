@@ -30,6 +30,7 @@ function Servicios() {
       const { data, error } = await supabase
         .from("servicios")
         .select("*, veredas(nombre)")
+        .is("cerrado_en", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -50,6 +51,7 @@ function Servicios() {
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
+          {s.foto_url && <img src={s.foto_url} alt={s.titulo} className="mt-2 w-full rounded-md" />}
         </Carta>
       ))}
     </AppShell>

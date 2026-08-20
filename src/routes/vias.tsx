@@ -31,6 +31,7 @@ function Vias() {
       const { data, error } = await supabase
         .from("vias")
         .select("*, veredas(nombre)")
+        .is("cerrado_en", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -51,6 +52,7 @@ function Vias() {
           meta={`${v.veredas?.nombre ?? ""} · actualizado ${fecha(v.created_at)}`}
         >
           {v.descripcion}
+          {v.foto_url && <img src={v.foto_url} alt={v.titulo} className="mt-2 w-full rounded-md" />}
         </Carta>
       ))}
     </AppShell>

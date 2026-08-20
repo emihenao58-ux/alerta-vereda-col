@@ -37,7 +37,16 @@ export function Carta({
     <article className="carta chinche mt-4" style={acento ? { borderLeft: `4px solid ${acento}` } : undefined}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="text-lg leading-tight font-semibold">{titulo}</h3>
-        {severidad && <ChipSeveridad severidad={severidad} texto={etiqueta} />}
+        {severidad && (
+          <span className="inline-flex items-center gap-1.5">
+            <ChipSeveridad severidad={severidad} />
+            {etiqueta && (
+              <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-xs font-medium text-[color:var(--tinta-suave)]">
+                {etiqueta}
+              </span>
+            )}
+          </span>
+        )}
       </div>
       {meta && <p className="mt-1 text-xs text-[color:var(--tinta-suave)]">{meta}</p>}
       {children && <div className="mt-2 text-sm text-[color:var(--tinta-suave)]">{children}</div>}

@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { useAuth } from "@/hooks/use-auth";
-import { fecha } from "@/lib/alerta";
+import { fecha, LABEL_RESULTADO_CIERRE, type ResultadoCierre } from "@/lib/alerta";
 import type { Database } from "@/integrations/supabase/types";
 
 type Reporte = Database["public"]["Tables"]["reportes"]["Row"] & {
@@ -52,6 +53,7 @@ async function publicar(r: Reporte, revisorId: string) {
       lugar: r.lugar,
       nivel,
       estado: estadoSegunNivel("Cerrada", "Precaución", "Habilitada"),
+      foto_url: r.foto_url,
       creado_por: revisorId,
     };
   } else if (r.categoria === "servicio") {
@@ -64,6 +66,7 @@ async function publicar(r: Reporte, revisorId: string) {
       nivel,
       tipo: "agua",
       estado: estadoSegunNivel("Interrumpido", "Intermitente", "Normal"),
+      foto_url: r.foto_url,
       creado_por: revisorId,
     };
   } else if (r.categoria === "otro") {
@@ -84,6 +87,7 @@ async function publicar(r: Reporte, revisorId: string) {
       lugar: r.lugar,
       nivel,
       estado: estadoSegunNivel("Activa", "En observación", "Activa"),
+      foto_url: r.foto_url,
       creado_por: revisorId,
     };
   }
@@ -123,6 +127,54 @@ console.log("REPORTES ADMIN DETALLE:", JSON.stringify(data, null, 2));
 if (error) throw error;
 return data as Reporte[];
     },
+  });
+
+  /** Carga las publicaciones vigentes (emergencias, vías, servicios) con sus datos de cierre. */
+  const { data: publicaciones } = useQuery({
+    queryKey: ["publicaciones-admin"],
+    enabled: esAdmin,
+    queryFn: async () => {
+      const [emergencias, vias, servicios] = await Promise.all([
+        supabase.from("emergencias").select("id, titulo, estado, cerrado_en, resultado, razon_cierre, foto_url").order("created_at", { ascending: false }),
+        supabase.from("vias").select("id, titulo, estado, cerrado_en, resultado, razon_cierre, foto_url").order("created_at", { ascending: false }),
+        supabase.from("servicios").select("id, titulo, estado, cerrado_en, resultado, razon_cierre, foto_url").order("created_at", { ascending: false }),
+      ]);
+      return {
+        emergencias: emergencias.data ?? [],
+        vias: vias.data ?? [],
+        servicios: servicios.data ?? [],
+      };
+    },
+  });
+
+  const cerrarPublicacion = useMutation({
+    mutationFn: async ({
+      tabla,
+      id,
+      resultado,
+      razon,
+    }: {
+      tabla: "emergencias" | "vias" | "servicios";
+      id: string;
+      resultado: ResultadoCierre;
+      razon?: string;
+    }) => {
+      if (!usuario) throw new Error("Sin sesión");
+      const { error } = await supabase
+        .from(tabla)
+        .update({
+          cerrado_en: new Date().toISOString(),
+          resultado,
+          razon_cierre: razon ?? null,
+        } as never)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Publicación cerrada.");
+      void qc.invalidateQueries({ queryKey: ["publicaciones-admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const revisar = useMutation({
@@ -200,7 +252,16 @@ console.log("REVISADOS:", revisados);
         >
           <p>{r.descripcion}</p>
           {r.lugar && <p className="mt-1">Lugar: {r.lugar}</p>}
-          {r.foto_url && <p className="mt-1 text-xs opacity-70">Foto adjunta: {r.foto_url}</p>}
+          {r.foto_url && (
+            <div className="mt-2">
+              <img
+                src={r.foto_url}
+                alt="Foto del reporte"
+                className="max-h-64 w-auto rounded-md border border-[color:var(--border)]"
+              />
+              <p className="mt-1 text-xs opacity-70">Foto adjunta por el reportante.</p>
+            </div>
+          )}
           <div className="mt-3 flex gap-2">
             <button
               onClick={() => revisar.mutate({ r, aprobar: true })}
@@ -218,6 +279,17 @@ console.log("REVISADOS:", revisados);
         </Carta>
       ))}
 
+      <h2 className="mt-8 text-lg font-semibold">Publicaciones vigentes</h2>
+      <p className="mt-1 text-sm text-[color:var(--tinta-suave)]">
+        Emergencias, vías y servicios publicados en la cartelera. Al cerrarlos, desaparecen de la
+        cartelera pública.
+      </p>
+      <PublicacionesVigentes
+        publicaciones={publicaciones}
+        onCerrar={cerrarPublicacion.mutate}
+        cerrando={cerrarPublicacion.isPending}
+      />
+
       <h2 className="mt-8 text-lg font-semibold">Ya revisados</h2>
       {revisados.length === 0 && <Vacio texto="Todavía no has revisado reportes." />}
       {revisados.map((r) => (
@@ -230,5 +302,115 @@ console.log("REVISADOS:", revisados);
         </Carta>
       ))}
     </AppShell>
+  );
+}
+
+/**
+ * Sección de publicaciones vigentes con acciones de cierre (Tarea 2):
+ * "Marcar solucionado" cierra sin razón; "No solucionado" pide una razón corta obligatoria.
+ */
+function PublicacionesVigentes({
+  publicaciones,
+  onCerrar,
+  cerrando,
+}: {
+  publicaciones:
+    | {
+        emergencias: Array<{ id: string; titulo: string; estado: string | null; cerrado_en: string | null; resultado: string | null; razon_cierre: string | null }>;
+        vias: Array<{ id: string; titulo: string; estado: string | null; cerrado_en: string | null; resultado: string | null; razon_cierre: string | null }>;
+        servicios: Array<{ id: string; titulo: string; estado: string | null; cerrado_en: string | null; resultado: string | null; razon_cierre: string | null }>;
+      }
+    | undefined;
+  onCerrar: (args: {
+    tabla: "emergencias" | "vias" | "servicios";
+    id: string;
+    resultado: ResultadoCierre;
+    razon?: string;
+  }) => void;
+  cerrando: boolean;
+}) {
+  const [pendiente, setPendiente] = useState<{ tabla: "emergencias" | "vias" | "servicios"; id: string; titulo: string } | null>(null);
+  const [razon, setRazon] = useState("");
+
+  const vigentes = useMemo(() => {
+    const todos = [
+      ...(publicaciones?.emergencias.map((p) => ({ ...p, tabla: "emergencias" as const })) ?? []),
+      ...(publicaciones?.vias.map((p) => ({ ...p, tabla: "vias" as const })) ?? []),
+      ...(publicaciones?.servicios.map((p) => ({ ...p, tabla: "servicios" as const })) ?? []),
+    ];
+    return todos.filter((p) => p.cerrado_en === null).sort((a, b) => b.id.localeCompare(a.id));
+  }, [publicaciones]);
+
+  return (
+    <div className="mt-3">
+      {vigentes.length === 0 && <Vacio texto="No hay publicaciones vigentes en la cartelera." />}
+      {vigentes.map((p) => (
+        <Carta key={`${p.tabla}-${p.id}`} titulo={p.titulo} meta={`${p.tabla} · estado: ${p.estado ?? "—"}`}>
+          {pendiente?.id === p.id ? (
+            <form
+              className="mt-2"
+              onSubmit={(ev) => {
+                ev.preventDefault();
+                if (razon.trim().length === 0) {
+                  toast.error("Escribe una razón corta antes de guardar.");
+                  return;
+                }
+                onCerrar({ tabla: p.tabla, id: p.id, resultado: "no_solucionado", razon: razon.trim() });
+                setPendiente(null);
+                setRazon("");
+              }}
+            >
+              <p className="mb-1 text-sm">¿Por qué no se solucionó? (obligatorio)</p>
+              <textarea
+                value={razon}
+                onChange={(ev) => setRazon(ev.target.value)}
+                maxLength={280}
+                rows={2}
+                placeholder="Ej.: el cable sigue caído, se avisó a la empresa y quedó pendiente…"
+                className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] p-2 text-sm"
+              />
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="submit"
+                  disabled={cerrando}
+                  className="rounded-md border border-[color:var(--border)] px-3 py-2 text-sm font-semibold"
+                >
+                  Guardar como no solucionado
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPendiente(null);
+                    setRazon("");
+                  }}
+                  className="rounded-md px-3 py-2 text-sm"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                onClick={() =>
+                  onCerrar({ tabla: p.tabla, id: p.id, resultado: "solucionado" })
+                }
+                disabled={cerrando}
+                className="rounded-md bg-[color:var(--bosque)] px-3 py-2 text-sm font-semibold text-[color:var(--card)]"
+              >
+                Marcar solucionado
+              </button>
+              <button
+                onClick={() => setPendiente({ tabla: p.tabla, id: p.id, titulo: p.titulo })}
+                disabled={cerrando}
+                className="rounded-md border border-[color:var(--border)] px-3 py-2 text-sm font-semibold"
+              >
+                No solucionado
+              </button>
+            </div>
+          )}
+        </Carta>
+      ))}
+    </div>
   );
 }

@@ -4,6 +4,13 @@ export type TipoServicio = "agua" | "luz" | "senal";
 
 export type TipoReporte = "emergencia" | "via" | "servicio" | "aviso";
 
+export type ResultadoCierre = "solucionado" | "no_solucionado";
+
+export const LABEL_RESULTADO_CIERRE: Record<ResultadoCierre, string> = {
+  solucionado: "Solucionado",
+  no_solucionado: "No solucionado",
+};
+
 /** Colores oficiales de severidad (documento de identidad, sección 4.4). */
 export const COLOR_SEVERIDAD: Record<Severidad, string> = {
   urgente: "#C23B2E",
@@ -28,6 +35,27 @@ export function severidadDeNivel(nivel: string | null | undefined): Severidad {
   return (NIVELES_VALIDOS as readonly string[]).includes(nivel ?? "")
     ? (nivel as Severidad)
     : "precaucion";
+}
+
+/**
+ * Texto neutro de estado publicado para la etiqueta al lado del chip de severidad.
+ * Normaliza minúsculas/añade "Activa" por defecto; si ya está bien escrito se usa tal cual. */
+export function ETIQUETA_ESTADO(
+  tipo: "emergencia" | "via" | "servicio" | "aviso",
+  estado: string | null | undefined,
+): string {
+  switch (tipo) {
+    case "emergencia":
+      return estado ?? "Activa";
+    case "via":
+      return estado ?? "";
+    case "servicio":
+      return estado ?? "";
+    case "aviso":
+      return "Aviso";
+    default:
+      return "";
+  }
 }
 
 export const LABEL_TIPO_SERVICIO: Record<TipoServicio, string> = {
