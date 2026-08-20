@@ -3,14 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import {
-  estadoDeServicio,
-  LABEL_SERVICIO,
-  LABEL_TIPO_SERVICIO,
-  SEVERIDAD_DE_SERVICIO,
-  fecha,
-} from "@/lib/alerta";
-import type { TipoServicio } from "@/lib/alerta";
+import { LABEL_TIPO_SERVICIO, severidadDeNivel, fecha } from "@/lib/alerta";
 
 export const Route = createFileRoute("/servicios")({
   head: () => ({
@@ -52,8 +45,8 @@ function Servicios() {
         <Carta
           key={s.id}
           titulo={s.tipo ? ((LABEL_TIPO_SERVICIO as Record<string, string>)[s.tipo] ?? "Servicio") : "Servicio"}
-          severidad={SEVERIDAD_DE_SERVICIO[estadoDeServicio(s.estado)]}
-          etiqueta={LABEL_SERVICIO[estadoDeServicio(s.estado)]}
+          severidad={severidadDeNivel(s.nivel)}
+          etiqueta={s.estado}
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}

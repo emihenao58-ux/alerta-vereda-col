@@ -3,16 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, ChipSeveridad, Vacio } from "@/components/carta";
-import {
-  estadoDeServicio,
-  estadoDeVia,
-  LABEL_SERVICIO,
-  LABEL_VIA,
-  SEVERIDAD_DE_SERVICIO,
-  SEVERIDAD_DE_VIA,
-  severidadDeEmergencia,
-  fecha,
-} from "@/lib/alerta";
+import { severidadDeNivel, fecha } from "@/lib/alerta";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,9 +36,9 @@ function Portada() {
     queryKey: ["portada"],
     queryFn: async () => {
       const [emergencias, vias, servicios, avisos] = await Promise.all([
-        supabase.from("emergencias").select("*, veredas(nombre)").neq("estado", "Resuelta").order("created_at", { ascending: false }).limit(3),
-        supabase.from("vias").select("*, veredas(nombre)").neq("estado", "Habilitada").order("created_at", { ascending: false }).limit(3),
-        supabase.from("servicios").select("*, veredas(nombre)").neq("estado", "Normal").order("created_at", { ascending: false }).limit(3),
+        supabase.from("emergencias").select("*, veredas(nombre)").neq("nivel", "normal").order("created_at", { ascending: false }).limit(3),
+        supabase.from("vias").select("*, veredas(nombre)").neq("nivel", "normal").order("created_at", { ascending: false }).limit(3),
+        supabase.from("servicios").select("*, veredas(nombre)").neq("nivel", "normal").order("created_at", { ascending: false }).limit(3),
         supabase.from("avisos").select("*, veredas(nombre)").order("created_at", { ascending: false }).limit(2),
       ]);
       return {
@@ -107,7 +98,8 @@ function Portada() {
         <Carta
           key={e.id}
           titulo={e.titulo}
-          severidad={severidadDeEmergencia(e.estado)}
+          severidad={severidadDeNivel(e.nivel)}
+          etiqueta={e.estado}
           meta={`Emergencia · ${e.veredas?.nombre ?? ""} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
@@ -118,8 +110,8 @@ function Portada() {
         <Carta
           key={v.id}
           titulo={v.titulo}
-          severidad={SEVERIDAD_DE_VIA[estadoDeVia(v.estado)]}
-          etiqueta={LABEL_VIA[estadoDeVia(v.estado)]}
+          severidad={severidadDeNivel(v.nivel)}
+          etiqueta={v.estado}
           meta={`Vía · ${v.veredas?.nombre ?? ""} · ${fecha(v.created_at)}`}
         >
           {v.descripcion}
@@ -130,8 +122,8 @@ function Portada() {
         <Carta
           key={s.id}
           titulo={s.tipo ? `Servicio de ${s.tipo === "senal" ? "señal" : s.tipo}` : "Servicio"}
-          severidad={SEVERIDAD_DE_SERVICIO[estadoDeServicio(s.estado)]}
-          etiqueta={LABEL_SERVICIO[estadoDeServicio(s.estado)]}
+          severidad={severidadDeNivel(s.nivel)}
+          etiqueta={s.estado}
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
