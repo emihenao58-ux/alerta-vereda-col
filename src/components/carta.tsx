@@ -40,11 +40,11 @@ export function Carta({
         {severidad && (
           <span className="inline-flex items-center gap-1.5">
             <ChipSeveridad severidad={severidad} />
-            {etiqueta && (
+            {etiqueta && etiqueta.trim() && etiqueta.trim().toLowerCase() !== LABEL_SEVERIDAD[severidad].toLowerCase() ? (
               <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-xs font-medium text-[color:var(--tinta-suave)]">
                 {etiqueta}
               </span>
-            )}
+            ) : null}
           </span>
         )}
       </div>
