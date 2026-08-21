@@ -6,7 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { useAuth } from "@/hooks/use-auth";
-import { fecha, LABEL_RESULTADO_CIERRE, URL_FOTO, type ResultadoCierre } from "@/lib/alerta";
+import {
+  fecha,
+  LABEL_RESULTADO_CIERRE,
+  LABEL_SEVERIDAD,
+  COLOR_SEVERIDAD,
+  URL_FOTO,
+  type ResultadoCierre,
+  type Severidad,
+} from "@/lib/alerta";
 import type { Database } from "@/integrations/supabase/types";
 
 type Reporte = Database["public"]["Tables"]["reportes"]["Row"] & {
@@ -36,13 +44,13 @@ export const Route = createFileRoute("/admin")({
 });
 
 /** Convierte un reporte aprobado en la publicación pública correspondiente. */
-async function publicar(r: Reporte, revisorId: string) {
+async function publicar(r: Reporte, revisorId: string, nivelElegido?: Severidad) {
   let tabla: "emergencias" | "vias" | "servicios" | "avisos" = "emergencias";
   let fila: Record<string, unknown>;
-  const nivel = r.nivel ?? "normal";
-
+  // El nivel lo fija el admin al verificar; si no se eligió, se hereda del reporte.
+  const nivel = (nivelElegido ?? r.nivel ?? "normal") as "urgente" | "precaucion" | "normal";
   const estadoSegunNivel = (urgente: string, precaucion: string, normal: string) =>
-    r.nivel === "urgente" ? urgente : r.nivel === "precaucion" ? precaucion : normal;
+    nivel === "urgente" ? urgente : nivel === "precaucion" ? precaucion : normal;
 
   if (r.categoria === "via") {
     tabla = "vias";
@@ -178,9 +186,9 @@ return data as Reporte[];
   });
 
   const revisar = useMutation({
-    mutationFn: async ({ r, aprobar }: { r: Reporte; aprobar: boolean }) => {
+    mutationFn: async ({ r, aprobar, nivel }: { r: Reporte; aprobar: boolean; nivel?: Severidad }) => {
       if (!usuario) throw new Error("Sin sesión");
-      if (aprobar) return publicar(r, usuario.id);
+      if (aprobar) return publicar(r, usuario.id, nivel);
       const { error } = await supabase
         .from("reportes")
         .update({
@@ -229,6 +237,9 @@ return data as Reporte[];
     );
   }
 
+  // Nivel elegido por el admin para cada reporte pendiente (por defecto "normal").
+  const [niveles, setNiveles] = useState<Record<string, Severidad>>({});
+
   const pendientes = reportes?.filter((r) => r.estado === "pendiente") ?? [];
   const revisados = reportes?.filter((r) => r.estado !== "pendiente") ?? [];
 
@@ -262,9 +273,30 @@ console.log("REVISADOS:", revisados);
               <p className="mt-1 text-xs opacity-70">Foto adjunta por el reportante.</p>
             </div>
           )}
+          {/* Selector de severidad: lo fija el admin al publicar. */}
+          <div className="mt-3">
+            <p className="mb-1.5 text-sm font-medium">Nivel de la alerta:</p>
+            <div className="flex gap-2">
+              {(["urgente", "precaucion", "normal"] as const).map((op) => (
+                <button
+                  key={op}
+                  type="button"
+                  onClick={() => setNiveles((n) => ({ ...n, [r.id]: op }))}
+                  className="rounded-md border px-3 py-1.5 text-sm font-semibold transition-colors"
+                  style={{
+                    borderColor: (niveles[r.id] ?? "normal") === op ? COLOR_SEVERIDAD[op] : "var(--border)",
+                    backgroundColor: (niveles[r.id] ?? "normal") === op ? COLOR_SEVERIDAD[op] : "transparent",
+                    color: (niveles[r.id] ?? "normal") === op ? "#ffffff" : "inherit",
+                  }}
+                >
+                  {LABEL_SEVERIDAD[op]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mt-3 flex gap-2">
             <button
-              onClick={() => revisar.mutate({ r, aprobar: true })}
+              onClick={() => revisar.mutate({ r, aprobar: true, nivel: niveles[r.id] ?? "normal" })}
               className="rounded-md bg-[color:var(--bosque)] px-3 py-2 text-sm font-semibold text-[color:var(--card)]"
             >
               Verificar y publicar
