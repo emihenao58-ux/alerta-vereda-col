@@ -48,9 +48,11 @@ async function publicar(r: Reporte, revisorId: string, nivelElegido?: Severidad)
   let tabla: "emergencias" | "vias" | "servicios" | "avisos" = "emergencias";
   let fila: Record<string, unknown>;
   // El nivel lo fija el admin al verificar; si no se eligió, se hereda del reporte.
-  const nivel = (nivelElegido ?? r.nivel ?? "normal") as "urgente" | "precaucion" | "normal";
-  const estadoSegunNivel = (urgente: string, precaucion: string, normal: string) =>
-    nivel === "urgente" ? urgente : nivel === "precaucion" ? precaucion : normal;
+  // Valores coinciden con el constraint `*_nivel_check` de la BD:
+  // ('urgente', 'atencion', 'normal'). La etiqueta visual es "Precaución".
+  const nivel = (nivelElegido ?? r.nivel ?? "normal") as "urgente" | "atencion" | "normal";
+  const estadoSegunNivel = (urgente: string, atencion: string, normal: string) =>
+    nivel === "urgente" ? urgente : nivel === "atencion" ? atencion : normal;
 
   if (r.categoria === "via") {
     tabla = "vias";
@@ -278,7 +280,7 @@ console.log("REVISADOS:", revisados);
           <div className="mt-3">
             <p className="mb-1.5 text-sm font-medium">Nivel de la alerta:</p>
             <div className="flex gap-2">
-              {(["urgente", "precaucion", "normal"] as const).map((op) => (
+              {(["urgente", "atencion", "normal"] as const).map((op) => (
                 <button
                   key={op}
                   type="button"

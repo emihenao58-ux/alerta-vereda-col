@@ -53,7 +53,7 @@
   --color-tinta: var(--tinta);
   --color-tinta-suave: var(--tinta-suave);
   --color-urgente: var(--urgente);
-  --color-precaucion: var(--precaucion);
+  --color-atencion: var(--atencion);
   --color-normal: var(--normal);
 }
 
@@ -69,7 +69,7 @@
   --tinta: #1c2e22;
   --tinta-suave: #3e4f44;
   --urgente: #c23b2e;
-  --precaucion: #db7b33;
+  --atencion: #db7b33;
   --normal: #3c8a5b;
 
   --background: var(--kraft);

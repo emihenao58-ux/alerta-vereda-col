@@ -1,4 +1,7 @@
-export type Severidad = "urgente" | "precaucion" | "normal";
+// El valor intermedio es "atencion" para coincidir con el constraint
+// `*_nivel_check` de la base de datos (ARRAY['urgente','atencion','normal']).
+// La etiqueta visual que ve el habitante sigue siendo "Precaución".
+export type Severidad = "urgente" | "atencion" | "normal";
 
 export type TipoServicio = "agua" | "luz" | "senal";
 
@@ -14,27 +17,27 @@ export const LABEL_RESULTADO_CIERRE: Record<ResultadoCierre, string> = {
 /** Colores oficiales de severidad (documento de identidad, sección 4.4). */
 export const COLOR_SEVERIDAD: Record<Severidad, string> = {
   urgente: "#C23B2E",
-  precaucion: "#DB7B33",
+  atencion: "#DB7B33",
   normal: "#3C8A5B",
 };
 
 export const LABEL_SEVERIDAD: Record<Severidad, string> = {
   urgente: "Urgente",
-  precaucion: "Precaución",
+  atencion: "Precaución",
   normal: "Normal",
 };
 
-const NIVELES_VALIDOS: readonly Severidad[] = ["urgente", "precaucion", "normal"];
+const NIVELES_VALIDOS: readonly Severidad[] = ["urgente", "atencion", "normal"];
 
 /**
  * Convierte la columna `nivel` (la fija el admin al publicar) al tipo `Severidad`.
- * Cualquier valor no reconocido cae en "precaucion" para no ocultar una novedad
+ * Cualquier valor no reconocido cae en "atencion" para no ocultar una novedad
  * por un dato inesperado.
  */
 export function severidadDeNivel(nivel: string | null | undefined): Severidad {
   return (NIVELES_VALIDOS as readonly string[]).includes(nivel ?? "")
     ? (nivel as Severidad)
-    : "precaucion";
+    : "atencion";
 }
 
 /**
