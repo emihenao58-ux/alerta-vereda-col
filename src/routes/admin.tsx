@@ -120,6 +120,10 @@ function Admin() {
   const { usuario, esAdmin, cargando } = useAuth();
   const qc = useQueryClient();
 
+  // Nivel elegido por el admin para cada reporte pendiente (por defecto "normal").
+  // Debe declararse antes de cualquier return temprano (reglas de Hooks).
+  const [niveles, setNiveles] = useState<Record<string, Severidad>>({});
+
   const { data: reportes } = useQuery({
     queryKey: ["reportes-admin"],
     enabled: esAdmin,
@@ -236,9 +240,6 @@ return data as Reporte[];
       </AppShell>
     );
   }
-
-  // Nivel elegido por el admin para cada reporte pendiente (por defecto "normal").
-  const [niveles, setNiveles] = useState<Record<string, Severidad>>({});
 
   const pendientes = reportes?.filter((r) => r.estado === "pendiente") ?? [];
   const revisados = reportes?.filter((r) => r.estado !== "pendiente") ?? [];
