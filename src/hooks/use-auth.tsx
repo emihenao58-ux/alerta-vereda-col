@@ -22,16 +22,14 @@ export function useAuth() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (_evento, nuevaSesion) => {
-        setSession(nuevaSesion);
+    const { data: sub } = supabase.auth.onAuthStateChange((_evento, nuevaSesion) => {
+      setSession(nuevaSesion);
 
-        if (!nuevaSesion) {
-          setPerfil(null);
-          setRoles([]);
-        }
-      },
-    );
+      if (!nuevaSesion) {
+        setPerfil(null);
+        setRoles([]);
+      }
+    });
 
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -43,33 +41,33 @@ export function useAuth() {
 
   useEffect(() => {
     const userId = session?.user.id;
-  
+
     if (!userId) {
       setPerfil(null);
       setRoles([]);
       return;
     }
-  
+
     let activo = true;
-  
+
     void (async () => {
       const { data: p, error } = await supabase
         .from("perfiles")
         .select("id, nombre, vereda_id, rol")
         .eq("id", userId)
         .maybeSingle();
-  
+
       if (!activo) return;
-  
+
       if (error) {
         console.error("Error cargando perfil:", error);
         setPerfil(null);
         setRoles([]);
         return;
       }
-  
+
       setPerfil(p);
-  
+
       if (p?.rol === "superadmin") {
         setRoles(["admin"]);
       } else if (p?.rol === "administrador") {
@@ -78,7 +76,7 @@ export function useAuth() {
         setRoles(["habitante"]);
       }
     })();
-  
+
     return () => {
       activo = false;
     };
