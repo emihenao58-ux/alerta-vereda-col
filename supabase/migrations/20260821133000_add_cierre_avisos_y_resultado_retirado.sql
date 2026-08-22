@@ -14,7 +14,7 @@ BEGIN
   FOREACH tabla IN ARRAY ARRAY['emergencias', 'vias', 'servicios', 'avisos']
   LOOP
     FOR restriccion IN
-      SELECT constraint_name
+      SELECT tc.constraint_name
       FROM information_schema.table_constraints AS tc
       JOIN information_schema.check_constraints AS cc
         ON tc.constraint_name = cc.constraint_name
