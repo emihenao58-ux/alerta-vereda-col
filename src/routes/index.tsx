@@ -36,10 +36,33 @@ function Portada() {
     queryKey: ["portada"],
     queryFn: async () => {
       const [emergencias, vias, servicios, avisos] = await Promise.all([
-        supabase.from("emergencias").select("*, veredas(nombre)").neq("nivel", "normal").is("cerrado_en", null).order("created_at", { ascending: false }).limit(3),
-        supabase.from("vias").select("*, veredas(nombre)").neq("nivel", "normal").is("cerrado_en", null).order("created_at", { ascending: false }).limit(3),
-        supabase.from("servicios").select("*, veredas(nombre)").neq("nivel", "normal").is("cerrado_en", null).order("created_at", { ascending: false }).limit(3),
-        supabase.from("avisos").select("*, veredas(nombre)").order("created_at", { ascending: false }).limit(2),
+        supabase
+          .from("emergencias")
+          .select("*, veredas(nombre)")
+          .neq("nivel", "normal")
+          .is("cerrado_en", null)
+          .order("created_at", { ascending: false })
+          .limit(3),
+        supabase
+          .from("vias")
+          .select("*, veredas(nombre)")
+          .neq("nivel", "normal")
+          .is("cerrado_en", null)
+          .order("created_at", { ascending: false })
+          .limit(3),
+        supabase
+          .from("servicios")
+          .select("*, veredas(nombre)")
+          .neq("nivel", "normal")
+          .is("cerrado_en", null)
+          .order("created_at", { ascending: false })
+          .limit(3),
+        supabase
+          .from("avisos")
+          .select("*, veredas(nombre)")
+          .is("cerrado_en", null)
+          .order("created_at", { ascending: false })
+          .limit(2),
       ]);
       return {
         emergencias: emergencias.data ?? [],
@@ -103,7 +126,9 @@ function Portada() {
           meta={`Emergencia · ${e.veredas?.nombre ?? ""} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
-          {URL_FOTO(e.foto_url) && <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(e.foto_url) && (
+            <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
 
@@ -116,7 +141,9 @@ function Portada() {
           meta={`Vía · ${v.veredas?.nombre ?? ""} · ${fecha(v.created_at)}`}
         >
           {v.descripcion}
-          {URL_FOTO(v.foto_url) && <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(v.foto_url) && (
+            <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
 
@@ -129,7 +156,9 @@ function Portada() {
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
-          {URL_FOTO(s.foto_url) && <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(s.foto_url) && (
+            <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
 

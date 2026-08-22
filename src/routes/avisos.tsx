@@ -30,6 +30,7 @@ function Avisos() {
       const { data, error } = await supabase
         .from("avisos")
         .select("*, veredas(nombre)")
+        .is("cerrado_en", null)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -38,7 +39,10 @@ function Avisos() {
 
   return (
     <AppShell>
-      <TituloModulo titulo="Avisos" bajada="Reuniones y actividades de la Junta de Acción Comunal." />
+      <TituloModulo
+        titulo="Avisos"
+        bajada="Reuniones y actividades de la Junta de Acción Comunal."
+      />
       {isLoading && <Vacio texto="Cargando…" />}
       {data?.length === 0 && <Vacio texto="No hay avisos publicados." />}
       {data?.map((a) => (

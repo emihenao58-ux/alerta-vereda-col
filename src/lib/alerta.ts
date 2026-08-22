@@ -7,11 +7,12 @@ export type TipoServicio = "agua" | "luz" | "senal";
 
 export type TipoReporte = "emergencia" | "via" | "servicio" | "aviso";
 
-export type ResultadoCierre = "solucionado" | "no_solucionado";
+export type ResultadoCierre = "solucionado" | "no_solucionado" | "retirado";
 
 export const LABEL_RESULTADO_CIERRE: Record<ResultadoCierre, string> = {
   solucionado: "Solucionado",
   no_solucionado: "No solucionado",
+  retirado: "Retirado",
 };
 
 /** Colores oficiales de severidad (documento de identidad, sección 4.4). */
