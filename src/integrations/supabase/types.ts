@@ -246,6 +246,69 @@ export type Database = {
           },
         ];
       };
+      auditoria_admin: {
+        Row: {
+          accion: string;
+          actor_auth_user_id: string | null;
+          actor_perfil_id: string | null;
+          actor_rol: string;
+          actor_vereda_id: string | null;
+          entidad_id: string;
+          entidad_tipo: string;
+          estado_anterior: string | null;
+          estado_nuevo: string | null;
+          id: number;
+          metadata: Json;
+          motivo: string | null;
+          ocurrido_en: string;
+          publicacion_id: string | null;
+          publicacion_tabla: string | null;
+          reporte_id: string | null;
+          request_id: string | null;
+          recurso_vereda_id: string | null;
+        };
+        Insert: {
+          accion: string;
+          actor_auth_user_id?: string | null;
+          actor_perfil_id?: string | null;
+          actor_rol: string;
+          actor_vereda_id?: string | null;
+          entidad_id: string;
+          entidad_tipo: string;
+          estado_anterior?: string | null;
+          estado_nuevo?: string | null;
+          id?: number;
+          metadata?: Json;
+          motivo?: string | null;
+          ocurrido_en?: string;
+          publicacion_id?: string | null;
+          publicacion_tabla?: string | null;
+          reporte_id?: string | null;
+          request_id?: string | null;
+          recurso_vereda_id?: string | null;
+        };
+        Update: {
+          accion?: string;
+          actor_auth_user_id?: string | null;
+          actor_perfil_id?: string | null;
+          actor_rol?: string;
+          actor_vereda_id?: string | null;
+          entidad_id?: string;
+          entidad_tipo?: string;
+          estado_anterior?: string | null;
+          estado_nuevo?: string | null;
+          id?: number;
+          metadata?: Json;
+          motivo?: string | null;
+          ocurrido_en?: string;
+          publicacion_id?: string | null;
+          publicacion_tabla?: string | null;
+          reporte_id?: string | null;
+          request_id?: string | null;
+          recurso_vereda_id?: string | null;
+        };
+        Relationships: [];
+      };
       reportes: {
         Row: {
           capturado_en: string | null;

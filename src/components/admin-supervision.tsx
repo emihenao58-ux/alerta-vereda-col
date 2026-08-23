@@ -71,6 +71,21 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
     },
   });
 
+  const auditoria = useQuery({
+    queryKey: ["auditoria-admin"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("auditoria_admin")
+        .select(
+          "id, ocurrido_en, actor_rol, entidad_tipo, entidad_id, publicacion_tabla, publicacion_id, recurso_vereda_id, accion, estado_anterior, estado_nuevo, motivo",
+        )
+        .order("ocurrido_en", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const nombreVereda = useMemo(() => {
     const mapa = new Map<string, string>();
     for (const vereda of veredas.data ?? []) mapa.set(vereda.id, vereda.nombre);
@@ -80,6 +95,7 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
   const invalidar = () => {
     void qc.invalidateQueries({ queryKey: ["solicitudes-admin"] });
     void qc.invalidateQueries({ queryKey: ["administradores-admin"] });
+    void qc.invalidateQueries({ queryKey: ["auditoria-admin"] });
   };
 
   const aprobar = useMutation({
@@ -292,6 +308,36 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
             </article>
           );
         })}
+      </section>
+
+      <section className="carta space-y-3">
+        <h3 className="text-lg font-semibold">Auditoría administrativa</h3>
+        <p className="text-sm text-[color:var(--tinta-suave)]">
+          Historial de decisiones y cambios administrativos. Solo el superadmin puede consultar este
+          registro.
+        </p>
+        {(auditoria.data ?? []).length === 0 && (
+          <p className="text-sm text-[color:var(--tinta-suave)]">No hay eventos registrados.</p>
+        )}
+        <div className="space-y-2">
+          {(auditoria.data ?? []).map((evento) => (
+            <article
+              key={evento.id}
+              className="rounded-md border border-[color:var(--border)] p-3 text-sm"
+            >
+              <p className="font-semibold">
+                {evento.accion} · {new Date(evento.ocurrido_en).toLocaleString("es-CO")}
+              </p>
+              <p className="text-[color:var(--tinta-suave)]">
+                {evento.entidad_tipo} · {evento.entidad_id}
+                {evento.estado_anterior || evento.estado_nuevo
+                  ? ` · ${evento.estado_anterior ?? "—"} → ${evento.estado_nuevo ?? "—"}`
+                  : ""}
+              </p>
+              {evento.motivo && <p>Motivo: {evento.motivo}</p>}
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="carta space-y-3">
