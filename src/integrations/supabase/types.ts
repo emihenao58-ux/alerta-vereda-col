@@ -154,28 +154,91 @@ export type Database = {
       perfiles: {
         Row: {
           created_at: string;
+          estado_cuenta: "activa" | "suspendida" | "desactivada";
+          estado_solicitud: "pendiente" | "aprobada" | "rechazada";
           id: string;
           nombre: string | null;
-          rol: string;
+          rol: "pendiente" | "habitante" | "admin_vereda" | "superadmin";
+          solicitud_razon: string | null;
           vereda_id: string | null;
+          vereda_solicitada_id: string | null;
         };
         Insert: {
           created_at?: string;
+          estado_cuenta?: "activa" | "suspendida" | "desactivada";
+          estado_solicitud?: "pendiente" | "aprobada" | "rechazada";
           id: string;
           nombre?: string | null;
-          rol?: string;
+          rol?: "pendiente" | "habitante" | "admin_vereda" | "superadmin";
+          solicitud_razon?: string | null;
           vereda_id?: string | null;
+          vereda_solicitada_id?: string | null;
         };
         Update: {
           created_at?: string;
+          estado_cuenta?: "activa" | "suspendida" | "desactivada";
+          estado_solicitud?: "pendiente" | "aprobada" | "rechazada";
           id?: string;
           nombre?: string | null;
-          rol?: string;
+          rol?: "pendiente" | "habitante" | "admin_vereda" | "superadmin";
+          solicitud_razon?: string | null;
           vereda_id?: string | null;
+          vereda_solicitada_id?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: "perfiles_vereda_id_fkey";
+            columns: ["vereda_id"];
+            isOneToOne: false;
+            referencedRelation: "veredas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      admin_asignaciones: {
+        Row: {
+          asignado_por: string;
+          created_at: string;
+          estado: "activa" | "revocada";
+          id: number;
+          motivo: string | null;
+          perfil_id: string;
+          vereda_id: string;
+          vigente_desde: string;
+          vigente_hasta: string | null;
+        };
+        Insert: {
+          asignado_por: string;
+          created_at?: string;
+          estado?: "activa" | "revocada";
+          id?: number;
+          motivo?: string | null;
+          perfil_id: string;
+          vereda_id: string;
+          vigente_desde?: string;
+          vigente_hasta?: string | null;
+        };
+        Update: {
+          asignado_por?: string;
+          created_at?: string;
+          estado?: "activa" | "revocada";
+          id?: number;
+          motivo?: string | null;
+          perfil_id?: string;
+          vereda_id?: string;
+          vigente_desde?: string;
+          vigente_hasta?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "admin_asignaciones_perfil_id_fkey";
+            columns: ["perfil_id"];
+            isOneToOne: false;
+            referencedRelation: "perfiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "admin_asignaciones_vereda_id_fkey";
             columns: ["vereda_id"];
             isOneToOne: false;
             referencedRelation: "veredas";
@@ -340,19 +403,25 @@ export type Database = {
       };
       veredas: {
         Row: {
+          activa: boolean;
           created_at: string;
           id: string;
           nombre: string;
+          updated_at: string;
         };
         Insert: {
+          activa?: boolean;
           created_at?: string;
           id?: string;
           nombre: string;
+          updated_at?: string;
         };
         Update: {
+          activa?: boolean;
           created_at?: string;
           id?: string;
           nombre?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -422,7 +491,44 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      aprobar_reporte: {
+        Args: {
+          p_emergencia_estado?: string;
+          p_estado_inicial?: string;
+          p_fecha_publicacion?: string;
+          p_modo?: string;
+          p_publicacion_id?: string;
+          p_reporte_id: string;
+          p_tipo_servicio?: string;
+        };
+        Returns: Json;
+      };
+      aprobar_solicitud_admin: {
+        Args: { p_motivo?: string; p_perfil_id: string; p_vereda_id: string };
+        Returns: Json;
+      };
+      cerrar_publicacion: {
+        Args: { p_id: string; p_motivo?: string; p_resultado: string; p_tabla: string };
+        Returns: Json;
+      };
       es_admin_de: { Args: { vereda: string }; Returns: boolean };
+      is_superadmin: { Args: Record<string, never>; Returns: boolean };
+      rechazar_reporte: { Args: { p_motivo: string; p_reporte_id: string }; Returns: Json };
+      rechazar_solicitud_admin: { Args: { p_motivo: string; p_perfil_id: string }; Returns: Json };
+      registrar_cambio_correo_superadmin: {
+        Args: { p_correo_anterior: string; p_correo_nuevo: string };
+        Returns: Json;
+      };
+      retirar_publicacion: {
+        Args: {
+          p_finalizacion_natural?: boolean;
+          p_id: string;
+          p_motivo?: string;
+          p_tabla: string;
+        };
+        Returns: Json;
+      };
+      revocar_asignacion_admin: { Args: { p_motivo: string; p_perfil_id: string }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;

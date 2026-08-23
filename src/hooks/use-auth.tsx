@@ -2,36 +2,38 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+export type Rol = "pendiente" | "habitante" | "admin_vereda" | "superadmin";
+
 export type Perfil = {
   id: string;
   nombre: string | null;
   vereda_id: string | null;
-  rol: string;
+  rol: Rol;
+  estado_solicitud: "pendiente" | "aprobada" | "rechazada";
+  estado_cuenta: "activa" | "suspendida" | "desactivada";
+  vereda_solicitada_id: string | null;
 };
 
-export type Rol = "habitante" | "admin";
-
 /**
- * Sesión + perfil del usuario.
- * La autorización real vive en las políticas RLS de Supabase.
+ * Sesión + perfil de aplicación + alcance territorial.
+ * La autorización real vive en las políticas RLS y las funciones transaccionales.
  */
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
-  const [roles, setRoles] = useState<Rol[]>([]);
+  const [veredaAsignadaId, setVeredaAsignadaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_evento, nuevaSesion) => {
       setSession(nuevaSesion);
-
       if (!nuevaSesion) {
         setPerfil(null);
-        setRoles([]);
+        setVeredaAsignadaId(null);
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setCargando(false);
     });
@@ -41,10 +43,9 @@ export function useAuth() {
 
   useEffect(() => {
     const userId = session?.user.id;
-
     if (!userId) {
       setPerfil(null);
-      setRoles([]);
+      setVeredaAsignadaId(null);
       return;
     }
 
@@ -53,7 +54,7 @@ export function useAuth() {
     void (async () => {
       const { data: p, error } = await supabase
         .from("perfiles")
-        .select("id, nombre, vereda_id, rol")
+        .select("id, nombre, vereda_id, rol, estado_solicitud, estado_cuenta, vereda_solicitada_id")
         .eq("id", userId)
         .maybeSingle();
 
@@ -62,19 +63,39 @@ export function useAuth() {
       if (error) {
         console.error("Error cargando perfil:", error);
         setPerfil(null);
-        setRoles([]);
+        setVeredaAsignadaId(null);
         return;
       }
 
-      setPerfil(p);
+      const perfilActual = p as Perfil | null;
+      setPerfil(perfilActual);
 
-      if (p?.rol === "superadmin") {
-        setRoles(["admin"]);
-      } else if (p?.rol === "administrador") {
-        setRoles(["admin"]);
-      } else {
-        setRoles(["habitante"]);
+      if (
+        !perfilActual ||
+        perfilActual.rol !== "admin_vereda" ||
+        perfilActual.estado_cuenta !== "activa"
+      ) {
+        setVeredaAsignadaId(null);
+        return;
       }
+
+      const { data: asignacion, error: asignacionError } = await supabase
+        .from("admin_asignaciones")
+        .select("vereda_id")
+        .eq("perfil_id", userId)
+        .eq("estado", "activa")
+        .is("vigente_hasta", null)
+        .maybeSingle();
+
+      if (!activo) return;
+
+      if (asignacionError) {
+        console.error("Error cargando asignación administrativa:", asignacionError);
+        setVeredaAsignadaId(null);
+        return;
+      }
+
+      setVeredaAsignadaId(asignacion?.vereda_id ?? null);
     })();
 
     return () => {
@@ -82,12 +103,23 @@ export function useAuth() {
     };
   }, [session?.user.id]);
 
+  const esSuperadmin = perfil?.rol === "superadmin" && perfil.estado_cuenta === "activa";
+  const esAdminVereda =
+    perfil?.rol === "admin_vereda" &&
+    perfil.estado_cuenta === "activa" &&
+    veredaAsignadaId !== null;
+  const solicitudPendiente =
+    perfil?.rol === "pendiente" || perfil?.estado_solicitud === "pendiente";
+
   return {
     session,
     usuario: session?.user ?? null,
     perfil,
-    roles,
-    esAdmin: roles.includes("admin"),
+    veredaAsignadaId,
+    esAdmin: Boolean(esSuperadmin || esAdminVereda),
+    esSuperadmin,
+    esAdminVereda,
+    solicitudPendiente,
     cargando,
     salir: () => supabase.auth.signOut(),
   };
