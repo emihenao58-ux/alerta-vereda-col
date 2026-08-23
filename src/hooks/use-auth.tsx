@@ -9,11 +9,22 @@ export type Perfil = {
   rol: string;
 };
 
-export type Rol = "habitante" | "admin";
+export type Rol = "pendiente" | "habitante" | "administrador" | "admin_vereda" | "superadmin";
+
+function esRolAdmin(rol: string | null | undefined) {
+  return rol === "administrador" || rol === "admin_vereda" || rol === "superadmin";
+}
 
 /**
- * Sesión + perfil del usuario.
- * La autorización real vive en las políticas RLS de Supabase.
+ * Puente de compatibilidad previo a la migración administrativa.
+ *
+ * Este hook consulta exclusivamente el contrato legacy de perfiles. Reconoce
+ * tanto administrador como admin_vereda, pero no consulta admin_asignaciones,
+ * estado_cuenta, estado_solicitud ni veredas.activa porque esas estructuras
+ * todavía no existen en producción durante esta etapa.
+ *
+ * La autorización real sigue viviendo en RLS y en las funciones del backend.
+ * Este puente debe retirarse después de aplicar y verificar la migración final.
  */
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -22,18 +33,16 @@ export function useAuth() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (_evento, nuevaSesion) => {
-        setSession(nuevaSesion);
+    const { data: sub } = supabase.auth.onAuthStateChange((_evento, nuevaSesion) => {
+      setSession(nuevaSesion);
 
-        if (!nuevaSesion) {
-          setPerfil(null);
-          setRoles([]);
-        }
-      },
-    );
+      if (!nuevaSesion) {
+        setPerfil(null);
+        setRoles([]);
+      }
+    });
 
-    supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setCargando(false);
     });
@@ -43,53 +52,63 @@ export function useAuth() {
 
   useEffect(() => {
     const userId = session?.user.id;
-  
+
     if (!userId) {
       setPerfil(null);
       setRoles([]);
       return;
     }
-  
+
     let activo = true;
-  
+
     void (async () => {
+      // Deliberadamente solo se consultan columnas presentes en producción
+      // antes de la migración administrativa.
       const { data: p, error } = await supabase
         .from("perfiles")
         .select("id, nombre, vereda_id, rol")
         .eq("id", userId)
         .maybeSingle();
-  
+
       if (!activo) return;
-  
+
       if (error) {
         console.error("Error cargando perfil:", error);
         setPerfil(null);
         setRoles([]);
         return;
       }
-  
-      setPerfil(p);
-  
-      if (p?.rol === "superadmin") {
-        setRoles(["admin"]);
-      } else if (p?.rol === "administrador") {
-        setRoles(["admin"]);
+
+      const perfilActual = (p as Perfil | null) ?? null;
+      setPerfil(perfilActual);
+
+      if (esRolAdmin(perfilActual?.rol)) {
+        setRoles(["admin_vereda"]);
       } else {
         setRoles(["habitante"]);
       }
     })();
-  
+
     return () => {
       activo = false;
     };
   }, [session?.user.id]);
+
+  const esSuperadmin = perfil?.rol === "superadmin";
+  const esAdminVereda =
+    (perfil?.rol === "administrador" || perfil?.rol === "admin_vereda") &&
+    perfil.vereda_id !== null;
+  const solicitudPendiente = perfil?.rol === "pendiente";
 
   return {
     session,
     usuario: session?.user ?? null,
     perfil,
     roles,
-    esAdmin: roles.includes("admin"),
+    esAdmin: Boolean(esSuperadmin || esAdminVereda),
+    esSuperadmin,
+    esAdminVereda,
+    solicitudPendiente,
     cargando,
     salir: () => supabase.auth.signOut(),
   };
