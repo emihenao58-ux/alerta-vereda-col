@@ -1773,7 +1773,7 @@ begin
     jsonb_build_object('confirmado_en_auth', true), null
   );
 
-  return jsonb_build_object('audit_id', v_audit_id, 'correo_nuevo', v_correo_nuevo);
+  return jsonb_build_object('audit_id', v_audit_id, 'correo_nuevo', p_correo_nuevo);
 end;
 $$;
 

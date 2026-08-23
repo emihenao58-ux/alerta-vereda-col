@@ -91,5 +91,7 @@ export function fecha(valor: string | null | undefined) {
 export function URL_FOTO(foto_url: string | null | undefined): string | null {
   if (!foto_url) return null;
   if (foto_url.startsWith("http")) return foto_url;
-  return `https://bajsmsuxuwkxlctukyvv.supabase.co/storage/v1/object/public/reportes-fotos/${foto_url}`;
+  const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"];
+  if (!supabaseUrl) return null;
+  return `${supabaseUrl}/storage/v1/object/public/reportes-fotos/${foto_url}`;
 }
