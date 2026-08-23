@@ -2043,7 +2043,11 @@ using (
 -- --------------------------------------------------------------------------
 
 -- Las funciones auxiliares se pueden usar desde las políticas; no se concede
--- escritura ni acceso a registrar_auditoria_admin.
+-- escritura ni acceso a registrar_auditoria_admin. Las funciones de trigger
+-- tampoco se exponen como RPC del cliente.
+revoke execute on function public.validar_admin_asignacion() from public, anon, authenticated;
+revoke execute on function public.crear_perfil_nuevo_usuario() from public, anon, authenticated;
+revoke execute on function public.preparar_reporte_nuevo() from public, anon, authenticated;
 revoke execute on function public.current_profile_id() from public, anon, authenticated;
 revoke execute on function public.current_app_role() from public, anon, authenticated;
 revoke execute on function public.is_superadmin() from public, anon, authenticated;
@@ -2066,12 +2070,12 @@ revoke execute on function public.registrar_auditoria_admin(text, text, uuid, te
   from public, anon, authenticated, service_role;
 
 revoke execute on function public.aprobar_solicitud_admin(uuid, uuid, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.aprobar_solicitud_admin(uuid, uuid, text)
   to authenticated;
 
 revoke execute on function public.rechazar_solicitud_admin(uuid, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.rechazar_solicitud_admin(uuid, text)
   to authenticated;
 
@@ -2081,7 +2085,7 @@ grant execute on function public.aprobar_reporte(uuid, text, uuid, text, text, t
   to authenticated;
 
 revoke execute on function public.rechazar_reporte(uuid, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.rechazar_reporte(uuid, text)
   to authenticated;
 
@@ -2091,22 +2095,22 @@ revoke execute on function public.retirar_reporte(uuid, text, boolean)
   from public, anon, authenticated;
 
 revoke execute on function public.cerrar_publicacion(text, uuid, text, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.cerrar_publicacion(text, uuid, text, text)
   to authenticated;
 
 revoke execute on function public.retirar_publicacion(text, uuid, text, boolean)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.retirar_publicacion(text, uuid, text, boolean)
   to authenticated;
 
 revoke execute on function public.revocar_asignacion_admin(uuid, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.revocar_asignacion_admin(uuid, text)
   to authenticated;
 
 revoke execute on function public.registrar_cambio_correo_superadmin(text, text)
-  from public;
+  from public, anon, authenticated;
 grant execute on function public.registrar_cambio_correo_superadmin(text, text)
   to authenticated;
 
