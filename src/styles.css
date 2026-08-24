@@ -919,3 +919,378 @@
     flex-direction: column;
   }
 }
+
+/* Splash de autenticación: gate visual breve, sin depender de operaciones de backend. */
+.auth-splash {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #183d32;
+  color: #f8f5e9;
+  animation: auth-splash-in 220ms ease-out both;
+}
+
+.auth-splash-grid {
+  position: absolute;
+  inset: -12%;
+  opacity: 0.12;
+  background-image:
+    linear-gradient(rgba(238, 221, 169, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(238, 221, 169, 0.35) 1px, transparent 1px);
+  background-size: 42px 42px;
+  transform: perspective(500px) rotateX(60deg) translateY(18%);
+  transform-origin: center bottom;
+}
+
+.auth-splash-pendiente {
+  background: #5e4a2d;
+}
+
+.auth-splash-panel {
+  position: relative;
+  display: grid;
+  width: min(100% - 2rem, 55rem);
+  gap: 1rem;
+  border: 1px solid rgba(238, 221, 169, 0.32);
+  border-radius: 1.45rem;
+  background: linear-gradient(142deg, rgba(31, 82, 66, 0.94), rgba(22, 57, 48, 0.98));
+  padding: clamp(1.3rem, 4vw, 2.7rem);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.28),
+    inset 0 1px rgba(255, 255, 255, 0.06);
+  animation: auth-splash-panel-in 520ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.auth-splash-admin_vereda .auth-splash-panel {
+  background: linear-gradient(142deg, rgba(50, 92, 58, 0.95), rgba(34, 62, 44, 0.98));
+}
+
+.auth-splash-pendiente .auth-splash-panel {
+  background: linear-gradient(142deg, rgba(111, 84, 42, 0.96), rgba(77, 60, 37, 0.98));
+}
+
+.auth-splash-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #f8edc9;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 800;
+}
+
+.auth-splash-logo {
+  display: grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  border: 1px solid rgba(238, 221, 169, 0.48);
+  border-radius: 0.75rem;
+  background: rgba(238, 221, 169, 0.12);
+}
+
+.auth-splash-illustration {
+  position: absolute;
+  top: clamp(4.7rem, 8vw, 5.7rem);
+  right: clamp(1.2rem, 5vw, 3.5rem);
+  width: clamp(11rem, 27vw, 17rem);
+  opacity: 0.98;
+}
+
+.auth-splash-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.auth-splash-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 70%;
+  padding: clamp(2rem, 5vw, 3.7rem) 0 1.7rem;
+}
+
+.auth-splash-eyebrow {
+  margin: 0;
+  color: #d9e5bd;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.auth-splash-copy h1 {
+  max-width: 29rem;
+  margin: 0.55rem 0 0;
+  color: #fff9e8;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.65rem);
+  line-height: 0.98;
+}
+
+.auth-splash-copy p:last-child {
+  margin: 0.9rem 0 0;
+  color: #c8d9c6;
+  font-size: 0.98rem;
+}
+
+.auth-splash-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.auth-splash-progress-track {
+  flex: 1;
+  height: 0.55rem;
+  overflow: hidden;
+  border: 1px solid rgba(238, 221, 169, 0.3);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.auth-splash-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #e1bd57, #e9e1a2, #8dbb86);
+  transition: width 80ms linear;
+}
+
+.auth-splash-progress-text {
+  width: 2.3rem;
+  color: #f4e4a6;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.auth-splash-features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  border-top: 1px solid rgba(238, 221, 169, 0.22);
+  padding-top: 1rem;
+  color: #d8e5ce;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.auth-splash-features span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.splash-map {
+  fill: rgba(126, 190, 149, 0.13);
+  stroke: #aad19c;
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.splash-route {
+  fill: none;
+  stroke: #ead883;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  animation: splash-route-draw 2.6s linear infinite;
+}
+
+.splash-node {
+  fill: #d9e995;
+  stroke: #2f715e;
+  stroke-width: 2;
+  animation: splash-node-glow 1.9s ease-in-out infinite;
+}
+
+.splash-node-halo {
+  fill: none;
+  stroke: rgba(217, 233, 149, 0.44);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  animation: splash-halo-spin 5s linear infinite;
+}
+
+.splash-hill-back {
+  fill: rgba(153, 197, 135, 0.42);
+}
+
+.splash-hill-front {
+  fill: rgba(73, 130, 80, 0.9);
+}
+
+.splash-road {
+  fill: none;
+  stroke: #efd490;
+  stroke-width: 7;
+  stroke-linecap: round;
+  opacity: 0.82;
+}
+
+.splash-house,
+.splash-house-roof {
+  fill: rgba(249, 235, 184, 0.94);
+  stroke: #eacb7e;
+  stroke-width: 2;
+}
+
+.splash-house-roof {
+  fill: none;
+  stroke: #f0d48e;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.splash-sun {
+  fill: #f3d982;
+  animation: splash-sun-breathe 2.8s ease-in-out infinite;
+}
+
+.splash-pending-card {
+  fill: rgba(252, 240, 197, 0.16);
+  stroke: #f0d995;
+  stroke-width: 2;
+}
+
+.splash-pending-line {
+  fill: none;
+  stroke: #e9d38b;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.splash-pending-check {
+  fill: #9cc584;
+  stroke: #f7e9b3;
+  stroke-width: 2;
+}
+
+.splash-pending-check-mark {
+  fill: none;
+  stroke: #234c39;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.splash-pending-icon {
+  fill: none;
+  stroke: transparent;
+}
+
+@keyframes auth-splash-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-splash-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes splash-route-draw {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes splash-node-glow {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+
+@keyframes splash-halo-spin {
+  from {
+    transform: rotate(0deg);
+    transform-origin: 116px 42px;
+  }
+  to {
+    transform: rotate(360deg);
+    transform-origin: 116px 42px;
+  }
+}
+
+@keyframes splash-sun-breathe {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.76;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-splash,
+  .auth-splash-panel,
+  .splash-route,
+  .splash-node,
+  .splash-node-halo,
+  .splash-sun {
+    animation: none;
+  }
+
+  .auth-splash-progress-track span {
+    transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-splash-panel {
+    min-height: min(100vh - 1rem, 42rem);
+    align-content: center;
+  }
+
+  .auth-splash-illustration {
+    position: relative;
+    top: auto;
+    right: auto;
+    justify-self: center;
+    width: min(60vw, 15rem);
+    margin: -0.3rem auto 0;
+  }
+
+  .auth-splash-copy {
+    max-width: 100%;
+    padding: 0.7rem 0 1.5rem;
+    text-align: center;
+  }
+
+  .auth-splash-copy h1 {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .auth-splash-features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -23,6 +23,7 @@ export function useAuth() {
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [veredaAsignadaId, setVeredaAsignadaId] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [cargandoPerfil, setCargandoPerfil] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_evento, nuevaSesion) => {
@@ -46,9 +47,11 @@ export function useAuth() {
     if (!userId) {
       setPerfil(null);
       setVeredaAsignadaId(null);
+      setCargandoPerfil(false);
       return;
     }
 
+    setCargandoPerfil(true);
     let activo = true;
 
     void (async () => {
@@ -64,6 +67,7 @@ export function useAuth() {
         console.error("Error cargando perfil:", error);
         setPerfil(null);
         setVeredaAsignadaId(null);
+        setCargandoPerfil(false);
         return;
       }
 
@@ -76,6 +80,7 @@ export function useAuth() {
         perfilActual.estado_cuenta !== "activa"
       ) {
         setVeredaAsignadaId(null);
+        setCargandoPerfil(false);
         return;
       }
 
@@ -92,10 +97,12 @@ export function useAuth() {
       if (asignacionError) {
         console.error("Error cargando asignación administrativa:", asignacionError);
         setVeredaAsignadaId(null);
+        setCargandoPerfil(false);
         return;
       }
 
       setVeredaAsignadaId(asignacion?.vereda_id ?? null);
+      setCargandoPerfil(false);
     })();
 
     return () => {
@@ -121,6 +128,7 @@ export function useAuth() {
     esAdminVereda,
     solicitudPendiente,
     cargando,
+    cargandoAcceso: cargando || (Boolean(session?.user.id) && cargandoPerfil),
     salir: () => supabase.auth.signOut(),
   };
 }

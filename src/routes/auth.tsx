@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { AppShell } from "@/components/app-shell";
 import { TituloModulo, Vacio } from "@/components/carta";
+import { beginLoginSplash, clearLoginSplash } from "@/components/admin/auth-splash";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -90,6 +91,7 @@ function Auth() {
     setCargando(true);
     try {
       if (modo === "entrar") {
+        beginLoginSplash();
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Sesión iniciada.");
@@ -117,6 +119,7 @@ function Auth() {
       toast.success("Solicitud creada. Revisa tu correo si debemos confirmar la cuenta.");
       setModo("entrar");
     } catch (err) {
+      if (modo === "entrar") clearLoginSplash();
       toast.error(err instanceof Error ? err.message : "No pudimos completar la acción");
     } finally {
       setCargando(false);
@@ -124,15 +127,25 @@ function Auth() {
   }
 
   async function conGoogle() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("No pudimos iniciar sesión con Google");
-      return;
+    setCargando(true);
+    beginLoginSplash();
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        clearLoginSplash();
+        toast.error("No pudimos iniciar sesión con Google");
+        return;
+      }
+      if (result.redirected) return;
+      void navigate({ to: "/" });
+    } catch (err) {
+      clearLoginSplash();
+      toast.error(err instanceof Error ? err.message : "No pudimos iniciar sesión con Google");
+    } finally {
+      setCargando(false);
     }
-    if (result.redirected) return;
-    void navigate({ to: "/" });
   }
 
   if (modo === "inicio") {
