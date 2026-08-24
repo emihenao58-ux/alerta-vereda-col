@@ -141,3 +141,781 @@
     box-shadow: 0 1px 3px rgba(28, 46, 34, 0.35);
   }
 }
+
+/* Espacios administrativos: extensión del tablero comunitario, sin cambiar la cartelera pública. */
+.admin-workspace {
+  --admin-ink: var(--tinta);
+  --admin-muted: var(--tinta-suave);
+  --admin-surface: color-mix(in srgb, var(--card) 92%, white);
+  --admin-border: color-mix(in srgb, var(--bosque) 18%, var(--border));
+  color: var(--admin-ink);
+}
+
+.admin-workspace-gestion {
+  --admin-surface: #f4f6f0;
+  --admin-border: #cad8cf;
+}
+
+.admin-workspace-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  padding-bottom: 1.25rem;
+}
+
+.admin-workspace-heading {
+  max-width: 48rem;
+}
+
+.admin-workspace-eyebrow,
+.admin-section-kicker,
+.gestion-kicker,
+.role-welcome-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--bosque);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-workspace-title {
+  margin: 0.35rem 0 0;
+  font-size: clamp(2rem, 4vw, 3.45rem);
+  line-height: 0.98;
+}
+
+.admin-workspace-subtitle {
+  max-width: 42rem;
+  margin: 0.7rem 0 0;
+  color: var(--admin-muted);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.admin-workspace-scope {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 75%, transparent);
+  padding: 0.5rem 0.7rem;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.admin-scope-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--normal);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--normal) 18%, transparent);
+}
+
+.admin-area-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1rem 0 1.4rem;
+}
+
+.admin-area-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease-out,
+    color 180ms ease-out,
+    transform 160ms ease-out;
+}
+
+.admin-area-link:hover {
+  background: color-mix(in srgb, var(--kraft) 72%, white);
+  color: var(--bosque-oscuro);
+  transform: translateY(-1px);
+}
+
+.admin-area-link-active {
+  border-color: var(--bosque);
+  background: var(--bosque);
+  color: var(--card);
+}
+
+.admin-workspace-content,
+.admin-operation {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-access-card,
+.admin-panel-card,
+.admin-intent-strip,
+.admin-territory-banner {
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  background: var(--admin-surface);
+  box-shadow: 0 12px 28px rgba(31, 68, 51, 0.08);
+}
+
+.admin-access-card {
+  max-width: 48rem;
+  margin: 3rem auto;
+  padding: clamp(1.3rem, 4vw, 2.4rem);
+}
+
+.admin-panel-card {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.admin-panel-heading,
+.admin-section-intro,
+.gestion-toolbar,
+.gestion-stat-card,
+.admin-intent-strip,
+.admin-territory-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-panel-heading h3,
+.admin-section-intro h2,
+.gestion-hero h2 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.3rem, 2.2vw, 2rem);
+}
+
+.admin-panel-note,
+.admin-operation-note,
+.gestion-select-help {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+}
+
+.admin-count-badge,
+.admin-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dorado) 25%, var(--card));
+  color: var(--bosque-oscuro);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-count-badge {
+  min-width: 2rem;
+  min-height: 2rem;
+}
+
+.admin-stat-pill {
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.admin-stat-number {
+  font-size: 1.25rem;
+}
+
+.admin-card-stack {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.admin-primary-action,
+.admin-secondary-action,
+.admin-danger-action,
+.admin-quiet-action,
+.role-welcome-continue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.55rem;
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.83rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 160ms ease-out,
+    box-shadow 160ms ease-out,
+    background-color 180ms ease-out;
+}
+
+.admin-primary-action,
+.role-welcome-continue {
+  border: 1px solid var(--bosque);
+  background: var(--bosque);
+  color: var(--card);
+}
+
+.admin-secondary-action {
+  border: 1px solid var(--admin-border);
+  background: transparent;
+  color: var(--bosque-oscuro);
+}
+
+.admin-danger-action {
+  border: 1px solid var(--terracota);
+  background: var(--terracota);
+  color: var(--card);
+}
+
+.admin-quiet-action {
+  border: 0;
+  background: transparent;
+  color: var(--admin-muted);
+}
+
+.admin-primary-action:hover,
+.admin-secondary-action:hover,
+.admin-danger-action:hover,
+.admin-quiet-action:hover,
+.role-welcome-continue:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(31, 68, 51, 0.14);
+}
+
+.admin-primary-action:active,
+.admin-secondary-action:active,
+.admin-danger-action:active,
+.role-welcome-continue:active {
+  transform: scale(0.97);
+}
+
+.admin-primary-action:disabled,
+.admin-secondary-action:disabled,
+.admin-danger-action:disabled,
+.role-welcome-continue:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.admin-territory-banner {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem;
+}
+
+.admin-territory-label,
+.admin-territory-lock {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.admin-territory-banner strong {
+  color: var(--bosque-oscuro);
+}
+
+.admin-territory-lock {
+  margin-left: auto;
+  border-left: 1px solid var(--admin-border);
+  padding-left: 0.75rem;
+}
+
+.admin-intent-strip {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--dorado) 12%, var(--admin-surface));
+}
+
+.admin-intent-strip p:last-child {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.9rem;
+}
+
+.role-welcome {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.7fr) minmax(0, 1.3fr) auto;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 1.15rem;
+  background: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--card) 98%, white),
+    color-mix(in srgb, var(--kraft) 70%, white)
+  );
+  padding: 1rem 1.15rem;
+  box-shadow: 0 14px 30px rgba(31, 68, 51, 0.1);
+  animation: role-welcome-enter 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.role-welcome-superadmin {
+  border-color: #a7cabb;
+  background: linear-gradient(120deg, #f3f8f2, #e8f0eb 65%, #edf5e5);
+}
+
+.role-welcome-pendiente {
+  background: linear-gradient(120deg, #faf7ef, #f3ead6);
+}
+
+.role-welcome-art {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+  color: var(--bosque);
+}
+
+.role-welcome-superadmin .role-welcome-art {
+  color: #2c6c63;
+}
+
+.role-welcome-pendiente .role-welcome-art {
+  color: var(--dorado);
+}
+
+.role-welcome-svg {
+  width: 100%;
+  max-width: 11rem;
+  overflow: visible;
+}
+
+.role-welcome-copy h2 {
+  margin: 0.3rem 0 0.35rem;
+  font-size: clamp(1.35rem, 3vw, 2.2rem);
+  line-height: 1;
+}
+
+.role-welcome-copy > p:not(.role-welcome-eyebrow) {
+  max-width: 36rem;
+  margin: 0;
+  color: var(--admin-muted);
+  line-height: 1.45;
+}
+
+.role-welcome-continue {
+  margin-top: 0.85rem;
+  width: fit-content;
+}
+
+.role-welcome-skip {
+  align-self: start;
+  border: 0;
+  background: transparent;
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.welcome-orbit,
+.welcome-node,
+.welcome-sun,
+.welcome-leaf,
+.welcome-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.welcome-orbit-one {
+  animation: welcome-orbit-one 8s linear infinite;
+}
+
+.welcome-orbit-two {
+  animation: welcome-orbit-two 10s linear infinite reverse;
+}
+
+.welcome-node-one,
+.welcome-node-two,
+.welcome-node-three {
+  animation: welcome-node-pulse 2.2s ease-in-out infinite;
+}
+
+.welcome-node-two {
+  animation-delay: 380ms;
+}
+
+.welcome-node-three {
+  animation-delay: 760ms;
+}
+
+.welcome-sun {
+  animation: welcome-sun-pulse 3s ease-in-out infinite;
+}
+
+.welcome-leaf {
+  animation: welcome-leaf-sway 2.8s ease-in-out infinite;
+}
+
+.welcome-leaf-two {
+  animation-delay: 350ms;
+}
+
+.welcome-pulse {
+  animation: welcome-pulse 2.4s ease-out infinite;
+}
+
+.gestion-dashboard {
+  display: grid;
+  gap: 1rem;
+}
+
+.gestion-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #b8cdc1;
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(circle at 82% 40%, rgba(67, 127, 110, 0.18), transparent 28%),
+    linear-gradient(135deg, #edf5ee, #e2eee9);
+  padding: clamp(1.2rem, 4vw, 2.3rem);
+}
+
+.gestion-kicker {
+  color: #2c6c63;
+}
+
+.gestion-hero h2 {
+  max-width: 34rem;
+  font-size: clamp(1.7rem, 4vw, 3rem);
+}
+
+.gestion-hero p:last-child {
+  max-width: 42rem;
+  margin: 0.7rem 0 0;
+  color: #456259;
+  line-height: 1.55;
+}
+
+.gestion-signal {
+  position: relative;
+  display: grid;
+  flex: 0 0 8rem;
+  place-items: center;
+  width: 8rem;
+  height: 8rem;
+}
+
+.gestion-signal-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(44, 108, 99, 0.35);
+  border-radius: 999px;
+  animation: gestion-ring 4.5s ease-in-out infinite;
+}
+
+.gestion-signal-ring-two {
+  inset: 1.25rem;
+  animation-delay: -1.5s;
+}
+
+.gestion-signal-core {
+  display: grid;
+  place-items: center;
+  width: 3.15rem;
+  height: 3.15rem;
+  border: 1px solid #6fa494;
+  border-radius: 999px;
+  background: #f3f8f2;
+  color: #2c6c63;
+  box-shadow: 0 0 0 0.7rem rgba(111, 164, 148, 0.12);
+}
+
+.gestion-toolbar {
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.gestion-select-label {
+  display: grid;
+  flex: 1 1 20rem;
+  gap: 0.28rem;
+}
+
+.gestion-select-caption {
+  font-weight: 800;
+}
+
+.gestion-select {
+  max-width: 32rem;
+  border: 1px solid #aec7bb;
+  border-radius: 0.7rem;
+  background: #fbfdf9;
+  padding: 0.75rem 0.85rem;
+  color: var(--tinta);
+  font: inherit;
+}
+
+.admin-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  align-self: end;
+  border: 1px solid #dec891;
+  border-radius: 0.8rem;
+  background: #fff9e9;
+  padding: 0.7rem 0.8rem;
+  color: #5f4d1f;
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition:
+    transform 160ms ease-out,
+    box-shadow 160ms ease-out;
+}
+
+.admin-pending-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(95, 77, 31, 0.12);
+}
+
+.admin-pending-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  background: #f1da91;
+}
+
+.gestion-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.gestion-stat-card {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  min-height: 8.5rem;
+  border: 1px solid #c9d8ce;
+  border-radius: 1rem;
+  background: #f8fbf7;
+  padding: 1rem;
+}
+
+.gestion-stat-card strong {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.gestion-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.65rem;
+  background: #dfeee5;
+  color: #2c6c63;
+}
+
+.gestion-stat-label,
+.gestion-stat-detail {
+  color: #557067;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.gestion-stat-label {
+  align-self: center;
+}
+
+.gestion-stat-detail {
+  width: 100%;
+  font-weight: 500;
+}
+
+.gestion-stat-card-attention {
+  border-color: #dfcf9e;
+  background: #fffaf0;
+}
+
+.gestion-stat-card-attention .gestion-stat-icon {
+  background: #f5e9bd;
+  color: #80621c;
+}
+
+@keyframes role-welcome-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcome-orbit-one {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes welcome-orbit-two {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes welcome-node-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+@keyframes welcome-sun-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes welcome-leaf-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes welcome-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes gestion-ring {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .role-welcome,
+  .welcome-orbit-one,
+  .welcome-orbit-two,
+  .welcome-node-one,
+  .welcome-node-two,
+  .welcome-node-three,
+  .welcome-sun,
+  .welcome-leaf,
+  .welcome-pulse,
+  .gestion-signal-ring {
+    animation: none;
+  }
+
+  .admin-area-link,
+  .admin-primary-action,
+  .admin-secondary-action,
+  .admin-danger-action,
+  .admin-quiet-action,
+  .role-welcome-continue,
+  .admin-pending-badge {
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-workspace-header,
+  .gestion-hero {
+    flex-direction: column;
+  }
+
+  .admin-workspace-scope {
+    align-self: flex-start;
+  }
+
+  .role-welcome {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .role-welcome-art {
+    min-height: 5.5rem;
+    justify-content: start;
+  }
+
+  .role-welcome-svg {
+    max-width: 9rem;
+  }
+
+  .role-welcome-skip {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .gestion-signal {
+    align-self: center;
+  }
+
+  .gestion-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-territory-lock {
+    width: 100%;
+    margin-left: 0;
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .admin-panel-heading,
+  .admin-section-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
