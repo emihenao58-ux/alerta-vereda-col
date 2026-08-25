@@ -931,6 +931,21 @@
   background: #183d32;
   color: #f8f5e9;
   animation: auth-splash-in 220ms ease-out both;
+  transition: opacity 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity;
+}
+
+.auth-splash-exiting {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.auth-splash-exiting .auth-splash-panel {
+  opacity: 0.86;
+  transform: translateY(-0.15rem) scale(0.985);
+  transition:
+    opacity 240ms ease-out,
+    transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .auth-splash-grid {
@@ -1261,6 +1276,15 @@
 
   .auth-splash-progress-track span {
     transition: none;
+  }
+
+  .auth-splash,
+  .auth-splash-exiting .auth-splash-panel {
+    transition: none;
+  }
+
+  .auth-splash-exiting {
+    opacity: 0;
   }
 }
 

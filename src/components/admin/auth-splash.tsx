@@ -5,6 +5,7 @@ import { useAuth, type Rol } from "@/hooks/use-auth";
 const SPLASH_STORAGE_KEY = "alertavereda:login-splash";
 const SPLASH_EVENT = "alertavereda:login-start";
 const MINIMUM_MS = 3000;
+const EXIT_MS = 280;
 
 type SplashAttempt = {
   startedAt: number;
@@ -51,6 +52,7 @@ export function AuthSplash() {
   const { perfil, cargandoAcceso } = useAuth();
   const [attempt, setAttempt] = useState<SplashAttempt | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const loadAttempt = () => {
@@ -73,10 +75,21 @@ export function AuthSplash() {
   }, [attempt]);
 
   useEffect(() => {
-    if (!attempt || elapsed < MINIMUM_MS || cargandoAcceso) return;
-    clearLoginSplash();
-    setAttempt(null);
-  }, [attempt, cargandoAcceso, elapsed]);
+    if (!attempt || isExiting || elapsed < MINIMUM_MS || cargandoAcceso) return;
+
+    setIsExiting(true);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const exitTimer = window.setTimeout(
+      () => {
+        clearLoginSplash();
+        setAttempt(null);
+        setIsExiting(false);
+      },
+      reducedMotion ? 0 : EXIT_MS,
+    );
+
+    return () => window.clearTimeout(exitTimer);
+  }, [attempt, cargandoAcceso, elapsed, isExiting]);
 
   const role = perfil?.rol ?? attempt?.roleHint ?? "pendiente";
   const roleLabel =
@@ -91,9 +104,10 @@ export function AuthSplash() {
 
   return (
     <div
-      className={`auth-splash auth-splash-${role}`}
+      className={`auth-splash auth-splash-${role}${isExiting ? " auth-splash-exiting" : ""}`}
       role="dialog"
       aria-modal="true"
+      aria-busy={!isExiting}
       aria-label="Cargando espacio administrativo"
     >
       <div className="auth-splash-grid" aria-hidden="true" />
