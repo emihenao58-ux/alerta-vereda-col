@@ -52,6 +52,8 @@ export function useAuth() {
     }
 
     setCargandoPerfil(true);
+    setPerfil(null);
+    setVeredaAsignadaId(null);
     let activo = true;
 
     void (async () => {

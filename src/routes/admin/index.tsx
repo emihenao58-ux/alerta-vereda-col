@@ -11,18 +11,18 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminEntry() {
   const navigate = useNavigate();
-  const { usuario, esAdminVereda, esSuperadmin, solicitudPendiente, cargando } = useAuth();
+  const { usuario, esAdminVereda, esSuperadmin, solicitudPendiente, cargandoAcceso } = useAuth();
 
   useEffect(() => {
-    if (cargando || !usuario) return;
+    if (cargandoAcceso || !usuario) return;
     if (esSuperadmin) {
       void navigate({ to: "/admin/gestion", replace: true });
     } else if (esAdminVereda) {
       void navigate({ to: "/admin/jac", replace: true });
     }
-  }, [cargando, esAdminVereda, esSuperadmin, navigate, usuario]);
+  }, [cargandoAcceso, esAdminVereda, esSuperadmin, navigate, usuario]);
 
-  if (cargando) {
+  if (cargandoAcceso) {
     return (
       <AppShell>
         <Vacio texto="Cargando tu acceso administrativo…" />
