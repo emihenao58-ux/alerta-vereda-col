@@ -6,7 +6,7 @@ import { useAuth, type Rol } from "@/hooks/use-auth";
 const SPLASH_STORAGE_KEY = "alertavereda:login-splash";
 const SPLASH_EVENT = "alertavereda:login-start";
 const MINIMUM_MS = 3000;
-const EXIT_MS = 280;
+const EXIT_MS = 420;
 const TOAST_DELAY_MS = 40;
 
 type SplashAttempt = {

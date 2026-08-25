@@ -931,21 +931,29 @@
   background: #183d32;
   color: #f8f5e9;
   animation: auth-splash-in 220ms ease-out both;
-  transition: opacity 280ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition:
+    opacity 420ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 420ms cubic-bezier(0.23, 1, 0.32, 1);
   will-change: opacity;
 }
 
 .auth-splash-exiting {
   pointer-events: none;
   opacity: 0;
+  transform: scale(1.012);
+}
+
+.auth-splash-exiting .auth-splash-grid {
+  opacity: 0;
+  transition: opacity 420ms ease-out;
 }
 
 .auth-splash-exiting .auth-splash-panel {
-  opacity: 0.86;
-  transform: translateY(-0.15rem) scale(0.985);
+  opacity: 0.72;
+  transform: translateY(-0.35rem) scale(0.975);
   transition:
-    opacity 240ms ease-out,
-    transform 280ms cubic-bezier(0.23, 1, 0.32, 1);
+    opacity 360ms ease-out,
+    transform 420ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .auth-splash-grid {
