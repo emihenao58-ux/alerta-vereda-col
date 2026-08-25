@@ -91,9 +91,9 @@ function Auth() {
     setCargando(true);
     try {
       if (modo === "entrar") {
-        beginLoginSplash(undefined, true);
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        beginLoginSplash(undefined, true);
         void navigate({ to: "/" });
         return;
       }
