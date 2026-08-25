@@ -96,9 +96,9 @@ export function AdminShell({ area, children }: { area: AdminArea; children: Reac
 }
 
 export function AdminGate({ access, children }: { access: AdminAccess; children: ReactNode }) {
-  const { usuario, esAdminVereda, esSuperadmin, solicitudPendiente, cargando } = useAuth();
+  const { usuario, esAdminVereda, esSuperadmin, solicitudPendiente, cargandoAcceso } = useAuth();
 
-  if (cargando) {
+  if (cargandoAcceso) {
     return (
       <AppShell>
         <Vacio texto="Cargando tu acceso administrativo…" />
