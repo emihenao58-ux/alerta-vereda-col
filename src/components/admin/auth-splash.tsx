@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { BellRing, ListChecks, MapPinned, ShieldCheck, Trees } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth, type Rol } from "@/hooks/use-auth";
 
 const SPLASH_STORAGE_KEY = "alertavereda:login-splash";
 const SPLASH_EVENT = "alertavereda:login-start";
 const MINIMUM_MS = 3000;
 const EXIT_MS = 280;
+const TOAST_DELAY_MS = 40;
 
 type SplashAttempt = {
   startedAt: number;
   roleHint?: Rol;
+  announce?: boolean;
 };
 
 function readAttempt(): SplashAttempt | null {
@@ -18,18 +21,22 @@ function readAttempt(): SplashAttempt | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<SplashAttempt>;
     if (typeof parsed.startedAt !== "number") return null;
-    return parsed.roleHint
-      ? { startedAt: parsed.startedAt, roleHint: parsed.roleHint }
-      : { startedAt: parsed.startedAt };
+    return {
+      startedAt: parsed.startedAt,
+      ...(parsed.roleHint ? { roleHint: parsed.roleHint } : {}),
+      ...(parsed.announce === true ? { announce: true } : {}),
+    };
   } catch {
     return null;
   }
 }
 
-export function beginLoginSplash(roleHint?: Rol) {
-  const attempt: SplashAttempt = roleHint
-    ? { startedAt: Date.now(), roleHint }
-    : { startedAt: Date.now() };
+export function beginLoginSplash(roleHint?: Rol, announce = false) {
+  const attempt: SplashAttempt = {
+    startedAt: Date.now(),
+    ...(roleHint ? { roleHint } : {}),
+    ...(announce ? { announce: true } : {}),
+  };
   try {
     sessionStorage.setItem(SPLASH_STORAGE_KEY, JSON.stringify(attempt));
   } catch {
@@ -83,16 +90,20 @@ export function AuthSplash() {
     if (!attempt || !isExiting) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const exitTimer = window.setTimeout(
-      () => {
-        clearLoginSplash();
-        setAttempt(null);
-        setIsExiting(false);
-      },
-      reducedMotion ? 0 : EXIT_MS,
-    );
+    const exitDuration = reducedMotion ? 0 : EXIT_MS;
+    const exitTimer = window.setTimeout(() => {
+      clearLoginSplash();
+      setAttempt(null);
+      setIsExiting(false);
+    }, exitDuration);
+    const toastTimer = attempt.announce
+      ? window.setTimeout(() => toast.success("Sesión iniciada."), exitDuration + TOAST_DELAY_MS)
+      : undefined;
 
-    return () => window.clearTimeout(exitTimer);
+    return () => {
+      window.clearTimeout(exitTimer);
+      if (toastTimer !== undefined) window.clearTimeout(toastTimer);
+    };
   }, [attempt, isExiting]);
 
   const role = perfil?.rol ?? attempt?.roleHint ?? "pendiente";

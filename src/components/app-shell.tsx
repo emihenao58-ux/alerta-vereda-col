@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { LayoutDashboard, Trees } from "lucide-react";
-import { AuthSplash } from "@/components/admin/auth-splash";
 import { useAuth } from "@/hooks/use-auth";
 
 const MODULOS = [
@@ -31,7 +30,6 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
 
   return (
     <div className="min-h-screen pb-24">
-      <AuthSplash />
       <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
         <div
           className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
