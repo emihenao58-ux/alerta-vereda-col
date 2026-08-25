@@ -76,8 +76,12 @@ export function AuthSplash() {
 
   useEffect(() => {
     if (!attempt || isExiting || elapsed < MINIMUM_MS || cargandoAcceso) return;
-
     setIsExiting(true);
+  }, [attempt, cargandoAcceso, elapsed, isExiting]);
+
+  useEffect(() => {
+    if (!attempt || !isExiting) return;
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const exitTimer = window.setTimeout(
       () => {
@@ -89,7 +93,7 @@ export function AuthSplash() {
     );
 
     return () => window.clearTimeout(exitTimer);
-  }, [attempt, cargandoAcceso, elapsed, isExiting]);
+  }, [attempt, isExiting]);
 
   const role = perfil?.rol ?? attempt?.roleHint ?? "pendiente";
   const roleLabel =
