@@ -25,6 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
+  { to: "/mi-vereda", label: "Mi Vereda", color: "#5A7D58" },
   { to: "/emergencias", label: "Emergencias", color: "#C23B2E" },
   { to: "/vias", label: "Vías", color: "#DB7B33" },
   { to: "/servicios", label: "Servicios", color: "#2F5D45" },
