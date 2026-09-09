@@ -52,7 +52,9 @@ function Vias() {
           meta={`${v.veredas?.nombre ?? ""} · actualizado ${fecha(v.created_at)}`}
         >
           {v.descripcion}
-          {URL_FOTO(v.foto_url) && <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(v.foto_url) && (
+            <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
     </AppShell>

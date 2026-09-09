@@ -45,13 +45,19 @@ function Servicios() {
       {data?.map((s) => (
         <Carta
           key={s.id}
-          titulo={s.tipo ? ((LABEL_TIPO_SERVICIO as Record<string, string>)[s.tipo] ?? "Servicio") : "Servicio"}
+          titulo={
+            s.tipo
+              ? ((LABEL_TIPO_SERVICIO as Record<string, string>)[s.tipo] ?? "Servicio")
+              : "Servicio"
+          }
           severidad={severidadDeNivel(s.nivel)}
           etiqueta={s.estado}
           meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
-          {URL_FOTO(s.foto_url) && <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(s.foto_url) && (
+            <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
     </AppShell>
