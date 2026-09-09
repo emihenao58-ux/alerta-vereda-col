@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { LayoutDashboard, Trees } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 const MODULOS = [
@@ -24,20 +25,35 @@ export function BotonEmergencias() {
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
-  const { usuario, esAdmin, salir } = useAuth();
+export function AppShell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+  const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
 
   return (
     <div className="min-h-screen pb-24">
       <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+        <div
+          className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
+        >
           <Link to="/" className="font-[family-name:var(--font-display)] text-xl font-bold">
             AlertaVereda
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            {esAdmin && (
-              <Link to="/admin" className="underline underline-offset-4">
+            {esAdminVereda && (
+              <Link
+                to="/admin/jac"
+                className="flex items-center gap-1 underline underline-offset-4"
+              >
+                <Trees size={15} aria-hidden="true" />
                 Panel JAC
+              </Link>
+            )}
+            {esSuperadmin && (
+              <Link
+                to="/admin/gestion"
+                className="flex items-center gap-1 underline underline-offset-4"
+              >
+                <LayoutDashboard size={15} aria-hidden="true" />
+                Centro de Gestión
               </Link>
             )}
             {usuario ? (
@@ -51,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           </div>
         </div>
-        <nav className="mx-auto max-w-3xl overflow-x-auto px-2 pb-2">
+        <nav className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
           <ul className="flex gap-1 text-sm">
             {MODULOS.map((m) => (
               <li key={m.to}>
@@ -71,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
+      <main className={`mx-auto px-4 py-5 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>{children}</main>
 
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
         Herramienta comunitaria — complementa, no reemplaza, a las autoridades.

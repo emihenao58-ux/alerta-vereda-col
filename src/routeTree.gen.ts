@@ -18,6 +18,10 @@ import { Route as MiVeredaRouteImport } from './routes/mi-vereda'
 import { Route as ReportarRouteImport } from './routes/reportar'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as ViasRouteImport } from './routes/vias'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminGestionRouteImport } from './routes/admin/gestion'
+import { Route as AdminJacRouteImport } from './routes/admin/jac'
+import { Route as AdminJacSuperadminRouteImport } from './routes/admin/jac-superadmin'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,10 +68,30 @@ const ViasRoute = ViasRouteImport.update({
   path: '/vias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGestionRoute = AdminGestionRouteImport.update({
+  id: '/gestion',
+  path: '/gestion',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJacRoute = AdminJacRouteImport.update({
+  id: '/jac',
+  path: '/jac',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJacSuperadminRoute = AdminJacSuperadminRouteImport.update({
+  id: '/jac-superadmin',
+  path: '/jac-superadmin',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
@@ -75,10 +99,13 @@ export interface FileRoutesByFullPath {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/gestion': typeof AdminGestionRoute
+  '/admin/jac': typeof AdminJacRoute
+  '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
@@ -86,11 +113,15 @@ export interface FileRoutesByTo {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/gestion': typeof AdminGestionRoute
+  '/admin/jac': typeof AdminJacRoute
+  '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
@@ -98,6 +129,10 @@ export interface FileRoutesById {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/gestion': typeof AdminGestionRoute
+  '/admin/jac': typeof AdminJacRoute
+  '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,10 +146,13 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/gestion'
+    | '/admin/jac'
+    | '/admin/jac-superadmin'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
     | '/avisos'
     | '/emergencias'
@@ -122,6 +160,10 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/gestion'
+    | '/admin/jac'
+    | '/admin/jac-superadmin'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -133,11 +175,15 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/gestion'
+    | '/admin/jac'
+    | '/admin/jac-superadmin'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   AvisosRoute: typeof AvisosRoute
   EmergenciasRoute: typeof EmergenciasRoute
@@ -212,12 +258,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ViasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/gestion': {
+      id: '/admin/gestion'
+      path: '/gestion'
+      fullPath: '/admin/gestion'
+      preLoaderRoute: typeof AdminGestionRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/jac': {
+      id: '/admin/jac'
+      path: '/jac'
+      fullPath: '/admin/jac'
+      preLoaderRoute: typeof AdminJacRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/jac-superadmin': {
+      id: '/admin/jac-superadmin'
+      path: '/jac-superadmin'
+      fullPath: '/admin/jac-superadmin'
+      preLoaderRoute: typeof AdminJacSuperadminRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminGestionRoute: typeof AdminGestionRoute
+  AdminJacRoute: typeof AdminJacRoute
+  AdminJacSuperadminRoute: typeof AdminJacSuperadminRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminGestionRoute: AdminGestionRoute,
+  AdminJacRoute: AdminJacRoute,
+  AdminJacSuperadminRoute: AdminJacSuperadminRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   AvisosRoute: AvisosRoute,
   EmergenciasRoute: EmergenciasRoute,

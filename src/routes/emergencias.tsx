@@ -55,7 +55,9 @@ function Emergencias() {
           meta={`${e.veredas?.nombre ?? ""} · ${e.lugar ?? "sin ubicación"} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
-          {URL_FOTO(e.foto_url) && <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />}
+          {URL_FOTO(e.foto_url) && (
+            <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />
+          )}
         </Carta>
       ))}
     </AppShell>

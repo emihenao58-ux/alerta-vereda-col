@@ -34,13 +34,18 @@ export function Carta({
   acento?: string | undefined;
 }) {
   return (
-    <article className="carta chinche mt-4" style={acento ? { borderLeft: `4px solid ${acento}` } : undefined}>
+    <article
+      className="carta chinche mt-4"
+      style={acento ? { borderLeft: `4px solid ${acento}` } : undefined}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="text-lg leading-tight font-semibold">{titulo}</h3>
         {severidad && (
           <span className="inline-flex items-center gap-1.5">
             <ChipSeveridad severidad={severidad} />
-            {etiqueta && etiqueta.trim() && etiqueta.trim().toLowerCase() !== LABEL_SEVERIDAD[severidad].toLowerCase() ? (
+            {etiqueta &&
+            etiqueta.trim() &&
+            etiqueta.trim().toLowerCase() !== LABEL_SEVERIDAD[severidad].toLowerCase() ? (
               <span className="rounded-full border border-[color:var(--border)] px-2.5 py-0.5 text-xs font-medium text-[color:var(--tinta-suave)]">
                 {etiqueta}
               </span>

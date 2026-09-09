@@ -1,20 +1,19 @@
-// El valor intermedio es "atencion" para coincidir con el constraint
-// `*_nivel_check` de la base de datos (ARRAY['urgente','atencion','normal']).
-// La etiqueta visual que ve el habitante sigue siendo "Precaución".
+// `*_nivel_check` de la base de datos usa urgent/atencion/normal.
+// La etiqueta visual conserva "Precaución" para el nivel atencion.
 export type Severidad = "urgente" | "atencion" | "normal";
 
-export type TipoServicio = "agua" | "luz" | "senal";
+export type TipoServicio = "agua" | "energia" | "senal" | "internet" | "luz" | "otro";
 
-export type TipoReporte = "emergencia" | "via" | "servicio" | "aviso";
+export type TipoReporte = "emergencia" | "via" | "servicio" | "otro" | "aviso";
 
-export type ResultadoCierre = "solucionado" | "no_solucionado";
+export type ResultadoCierre = "solucionado" | "no_solucionado" | "retirado";
 
 export const LABEL_RESULTADO_CIERRE: Record<ResultadoCierre, string> = {
   solucionado: "Solucionado",
   no_solucionado: "No solucionado",
+  retirado: "Retirado",
 };
 
-/** Colores oficiales de severidad (documento de identidad, sección 4.4). */
 export const COLOR_SEVERIDAD: Record<Severidad, string> = {
   urgente: "#C23B2E",
   atencion: "#DB7B33",
@@ -29,24 +28,23 @@ export const LABEL_SEVERIDAD: Record<Severidad, string> = {
 
 const NIVELES_VALIDOS: readonly Severidad[] = ["urgente", "atencion", "normal"];
 
-/**
- * Convierte la columna `nivel` (la fija el admin al publicar) al tipo `Severidad`.
- * Cualquier valor no reconocido cae en "atencion" para no ocultar una novedad
- * por un dato inesperado.
- */
 export function severidadDeNivel(nivel: string | null | undefined): Severidad {
   return (NIVELES_VALIDOS as readonly string[]).includes(nivel ?? "")
     ? (nivel as Severidad)
     : "atencion";
 }
 
-/**
- * Texto neutro de estado publicado para la etiqueta al lado del chip de severidad.
- * Normaliza minúsculas/añade "Activa" por defecto; si ya está bien escrito se usa tal cual. */
+/** Texto visual del estado operacional de una publicación. */
 export function ETIQUETA_ESTADO(
-  tipo: "emergencia" | "via" | "servicio" | "aviso",
+  tipo: "emergencia" | "via" | "servicio" | "avisos" | "aviso" | "otro",
   estado: string | null | undefined,
+  resultado?: string | null,
+  razonCierre?: string | null,
 ): string {
+  if ((tipo === "avisos" || tipo === "aviso" || tipo === "otro") && resultado === "retirado") {
+    return razonCierre === "finalizacion_natural" ? "Finalizado" : "Retirado";
+  }
+
   switch (tipo) {
     case "emergencia":
       return estado ?? "Activa";
@@ -54,7 +52,9 @@ export function ETIQUETA_ESTADO(
       return estado ?? "";
     case "servicio":
       return estado ?? "";
+    case "avisos":
     case "aviso":
+    case "otro":
       return "Aviso";
     default:
       return "";
@@ -63,14 +63,18 @@ export function ETIQUETA_ESTADO(
 
 export const LABEL_TIPO_SERVICIO: Record<TipoServicio, string> = {
   agua: "Agua",
-  luz: "Luz",
-  senal: "Señal / internet",
+  energia: "Energía",
+  senal: "Señal",
+  internet: "Internet",
+  luz: "Alumbrado",
+  otro: "Otro servicio",
 };
 
 export const LABEL_TIPO_REPORTE: Record<TipoReporte, string> = {
   emergencia: "Emergencia",
   via: "Estado de una vía",
   servicio: "Corte de servicio",
+  otro: "Aviso comunitario",
   aviso: "Aviso comunitario",
 };
 
@@ -84,12 +88,10 @@ export function fecha(valor: string | null | undefined) {
   });
 }
 
-/**
- * Convierte un path relativo de Storage (ej.: "vereda_id/archivo.png", guardado en
- * `foto_url`) en la URL pública completa de Supabase Storage.
- * Si el valor ya es una URL absoluta, se devuelve tal cual. */
 export function URL_FOTO(foto_url: string | null | undefined): string | null {
   if (!foto_url) return null;
   if (foto_url.startsWith("http")) return foto_url;
-  return `https://bajsmsuxuwkxlctukyvv.supabase.co/storage/v1/object/public/reportes-fotos/${foto_url}`;
+  const supabaseUrl = import.meta.env["VITE_SUPABASE_URL"];
+  if (!supabaseUrl) return null;
+  return `${supabaseUrl}/storage/v1/object/public/reportes-fotos/${foto_url}`;
 }
