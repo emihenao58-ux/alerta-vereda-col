@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { fecha } from "@/lib/alerta";
+import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/avisos")({
   head: () => ({
@@ -26,15 +26,12 @@ export const Route = createFileRoute("/avisos")({
 function Avisos() {
   const { data, isLoading } = useQuery({
     queryKey: ["avisos"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("avisos")
-        .select("*, veredas(nombre)")
-        .is("cerrado_en", null)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      consultarCartelera({
+        p_categoria: "aviso",
+        p_limit: 100,
+        p_excluir_nivel_normal: false,
+      }),
   });
 
   return (
@@ -47,12 +44,10 @@ function Avisos() {
       {data?.length === 0 && <Vacio texto="No hay avisos publicados." />}
       {data?.map((a) => (
         <Carta
-          key={a.id}
+          key={a.publicacion_id}
           titulo={a.titulo}
           acento="#C99A2E"
-          meta={`${a.veredas?.nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${
-            a.fecha ? ` · ${fecha(a.fecha)}` : ""
-          }`}
+          meta={`${a.vereda_nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${a.fecha_evento ? ` · ${fecha(a.fecha_evento)}` : ""}`}
         >
           {a.descripcion}
         </Carta>

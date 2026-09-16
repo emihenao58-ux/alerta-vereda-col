@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
+import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/vias")({
   head: () => ({
@@ -27,15 +27,12 @@ export const Route = createFileRoute("/vias")({
 function Vias() {
   const { data, isLoading } = useQuery({
     queryKey: ["vias"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("vias")
-        .select("*, veredas(nombre)")
-        .is("cerrado_en", null)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      consultarCartelera({
+        p_categoria: "via",
+        p_limit: 100,
+        p_excluir_nivel_normal: false,
+      }),
   });
 
   return (
@@ -45,11 +42,11 @@ function Vias() {
       {data?.length === 0 && <Vacio texto="Todavía no hay vías registradas." />}
       {data?.map((v) => (
         <Carta
-          key={v.id}
+          key={v.publicacion_id}
           titulo={v.titulo}
           severidad={severidadDeNivel(v.nivel)}
-          etiqueta={v.estado}
-          meta={`${v.veredas?.nombre ?? ""} · actualizado ${fecha(v.created_at)}`}
+          etiqueta={v.estado_operativo ?? ""}
+          meta={`${v.vereda_nombre ?? ""} · actualizado ${fecha(v.created_at)}`}
         >
           {v.descripcion}
           {URL_FOTO(v.foto_url) && (
