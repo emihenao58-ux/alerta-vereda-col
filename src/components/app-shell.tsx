@@ -4,7 +4,6 @@ import { LayoutDashboard, Trees } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 const MODULOS = [
-  { to: "/mi-vereda", label: "Mi Vereda" },
   { to: "/emergencias", label: "Emergencias" },
   { to: "/vias", label: "Vías" },
   { to: "/servicios", label: "Servicios" },
