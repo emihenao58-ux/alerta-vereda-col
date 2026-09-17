@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { LABEL_TIPO_SERVICIO, URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
+import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/servicios")({
   head: () => ({
@@ -26,15 +26,12 @@ export const Route = createFileRoute("/servicios")({
 function Servicios() {
   const { data, isLoading } = useQuery({
     queryKey: ["servicios"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("servicios")
-        .select("*, veredas(nombre)")
-        .is("cerrado_en", null)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      consultarCartelera({
+        p_categoria: "servicio",
+        p_limit: 100,
+        p_excluir_nivel_normal: false,
+      }),
   });
 
   return (
@@ -44,15 +41,15 @@ function Servicios() {
       {data?.length === 0 && <Vacio texto="Sin novedades de servicios por ahora." />}
       {data?.map((s) => (
         <Carta
-          key={s.id}
+          key={s.publicacion_id}
           titulo={
             s.tipo
-              ? ((LABEL_TIPO_SERVICIO as Record<string, string>)[s.tipo] ?? "Servicio")
+              ? (LABEL_TIPO_SERVICIO[s.tipo as keyof typeof LABEL_TIPO_SERVICIO] ?? "Servicio")
               : "Servicio"
           }
           severidad={severidadDeNivel(s.nivel)}
-          etiqueta={s.estado}
-          meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
+          etiqueta={s.estado_operativo ?? ""}
+          meta={`${s.vereda_nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
           {URL_FOTO(s.foto_url) && (

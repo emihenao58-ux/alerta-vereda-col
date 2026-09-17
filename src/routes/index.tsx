@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, ChipSeveridad, Vacio } from "@/components/carta";
 import { URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
+import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
+  { to: "/mi-vereda", label: "Mi Vereda", color: "#5C7A47" },
   { to: "/emergencias", label: "Emergencias", color: "#C23B2E" },
   { to: "/vias", label: "Vías", color: "#DB7B33" },
   { to: "/servicios", label: "Servicios", color: "#2F5D45" },
@@ -36,40 +37,28 @@ function Portada() {
     queryKey: ["portada"],
     queryFn: async () => {
       const [emergencias, vias, servicios, avisos] = await Promise.all([
-        supabase
-          .from("emergencias")
-          .select("*, veredas(nombre)")
-          .neq("nivel", "normal")
-          .is("cerrado_en", null)
-          .order("created_at", { ascending: false })
-          .limit(3),
-        supabase
-          .from("vias")
-          .select("*, veredas(nombre)")
-          .neq("nivel", "normal")
-          .is("cerrado_en", null)
-          .order("created_at", { ascending: false })
-          .limit(3),
-        supabase
-          .from("servicios")
-          .select("*, veredas(nombre)")
-          .neq("nivel", "normal")
-          .is("cerrado_en", null)
-          .order("created_at", { ascending: false })
-          .limit(3),
-        supabase
-          .from("avisos")
-          .select("*, veredas(nombre)")
-          .is("cerrado_en", null)
-          .order("created_at", { ascending: false })
-          .limit(2),
+        consultarCartelera({
+          p_categoria: "emergencia",
+          p_limit: 3,
+          p_excluir_nivel_normal: true,
+        }),
+        consultarCartelera({
+          p_categoria: "via",
+          p_limit: 3,
+          p_excluir_nivel_normal: true,
+        }),
+        consultarCartelera({
+          p_categoria: "servicio",
+          p_limit: 3,
+          p_excluir_nivel_normal: true,
+        }),
+        consultarCartelera({
+          p_categoria: "aviso",
+          p_limit: 2,
+          p_excluir_nivel_normal: false,
+        }),
       ]);
-      return {
-        emergencias: emergencias.data ?? [],
-        vias: vias.data ?? [],
-        servicios: servicios.data ?? [],
-        avisos: avisos.data ?? [],
-      };
+      return { emergencias, vias, servicios, avisos };
     },
   });
 
@@ -119,11 +108,11 @@ function Portada() {
 
       {data?.emergencias.map((e) => (
         <Carta
-          key={e.id}
+          key={e.publicacion_id}
           titulo={e.titulo}
           severidad={severidadDeNivel(e.nivel)}
-          etiqueta={e.estado}
-          meta={`Emergencia · ${e.veredas?.nombre ?? ""} · ${fecha(e.created_at)}`}
+          etiqueta={e.estado_operativo ?? "Activa"}
+          meta={`Emergencia · ${e.vereda_nombre ?? ""} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
           {URL_FOTO(e.foto_url) && (
@@ -134,11 +123,11 @@ function Portada() {
 
       {data?.vias.map((v) => (
         <Carta
-          key={v.id}
+          key={v.publicacion_id}
           titulo={v.titulo}
           severidad={severidadDeNivel(v.nivel)}
-          etiqueta={v.estado}
-          meta={`Vía · ${v.veredas?.nombre ?? ""} · ${fecha(v.created_at)}`}
+          etiqueta={v.estado_operativo ?? ""}
+          meta={`Vía · ${v.vereda_nombre ?? ""} · ${fecha(v.created_at)}`}
         >
           {v.descripcion}
           {URL_FOTO(v.foto_url) && (
@@ -149,11 +138,11 @@ function Portada() {
 
       {data?.servicios.map((s) => (
         <Carta
-          key={s.id}
+          key={s.publicacion_id}
           titulo={s.tipo ? `Servicio de ${s.tipo === "senal" ? "señal" : s.tipo}` : "Servicio"}
           severidad={severidadDeNivel(s.nivel)}
-          etiqueta={s.estado}
-          meta={`${s.veredas?.nombre ?? ""} · ${fecha(s.created_at)}`}
+          etiqueta={s.estado_operativo ?? ""}
+          meta={`${s.vereda_nombre ?? ""} · ${fecha(s.created_at)}`}
         >
           {s.descripcion}
           {URL_FOTO(s.foto_url) && (
@@ -164,10 +153,10 @@ function Portada() {
 
       {data?.avisos.map((a) => (
         <Carta
-          key={a.id}
+          key={a.publicacion_id}
           titulo={a.titulo}
           acento="#C99A2E"
-          meta={`Aviso de la JAC · ${a.veredas?.nombre ?? ""}${a.fecha ? ` · ${fecha(a.fecha)}` : ""}`}
+          meta={`Aviso de la JAC · ${a.vereda_nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${a.fecha_evento ? ` · ${fecha(a.fecha_evento)}` : ""}`}
         >
           {a.descripcion}
         </Carta>

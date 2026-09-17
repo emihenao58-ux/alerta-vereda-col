@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Carta, TituloModulo, Vacio } from "@/components/carta";
 import { URL_FOTO, severidadDeNivel, ETIQUETA_ESTADO, fecha } from "@/lib/alerta";
+import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/emergencias")({
   head: () => ({
@@ -27,15 +27,12 @@ export const Route = createFileRoute("/emergencias")({
 function Emergencias() {
   const { data, isLoading } = useQuery({
     queryKey: ["emergencias"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("emergencias")
-        .select("*, veredas(nombre)")
-        .is("cerrado_en", null)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () =>
+      consultarCartelera({
+        p_categoria: "emergencia",
+        p_limit: 100,
+        p_excluir_nivel_normal: false,
+      }),
   });
 
   return (
@@ -48,11 +45,11 @@ function Emergencias() {
       {data?.length === 0 && <Vacio texto="No hay emergencias activas en este momento." />}
       {data?.map((e) => (
         <Carta
-          key={e.id}
+          key={e.publicacion_id}
           titulo={e.titulo}
           severidad={severidadDeNivel(e.nivel)}
-          etiqueta={ETIQUETA_ESTADO("emergencia", e.estado)}
-          meta={`${e.veredas?.nombre ?? ""} · ${e.lugar ?? "sin ubicación"} · ${fecha(e.created_at)}`}
+          etiqueta={ETIQUETA_ESTADO("emergencia", e.estado_operativo)}
+          meta={`${e.vereda_nombre ?? ""} · ${e.lugar ?? "sin ubicación"} · ${fecha(e.created_at)}`}
         >
           {e.descripcion}
           {URL_FOTO(e.foto_url) && (

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   CalendarDays,
   ChevronDown,
@@ -20,9 +20,15 @@ import {
   type GuiaObjetivos,
 } from "@/components/guia-hablada";
 import {
+  consultarCartelera,
+  consultarHistorial,
+  consultarVeredas,
+  type MiVeredaHistorialPublicacion,
+  type MiVeredaPublicacion,
+  type MiVeredaVereda,
+} from "@/lib/mi-vereda-cartelera";
+import {
   ETIQUETAS_CATEGORIA,
-  REGISTROS_DEMO,
-  VEREDAS_DEMO,
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
@@ -43,6 +49,19 @@ export const Route = createFileRoute("/mi-vereda")({
 type Vista = "activas" | "historial";
 type FiltroHistorial = "todos" | "solucionado" | "no_solucionado";
 type Periodo = "todo" | "30" | "90";
+
+type RegistroMiVereda = {
+  id: string;
+  veredaId: string;
+  categoria: CategoriaMiVereda;
+  titulo: string;
+  descripcion: string;
+  estado: EstadoMiVereda;
+  fechaCreacion: string;
+  cerradoEn: string | undefined;
+  lugar: string | undefined;
+  nivel: "urgente" | "atencion" | "normal" | undefined;
+};
 
 const GUIA_PASOS: readonly GuiaHabladaPaso[] = [
   {
@@ -163,14 +182,6 @@ const CATEGORIA_ICONOS: Record<CategoriaMiVereda, string> = {
   aviso: "A",
 };
 
-function normalizar(texto: string) {
-  return texto
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("es-CO")
-    .trim();
-}
-
 function fechaVisible(valor: string) {
   return new Date(valor).toLocaleDateString("es-CO", {
     day: "numeric",
@@ -179,8 +190,40 @@ function fechaVisible(valor: string) {
   });
 }
 
-function fechaOrden(registro: (typeof REGISTROS_DEMO)[number]) {
+function fechaOrden(registro: RegistroMiVereda) {
   return new Date(registro.cerradoEn ?? registro.fechaCreacion).getTime();
+}
+
+function fechaDesdePeriodo(periodo: Periodo) {
+  if (periodo === "todo") return null;
+  const desde = new Date();
+  desde.setDate(desde.getDate() - Number(periodo));
+  return desde.toISOString();
+}
+
+function mapearPublicacion(
+  publicacion: MiVeredaPublicacion | MiVeredaHistorialPublicacion,
+): RegistroMiVereda {
+  const esCerrado = publicacion.cerrado_en !== null;
+  const estado = !esCerrado
+    ? "activo"
+    : publicacion.resultado === "solucionado"
+      ? "solucionado"
+      : "no_solucionado";
+  const nivel = "nivel" in publicacion ? publicacion.nivel : null;
+
+  return {
+    id: publicacion.publicacion_id,
+    veredaId: publicacion.vereda_id,
+    categoria: publicacion.categoria,
+    titulo: publicacion.titulo,
+    descripcion: publicacion.descripcion ?? "",
+    estado,
+    fechaCreacion: publicacion.created_at,
+    cerradoEn: publicacion.cerrado_en ?? undefined,
+    lugar: publicacion.lugar ?? undefined,
+    nivel: nivel === "urgente" || nivel === "atencion" || nivel === "normal" ? nivel : undefined,
+  };
 }
 
 function etiquetaEstado(estado: EstadoMiVereda) {
@@ -190,7 +233,8 @@ function etiquetaEstado(estado: EstadoMiVereda) {
 }
 
 function MiVereda() {
-  const [veredaId, setVeredaId] = useState("aguada");
+  const [veredas, setVeredas] = useState<MiVeredaVereda[]>([]);
+  const [veredaId, setVeredaId] = useState("");
   const [vista, setVista] = useState<Vista>("activas");
   const [categoria, setCategoria] = useState<"todas" | CategoriaMiVereda>("todas");
   const [estadoHistorial, setEstadoHistorial] = useState<FiltroHistorial>("todos");
@@ -200,6 +244,9 @@ function MiVereda() {
   const [forzarGuia, setForzarGuia] = useState(0);
   const [inicioGuia, setInicioGuia] = useState<GuiaHabladaPaso["id"]>("bienvenida");
   const [activacionesVista, setActivacionesVista] = useState({ activas: 0, historial: 0 });
+  const [registros, setRegistros] = useState<RegistroMiVereda[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorConsulta, setErrorConsulta] = useState<string | null>(null);
   const selectorVeredaRef = useRef<HTMLSelectElement>(null);
   const panelConsultaRef = useRef<HTMLElement>(null);
   const tabActivasRef = useRef<HTMLButtonElement>(null);
@@ -208,35 +255,87 @@ function MiVereda() {
   const filtroSolucionadoRef = useRef<HTMLSelectElement>(null);
   const filtroNoSolucionadoRef = useRef<HTMLSelectElement>(null);
 
-  const vereda = VEREDAS_DEMO.find((item) => item.id === veredaId) ?? VEREDAS_DEMO[0]!;
-  const consulta = normalizar(busqueda);
+  useEffect(() => {
+    let cancelado = false;
 
-  const registros = useMemo(() => {
-    const ahora = new Date("2026-08-25T12:00:00-05:00").getTime();
-    const diasPermitidos = periodo === "30" ? 30 : periodo === "90" ? 90 : null;
+    void consultarVeredas()
+      .then((datos) => {
+        if (cancelado) return;
+        setVeredas(datos);
+        setVeredaId((actual) => actual || datos[0]?.id || "");
+      })
+      .catch((error: unknown) => {
+        if (!cancelado) {
+          setErrorConsulta(
+            error instanceof Error ? error.message : "No pudimos cargar las veredas.",
+          );
+          setCargando(false);
+        }
+      });
 
-    return REGISTROS_DEMO.filter((registro) => {
-      if (registro.veredaId !== veredaId) return false;
-      if (vista === "activas" && registro.estado !== "activo") return false;
-      if (vista === "historial" && registro.estado === "activo") return false;
-      if (categoria !== "todas" && registro.categoria !== categoria) return false;
-      if (
-        vista === "historial" &&
-        estadoHistorial !== "todos" &&
-        registro.estado !== estadoHistorial
-      )
-        return false;
-      if (diasPermitidos !== null && ahora - fechaOrden(registro) > diasPermitidos * 86400000)
-        return false;
-      if (
-        consulta &&
-        !normalizar(`${registro.titulo} ${registro.descripcion} ${registro.lugar ?? ""}`).includes(
-          consulta,
-        )
-      )
-        return false;
-      return true;
-    }).sort((a, b) => fechaOrden(b) - fechaOrden(a));
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  const vereda = veredas.find((item) => item.id === veredaId) ?? null;
+  const consulta = busqueda.trim();
+
+  useEffect(() => {
+    if (!veredaId) return;
+    let cancelado = false;
+    setCargando(true);
+    setErrorConsulta(null);
+
+    const cargarRegistros = async () => {
+      try {
+        const categoriaConsulta = categoria === "todas" ? null : categoria;
+        const pDesde = fechaDesdePeriodo(periodo);
+        const datos =
+          vista === "activas"
+            ? await consultarCartelera({
+                p_vereda_id: veredaId,
+                p_busqueda: consulta || null,
+                p_categoria: categoriaConsulta,
+                p_limit: 100,
+                p_offset: 0,
+                p_excluir_nivel_normal: false,
+              })
+            : await consultarHistorial({
+                p_vereda_id: veredaId,
+                p_resultado: estadoHistorial === "todos" ? null : estadoHistorial,
+                p_categoria: categoriaConsulta,
+                p_desde: pDesde,
+                p_hasta: null,
+                p_limit: 100,
+                p_offset: 0,
+              });
+
+        if (cancelado) return;
+        const limitePeriodo = periodo === "todo" ? null : Number(periodo) * 86400000;
+        const ahora = Date.now();
+        const mapeados = datos
+          .map(mapearPublicacion)
+          .filter(
+            (registro) => limitePeriodo === null || ahora - fechaOrden(registro) <= limitePeriodo,
+          );
+        setRegistros(mapeados);
+      } catch (error: unknown) {
+        if (!cancelado) {
+          setRegistros([]);
+          setErrorConsulta(
+            error instanceof Error ? error.message : "No pudimos cargar los registros.",
+          );
+        }
+      } finally {
+        if (!cancelado) setCargando(false);
+      }
+    };
+
+    void cargarRegistros();
+    return () => {
+      cancelado = true;
+    };
   }, [categoria, consulta, estadoHistorial, periodo, veredaId, vista]);
 
   const objetivos = useMemo<GuiaObjetivos>(
@@ -334,7 +433,7 @@ function MiVereda() {
               onChange={(event) => setVeredaId(event.target.value)}
               className="mi-vereda-select"
             >
-              {VEREDAS_DEMO.map((item) => (
+              {veredas.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.nombre}
                   {item.activa ? "" : " · inactiva"}
@@ -357,14 +456,18 @@ function MiVereda() {
           <div className="mi-vereda-board-heading">
             <div>
               <p className="eyebrow">Estás consultando</p>
-              <h2 id="vereda-seleccionada-titulo">{vereda.nombre}</h2>
+              <h2 id="vereda-seleccionada-titulo">{vereda?.nombre ?? "Selecciona una vereda"}</h2>
             </div>
-            {!vereda.activa && <span className="mi-vereda-inactive-badge">Vereda inactiva</span>}
+            {vereda && !vereda.activa && (
+              <span className="mi-vereda-inactive-badge">Vereda inactiva</span>
+            )}
           </div>
           <p className="mi-vereda-board-description">
-            {vereda.activa
-              ? "Consulta la información vigente y los antecedentes de esta comunidad."
-              : "El historial permanece disponible aunque esta vereda no esté activa en la cartelera."}
+            {!vereda
+              ? "Cargando las veredas disponibles."
+              : vereda.activa
+                ? "Consulta la información vigente y los antecedentes de esta comunidad."
+                : "El historial permanece disponible aunque esta vereda no esté activa en la cartelera."}
           </p>
 
           <div className="mi-vereda-tabs" role="tablist" aria-label="Contenido de la vereda">
@@ -498,7 +601,17 @@ function MiVereda() {
             </button>
           </div>
 
-          {registros.length > 0 ? (
+          {cargando ? (
+            <div className="mi-vereda-empty" role="status" aria-live="polite">
+              <h4>Cargando la información de la vereda…</h4>
+              <p>Estamos consultando la cartelera comunitaria.</p>
+            </div>
+          ) : errorConsulta ? (
+            <div className="mi-vereda-empty" role="alert">
+              <h4>No pudimos cargar esta consulta</h4>
+              <p>Revisa la conexión e inténtalo nuevamente.</p>
+            </div>
+          ) : registros.length > 0 ? (
             <div className="mi-vereda-list" aria-live="polite">
               {registros.map((registro) => (
                 <article
@@ -553,7 +666,7 @@ function MiVereda() {
               <h4>No encontramos resultados con esos filtros</h4>
               <p>
                 Prueba otra palabra, cambia la categoría o revisa todo el historial de{" "}
-                {vereda.nombre}.
+                {vereda?.nombre ?? "la vereda"}.
               </p>
               <button type="button" onClick={limpiarFiltros}>
                 Ver todo
@@ -562,11 +675,11 @@ function MiVereda() {
           )}
         </section>
 
-        <aside className="mi-vereda-demo-note" aria-label="Estado de demostración">
-          <strong>Vista de demostración</strong>
+        <aside className="mi-vereda-demo-note" aria-label="Estado de la conexión">
+          <strong>Preview temporal</strong>
           <span>
-            Esta pantalla usa datos simulados mientras se prepara la conexión segura con el
-            historial real.
+            Esta revisión usa el contrato público de Mi Vereda en el proyecto temporal. La
+            navegación global permanece oculta hasta la activación real.
           </span>
         </aside>
       </div>
