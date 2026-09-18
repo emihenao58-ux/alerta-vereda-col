@@ -677,10 +677,7 @@ function MiVereda() {
 
         <aside className="mi-vereda-demo-note" aria-label="Estado de la conexión">
           <strong>Preview temporal</strong>
-          <span>
-            Esta revisión usa el contrato público de Mi Vereda en el proyecto temporal. La
-            navegación global permanece oculta hasta la activación real.
-          </span>
+          <span>Esta revisión usa el contrato público de Mi Vereda en el proyecto temporal.</span>
         </aside>
       </div>
     </MiVeredaShell>
