@@ -54,6 +54,7 @@ type MiVeredaCarteleraArgs = {
 
 type MiVeredaHistorialArgs = {
   p_vereda_id: string | null;
+  p_busqueda: string | null;
   p_resultado: "solucionado" | "no_solucionado" | null;
   p_categoria: MiVeredaCategoria | null;
   p_desde: string | null;
@@ -100,12 +101,14 @@ export async function consultarCartelera(
 export async function consultarHistorial(
   args: Omit<MiVeredaHistorialArgs, "p_vereda_id" | "p_busqueda" | "p_offset"> & {
     p_vereda_id?: string | null;
+    p_busqueda?: string | null;
     p_offset?: number;
   },
 ): Promise<MiVeredaHistorialPublicacion[]> {
   const rpcClient = supabase as unknown as MiVeredaRpcClient;
   const { data, error } = await rpcClient.rpc("mi_vereda_historial", {
     p_vereda_id: args.p_vereda_id ?? null,
+    p_busqueda: args.p_busqueda ?? null,
     p_resultado: args.p_resultado,
     p_categoria: args.p_categoria,
     p_desde: args.p_desde,

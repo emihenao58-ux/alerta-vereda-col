@@ -303,6 +303,7 @@ function MiVereda() {
               })
             : await consultarHistorial({
                 p_vereda_id: veredaId,
+                p_busqueda: consulta || null,
                 p_resultado: estadoHistorial === "todos" ? null : estadoHistorial,
                 p_categoria: categoriaConsulta,
                 p_desde: pDesde,
