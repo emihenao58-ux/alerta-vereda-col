@@ -676,8 +676,8 @@ function MiVereda() {
         </section>
 
         <aside className="mi-vereda-demo-note" aria-label="Estado de la conexión">
-          <strong>Preview temporal</strong>
-          <span>Esta revisión usa el contrato público de Mi Vereda en el proyecto temporal.</span>
+          <strong>Datos reales</strong>
+          <span>Esta pantalla usa datos reales de Mi Vereda en el proyecto real.</span>
         </aside>
       </div>
     </MiVeredaShell>
