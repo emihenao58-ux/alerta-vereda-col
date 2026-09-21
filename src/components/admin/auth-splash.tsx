@@ -18,20 +18,25 @@ type SplashAttempt = {
 function readAttempt(): SplashAttempt | null {
   try {
     const raw = sessionStorage.getItem(SPLASH_STORAGE_KEY);
+    console.info("[SPLASH DEBUG] readAttempt", { hasValue: Boolean(raw) });
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<SplashAttempt>;
     if (typeof parsed.startedAt !== "number") return null;
-    return {
+    const attempt = {
       startedAt: parsed.startedAt,
       ...(parsed.roleHint ? { roleHint: parsed.roleHint } : {}),
       ...(parsed.announce === true ? { announce: true } : {}),
     };
+    console.info("[SPLASH DEBUG] readAttempt result", { attempt });
+    return attempt;
   } catch {
+    console.info("[SPLASH DEBUG] readAttempt failed");
     return null;
   }
 }
 
 export function beginLoginSplash(roleHint?: Rol, announce = false) {
+  console.info("[SPLASH DEBUG] beginLoginSplash invoked", { roleHint, announce });
   const attempt: SplashAttempt = {
     startedAt: Date.now(),
     ...(roleHint ? { roleHint } : {}),
@@ -39,10 +44,15 @@ export function beginLoginSplash(roleHint?: Rol, announce = false) {
   };
   try {
     sessionStorage.setItem(SPLASH_STORAGE_KEY, JSON.stringify(attempt));
+    console.info("[SPLASH DEBUG] login-splash written", {
+      hasValue: Boolean(sessionStorage.getItem(SPLASH_STORAGE_KEY)),
+    });
   } catch {
+    console.info("[SPLASH DEBUG] login-splash write failed");
     // El splash debe ser una mejora visual; el login no depende de sessionStorage.
   }
   if (typeof window !== "undefined") {
+    console.info("[SPLASH DEBUG] dispatch login-start");
     window.dispatchEvent(new Event(SPLASH_EVENT));
   }
 }
@@ -62,15 +72,22 @@ export function AuthSplash() {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    const loadAttempt = () => {
+    const loadAttempt = (source: "initial" | "event") => {
+      console.info("[SPLASH DEBUG] AuthSplash loadAttempt", { source });
       const next = readAttempt();
       setAttempt(next);
       setElapsed(next ? Math.max(0, Date.now() - next.startedAt) : 0);
+      setIsExiting(false);
+      console.info("[SPLASH DEBUG] AuthSplash setAttempt", { attempt: next });
+    };
+    const handleLoginStart = () => {
+      console.info("[SPLASH DEBUG] AuthSplash received login-start");
+      loadAttempt("event");
     };
 
-    loadAttempt();
-    window.addEventListener(SPLASH_EVENT, loadAttempt);
-    return () => window.removeEventListener(SPLASH_EVENT, loadAttempt);
+    loadAttempt("initial");
+    window.addEventListener(SPLASH_EVENT, handleLoginStart);
+    return () => window.removeEventListener(SPLASH_EVENT, handleLoginStart);
   }, []);
 
   useEffect(() => {
@@ -83,11 +100,16 @@ export function AuthSplash() {
 
   useEffect(() => {
     if (!attempt || isExiting || elapsed < MINIMUM_MS || cargandoAcceso) return;
+    console.info("[SPLASH DEBUG] AuthSplash starting exit", {
+      elapsed,
+      cargandoAcceso,
+    });
     setIsExiting(true);
   }, [attempt, cargandoAcceso, elapsed, isExiting]);
 
   useEffect(() => {
     if (!attempt || !isExiting) return;
+    console.info("[SPLASH DEBUG] AuthSplash exit effect", { attempt });
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const exitDuration = reducedMotion ? 0 : EXIT_MS;
@@ -105,6 +127,15 @@ export function AuthSplash() {
       if (toastTimer !== undefined) window.clearTimeout(toastTimer);
     };
   }, [attempt, isExiting]);
+
+  useEffect(() => {
+    console.info("[SPLASH DEBUG] AuthSplash render state", {
+      hasAttempt: Boolean(attempt),
+      attempt,
+      isExiting,
+      cargandoAcceso,
+    });
+  }, [attempt, cargandoAcceso, isExiting]);
 
   const role = perfil?.rol ?? attempt?.roleHint ?? "pendiente";
   const roleLabel =

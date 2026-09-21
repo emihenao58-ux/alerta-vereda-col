@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { TituloModulo, Vacio } from "@/components/carta";
 import { beginLoginSplash, clearLoginSplash } from "@/components/admin/auth-splash";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -28,9 +29,21 @@ const campo =
   "mt-1 w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2 text-sm";
 
 type Modo = "inicio" | "entrar" | "solicitar";
+const GOOGLE_LOGIN_PENDING_KEY = "alertavereda:google-login-pending";
+const CUENTA_SUSPENDIDA_MESSAGE =
+  "Cuenta suspendida. Tu cuenta administrativa se encuentra suspendida. Si crees que esto es un error, contacta al administrador.";
 
 function Auth() {
   const navigate = useNavigate();
+  const { usuario, perfil, cargandoAcceso } = useAuth();
+  const [loginPendiente, setLoginPendiente] = useState<"google" | "password" | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      return sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1" ? "google" : null;
+    } catch {
+      return null;
+    }
+  });
   const [modo, setModo] = useState<Modo>("inicio");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +51,119 @@ function Auth() {
   const [veredaSolicitadaId, setVeredaSolicitadaId] = useState("");
   const [veredas, setVeredas] = useState<Array<{ id: string; nombre: string }>>([]);
   const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    let marcadorGoogle: boolean | "unavailable" = false;
+    try {
+      marcadorGoogle = sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1";
+    } catch {
+      marcadorGoogle = "unavailable";
+    }
+    console.info("[SPLASH DEBUG] auth state", {
+      loginPendiente,
+      usuario: usuario?.email ?? null,
+      usuarioId: usuario?.id ?? null,
+      perfil: perfil
+        ? { id: perfil.id, rol: perfil.rol, estado_cuenta: perfil.estado_cuenta }
+        : null,
+      cargandoAcceso,
+      marcadorGoogle,
+    });
+  }, [cargandoAcceso, loginPendiente, perfil, usuario]);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((evento, session) => {
+      console.info("[SPLASH DEBUG] auth event", {
+        evento,
+        usuario: session?.user?.email ?? null,
+        usuarioId: session?.user?.id ?? null,
+      });
+      if (evento !== "SIGNED_IN") return;
+
+      try {
+        const marcadorGoogle = sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1";
+        console.info("[SPLASH DEBUG] SIGNED_IN marker", { marcadorGoogle });
+        if (!marcadorGoogle) return;
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        console.info("[SPLASH DEBUG] SIGNED_IN marker unavailable");
+        return;
+      }
+
+      console.info("[SPLASH DEBUG] setLoginPendiente google from SIGNED_IN");
+      setLoginPendiente("google");
+    });
+
+    return () => authListener.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    let marcadorGoogle: boolean | "unavailable" = false;
+    try {
+      marcadorGoogle = sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1";
+    } catch {
+      marcadorGoogle = "unavailable";
+    }
+    console.info("[SPLASH DEBUG] OAuth fallback check", {
+      loginPendiente,
+      usuario: usuario?.email ?? null,
+      cargandoAcceso,
+      marcadorGoogle,
+    });
+    if (loginPendiente || cargandoAcceso || !usuario) return;
+
+    try {
+      if (sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) !== "1") return;
+      sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      console.info("[SPLASH DEBUG] setLoginPendiente google from fallback");
+      setLoginPendiente("google");
+    } catch {
+      console.info("[SPLASH DEBUG] OAuth fallback marker unavailable");
+      // El flujo principal no depende de sessionStorage.
+    }
+  }, [cargandoAcceso, loginPendiente, usuario]);
+
+  useEffect(() => {
+    console.info("[SPLASH DEBUG] login decision effect", {
+      loginPendiente,
+      usuario: usuario?.email ?? null,
+      usuarioId: usuario?.id ?? null,
+      perfil: perfil
+        ? { id: perfil.id, rol: perfil.rol, estado_cuenta: perfil.estado_cuenta }
+        : null,
+      cargandoAcceso,
+    });
+    if (!loginPendiente || cargandoAcceso || !usuario || !perfil || perfil.id !== usuario.id)
+      return;
+
+    const metodo = loginPendiente;
+    setLoginPendiente(null);
+
+    if (perfil.estado_cuenta === "suspendida") {
+      console.info("[SPLASH DEBUG] suspended account path; no splash", {
+        usuario: usuario.email,
+      });
+      clearLoginSplash();
+      try {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        // La sesión se cierra aunque sessionStorage no esté disponible.
+      }
+      void supabase.auth.signOut().then(({ error }) => {
+        if (error) console.error("No se pudo cerrar la sesión de una cuenta suspendida:", error);
+        toast.error(CUENTA_SUSPENDIDA_MESSAGE);
+      });
+      return;
+    }
+
+    console.info("[SPLASH DEBUG] calling beginLoginSplash", {
+      metodo,
+      usuario: usuario.email,
+      estado_cuenta: perfil.estado_cuenta,
+    });
+    beginLoginSplash(undefined, metodo === "password");
+    if (metodo === "password") void navigate({ to: "/" });
+  }, [cargandoAcceso, loginPendiente, navigate, perfil, usuario]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -92,8 +218,7 @@ function Auth() {
       if (modo === "entrar") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        beginLoginSplash(undefined, true);
-        void navigate({ to: "/" });
+        setLoginPendiente("password");
         return;
       }
 
@@ -126,19 +251,34 @@ function Auth() {
 
   async function conGoogle() {
     setCargando(true);
-    beginLoginSplash();
+    console.info("[SPLASH DEBUG] conGoogle start");
     try {
+      try {
+        sessionStorage.setItem(GOOGLE_LOGIN_PENDING_KEY, "1");
+        console.info("[SPLASH DEBUG] google marker written", {
+          marcadorGoogle: sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1",
+        });
+      } catch {
+        console.info("[SPLASH DEBUG] google marker unavailable before OAuth");
+        // El login no depende de sessionStorage.
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth`,
         },
       });
+      console.info("[SPLASH DEBUG] signInWithOAuth returned", {
+        error: error?.message ?? null,
+      });
       if (error) {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
         clearLoginSplash();
         toast.error("No pudimos iniciar sesión con Google");
       }
     } catch (err) {
+      sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
       clearLoginSplash();
       toast.error(err instanceof Error ? err.message : "No pudimos iniciar sesión con Google");
     } finally {
