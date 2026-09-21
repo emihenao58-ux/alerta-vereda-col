@@ -4,7 +4,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { TituloModulo, Vacio } from "@/components/carta";
-import { beginLoginSplash, clearLoginSplash } from "@/components/admin/auth-splash";
+import {
+  beginLoginSplash,
+  clearLoginSplash,
+  GOOGLE_LOGIN_PENDING_KEY,
+} from "@/components/admin/auth-splash";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/auth")({
@@ -29,13 +33,14 @@ const campo =
   "mt-1 w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2 text-sm";
 
 type Modo = "inicio" | "entrar" | "solicitar";
-const GOOGLE_LOGIN_PENDING_KEY = "alertavereda:google-login-pending";
 const CUENTA_SUSPENDIDA_MESSAGE =
   "Cuenta suspendida. Tu cuenta administrativa se encuentra suspendida. Si crees que esto es un error, contacta al administrador.";
+const SIN_CUENTA_ADMINISTRATIVA_MESSAGE =
+  "No tienes una cuenta administrativa en AlertaVereda. Si necesitas acceso administrativo, debes solicitar una cuenta.";
 
 function Auth() {
   const navigate = useNavigate();
-  const { usuario, perfil, cargandoAcceso } = useAuth();
+  const { usuario, perfil, cargandoAcceso, esAdminVereda, esSuperadmin } = useAuth();
   const [loginPendiente, setLoginPendiente] = useState<"google" | "password" | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -51,7 +56,7 @@ function Auth() {
   const [veredaSolicitadaId, setVeredaSolicitadaId] = useState("");
   const [veredas, setVeredas] = useState<Array<{ id: string; nombre: string }>>([]);
   const [cargando, setCargando] = useState(false);
-  const googleSplashStarted = useRef(false);
+  const accesoObservado = useRef<string | null>(null);
 
   useEffect(() => {
     let marcadorGoogle: boolean | "unavailable" = false;
@@ -99,6 +104,22 @@ function Auth() {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauthError =
+      params.has("error") || params.has("error_code") || params.has("error_description");
+    if (!oauthError || loginPendiente !== "google") return;
+
+    setLoginPendiente(null);
+    try {
+      sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+    } catch {
+      // El flujo normal continúa aunque sessionStorage no esté disponible.
+    }
+    clearLoginSplash();
+    toast.error("No pudimos iniciar sesión con Google");
+  }, [loginPendiente]);
+
+  useEffect(() => {
     let marcadorGoogle: boolean | "unavailable" = false;
     try {
       marcadorGoogle = sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1";
@@ -125,20 +146,6 @@ function Auth() {
   }, [cargandoAcceso, loginPendiente, usuario]);
 
   useEffect(() => {
-    if (loginPendiente !== "google") {
-      googleSplashStarted.current = false;
-      return;
-    }
-    if (googleSplashStarted.current || !usuario) return;
-
-    googleSplashStarted.current = true;
-    console.info("[SPLASH DEBUG] starting Google splash before access load", {
-      usuario: usuario.email,
-    });
-    beginLoginSplash();
-  }, [loginPendiente, usuario]);
-
-  useEffect(() => {
     console.info("[SPLASH DEBUG] login decision effect", {
       loginPendiente,
       usuario: usuario?.email ?? null,
@@ -148,26 +155,78 @@ function Auth() {
         : null,
       cargandoAcceso,
     });
-    if (!loginPendiente || cargandoAcceso || !usuario || !perfil || perfil.id !== usuario.id)
+    if (loginPendiente === "google" && !cargandoAcceso && !usuario) {
+      setLoginPendiente(null);
+      try {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        // El flujo normal continúa aunque sessionStorage no esté disponible.
+      }
+      clearLoginSplash();
       return;
+    }
+
+    if (!loginPendiente || !usuario) return;
 
     const metodo = loginPendiente;
+    const accesoActual = `${metodo}:${usuario.id}`;
+    if (cargandoAcceso) {
+      accesoObservado.current = accesoActual;
+      return;
+    }
+
+    if (!perfil || perfil.id !== usuario.id) {
+      if (accesoObservado.current !== accesoActual) {
+        accesoObservado.current = accesoActual;
+        return;
+      }
+      try {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        // El flujo normal continúa aunque sessionStorage no esté disponible.
+      }
+      clearLoginSplash();
+      toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      return;
+    }
+
     setLoginPendiente(null);
 
     if (perfil.estado_cuenta === "suspendida") {
       console.info("[SPLASH DEBUG] suspended account path; no splash", {
         usuario: usuario.email,
       });
-      clearLoginSplash();
       try {
         sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
       } catch {
         // La sesión se cierra aunque sessionStorage no esté disponible.
       }
+      clearLoginSplash();
       void supabase.auth.signOut().then(({ error }) => {
         if (error) console.error("No se pudo cerrar la sesión de una cuenta suspendida:", error);
         toast.error(CUENTA_SUSPENDIDA_MESSAGE);
       });
+      return;
+    }
+
+    if (!esAdminVereda && !esSuperadmin) {
+      try {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        // El flujo normal continúa aunque sessionStorage no esté disponible.
+      }
+      clearLoginSplash();
+      toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      return;
+    }
+
+    if (metodo === "google") {
+      try {
+        sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
+      } catch {
+        // El flujo normal continúa aunque sessionStorage no esté disponible.
+      }
+      beginLoginSplash();
       return;
     }
 
@@ -180,7 +239,7 @@ function Auth() {
       beginLoginSplash(undefined, true);
       void navigate({ to: "/" });
     }
-  }, [cargandoAcceso, loginPendiente, navigate, perfil, usuario]);
+  }, [cargandoAcceso, esAdminVereda, esSuperadmin, loginPendiente, navigate, perfil, usuario]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

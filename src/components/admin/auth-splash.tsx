@@ -5,6 +5,7 @@ import { useAuth, type Rol } from "@/hooks/use-auth";
 
 const SPLASH_STORAGE_KEY = "alertavereda:login-splash";
 const SPLASH_EVENT = "alertavereda:login-start";
+export const GOOGLE_LOGIN_PENDING_KEY = "alertavereda:google-login-pending";
 const MINIMUM_MS = 3000;
 const EXIT_MS = 420;
 const TOAST_DELAY_MS = 40;
@@ -32,6 +33,14 @@ function readAttempt(): SplashAttempt | null {
   } catch {
     console.info("[SPLASH DEBUG] readAttempt failed");
     return null;
+  }
+}
+
+function hasGoogleLoginPending() {
+  try {
+    return sessionStorage.getItem(GOOGLE_LOGIN_PENDING_KEY) === "1";
+  } catch {
+    return false;
   }
 }
 
@@ -70,6 +79,10 @@ export function clearLoginSplash() {
 
 export function AuthSplash() {
   const { perfil, cargandoAcceso } = useAuth();
+  const [verificandoGoogle, setVerificandoGoogle] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return hasGoogleLoginPending();
+  });
   const [attempt, setAttempt] = useState<SplashAttempt | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -81,6 +94,9 @@ export function AuthSplash() {
       setAttempt(next);
       setElapsed(next ? Math.max(0, Date.now() - next.startedAt) : 0);
       setIsExiting(false);
+      if (source === "event" || hasGoogleLoginPending()) {
+        setVerificandoGoogle(hasGoogleLoginPending());
+      }
       console.info("[SPLASH DEBUG] AuthSplash setAttempt", { attempt: next });
     };
     const handleLoginStart = () => {
@@ -148,6 +164,25 @@ export function AuthSplash() {
         ? "administrador de vereda"
         : "tu acceso administrativo";
   const progress = Math.min(100, Math.round((elapsed / MINIMUM_MS) * 100));
+
+  if (verificandoGoogle) {
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex min-h-screen items-center justify-center bg-[color:var(--card)] text-[color:var(--bosque-oscuro)]"
+        role="status"
+        aria-live="polite"
+        aria-label="Verificando acceso"
+      >
+        <div className="flex items-center gap-3 rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-5 py-4 shadow-sm">
+          <span
+            className="h-4 w-4 animate-spin rounded-full border-2 border-[color:var(--bosque)] border-t-transparent"
+            aria-hidden="true"
+          />
+          <span className="text-sm font-medium">Verificando acceso...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!attempt) return null;
 
