@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
@@ -123,7 +123,7 @@ function Auth() {
     }
   }, [cargandoAcceso, loginPendiente, usuario]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.info("[SPLASH DEBUG] login decision effect", {
       loginPendiente,
       usuario: usuario?.email ?? null,
