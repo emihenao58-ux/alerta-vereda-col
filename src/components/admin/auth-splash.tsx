@@ -189,6 +189,7 @@ export function AuthSplash() {
   return (
     <div
       className={`auth-splash auth-splash-${role}${isExiting ? " auth-splash-exiting" : ""}`}
+      style={{ animation: "none" }}
       role="dialog"
       aria-modal="true"
       aria-busy={!isExiting}
