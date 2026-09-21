@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
@@ -51,6 +51,7 @@ function Auth() {
   const [veredaSolicitadaId, setVeredaSolicitadaId] = useState("");
   const [veredas, setVeredas] = useState<Array<{ id: string; nombre: string }>>([]);
   const [cargando, setCargando] = useState(false);
+  const googleSplashStarted = useRef(false);
 
   useEffect(() => {
     let marcadorGoogle: boolean | "unavailable" = false;
@@ -123,7 +124,21 @@ function Auth() {
     }
   }, [cargandoAcceso, loginPendiente, usuario]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    if (loginPendiente !== "google") {
+      googleSplashStarted.current = false;
+      return;
+    }
+    if (googleSplashStarted.current || !usuario) return;
+
+    googleSplashStarted.current = true;
+    console.info("[SPLASH DEBUG] starting Google splash before access load", {
+      usuario: usuario.email,
+    });
+    beginLoginSplash();
+  }, [loginPendiente, usuario]);
+
+  useEffect(() => {
     console.info("[SPLASH DEBUG] login decision effect", {
       loginPendiente,
       usuario: usuario?.email ?? null,
@@ -156,13 +171,15 @@ function Auth() {
       return;
     }
 
-    console.info("[SPLASH DEBUG] calling beginLoginSplash", {
-      metodo,
-      usuario: usuario.email,
-      estado_cuenta: perfil.estado_cuenta,
-    });
-    beginLoginSplash(undefined, metodo === "password");
-    if (metodo === "password") void navigate({ to: "/" });
+    if (metodo === "password") {
+      console.info("[SPLASH DEBUG] calling beginLoginSplash", {
+        metodo,
+        usuario: usuario.email,
+        estado_cuenta: perfil.estado_cuenta,
+      });
+      beginLoginSplash(undefined, true);
+      void navigate({ to: "/" });
+    }
   }, [cargandoAcceso, loginPendiente, navigate, perfil, usuario]);
 
   useEffect(() => {

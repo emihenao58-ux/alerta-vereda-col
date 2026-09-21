@@ -63,6 +63,9 @@ export function clearLoginSplash() {
   } catch {
     // No bloquear el flujo si el navegador impide usar sessionStorage.
   }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(SPLASH_EVENT));
+  }
 }
 
 export function AuthSplash() {
