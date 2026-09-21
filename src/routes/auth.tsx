@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { AppShell } from "@/components/app-shell";
 import { TituloModulo, Vacio } from "@/components/carta";
 import { beginLoginSplash, clearLoginSplash } from "@/components/admin/auth-splash";
@@ -129,16 +128,16 @@ function Auth() {
     setCargando(true);
     beginLoginSplash();
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+        },
       });
-      if (result.error) {
+      if (error) {
         clearLoginSplash();
         toast.error("No pudimos iniciar sesión con Google");
-        return;
       }
-      if (result.redirected) return;
-      void navigate({ to: "/" });
     } catch (err) {
       clearLoginSplash();
       toast.error(err instanceof Error ? err.message : "No pudimos iniciar sesión con Google");
