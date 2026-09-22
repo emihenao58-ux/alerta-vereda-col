@@ -56,6 +56,7 @@ function Auth() {
   const [veredaSolicitadaId, setVeredaSolicitadaId] = useState("");
   const [veredas, setVeredas] = useState<Array<{ id: string; nombre: string }>>([]);
   const [cargando, setCargando] = useState(false);
+  const [loginPasswordEnCurso, setLoginPasswordEnCurso] = useState(false);
   const accesoObservado = useRef<string | null>(null);
 
   useEffect(() => {
@@ -180,13 +181,19 @@ function Auth() {
         accesoObservado.current = accesoActual;
         return;
       }
+      setLoginPendiente(null);
       try {
         sessionStorage.removeItem(GOOGLE_LOGIN_PENDING_KEY);
       } catch {
         // El flujo normal continúa aunque sessionStorage no esté disponible.
       }
       clearLoginSplash();
-      toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      void supabase.auth.signOut().then(({ error }) => {
+        if (error) console.error("No se pudo cerrar la sesión sin acceso administrativo:", error);
+        setLoginPasswordEnCurso(false);
+        setCargando(false);
+        toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      });
       return;
     }
 
@@ -204,6 +211,8 @@ function Auth() {
       clearLoginSplash();
       void supabase.auth.signOut().then(({ error }) => {
         if (error) console.error("No se pudo cerrar la sesión de una cuenta suspendida:", error);
+        setLoginPasswordEnCurso(false);
+        setCargando(false);
         toast.error(CUENTA_SUSPENDIDA_MESSAGE);
       });
       return;
@@ -216,7 +225,12 @@ function Auth() {
         // El flujo normal continúa aunque sessionStorage no esté disponible.
       }
       clearLoginSplash();
-      toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      void supabase.auth.signOut().then(({ error }) => {
+        if (error) console.error("No se pudo cerrar la sesión sin acceso administrativo:", error);
+        setLoginPasswordEnCurso(false);
+        setCargando(false);
+        toast.error(SIN_CUENTA_ADMINISTRATIVA_MESSAGE);
+      });
       return;
     }
 
@@ -236,6 +250,8 @@ function Auth() {
         usuario: usuario.email,
         estado_cuenta: perfil.estado_cuenta,
       });
+      setLoginPasswordEnCurso(false);
+      setCargando(false);
       beginLoginSplash(undefined, true);
       void navigate({ to: "/" });
     }
@@ -290,10 +306,14 @@ function Auth() {
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setCargando(true);
+    const esLoginPassword = modo === "entrar";
+    if (esLoginPassword) setLoginPasswordEnCurso(true);
+    let esperarDecisionDeAcceso = false;
     try {
       if (modo === "entrar") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        esperarDecisionDeAcceso = true;
         setLoginPendiente("password");
         return;
       }
@@ -318,10 +338,24 @@ function Auth() {
       toast.success("Solicitud creada. Revisa tu correo si debemos confirmar la cuenta.");
       setModo("entrar");
     } catch (err) {
-      if (modo === "entrar") clearLoginSplash();
-      toast.error(err instanceof Error ? err.message : "No pudimos completar la acción");
+      if (esLoginPassword) {
+        setLoginPendiente(null);
+        setLoginPasswordEnCurso(false);
+        clearLoginSplash();
+        const mensaje =
+          err instanceof Error && /invalid login credentials/i.test(err.message)
+            ? "Correo o contraseña incorrectos."
+            : err instanceof Error
+              ? err.message
+              : "No pudimos completar el inicio de sesión.";
+        toast.error(mensaje);
+      } else {
+        toast.error(err instanceof Error ? err.message : "No pudimos completar la acción");
+      }
     } finally {
-      setCargando(false);
+      if (!esperarDecisionDeAcceso) {
+        setCargando(false);
+      }
     }
   }
 
@@ -405,8 +439,8 @@ function Auth() {
 
   const solicitar = modo === "solicitar";
 
-  return (
-    <AppShell>
+  const contenidoAuth = (
+    <>
       <TituloModulo
         titulo={solicitar ? "Solicitar acceso de administrador" : "Iniciar sesión"}
         bajada={
@@ -489,13 +523,22 @@ function Auth() {
           disabled={cargando}
           className="w-full rounded-md bg-[color:var(--bosque)] px-4 py-3 font-semibold text-[color:var(--card)] disabled:opacity-60"
         >
-          {cargando ? "Procesando…" : solicitar ? "Enviar solicitud" : "Iniciar sesión"}
+          {cargando
+            ? solicitar
+              ? "Procesando…"
+              : loginPasswordEnCurso
+                ? "Iniciando sesión…"
+                : "Procesando…"
+            : solicitar
+              ? "Enviar solicitud"
+              : "Iniciar sesión"}
         </button>
         {!solicitar && (
           <button
             type="button"
             onClick={() => void conGoogle()}
-            className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3 text-sm font-semibold"
+            disabled={cargando}
+            className="w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3 text-sm font-semibold disabled:opacity-60"
           >
             Continuar con Google
           </button>
@@ -511,6 +554,16 @@ function Auth() {
       {solicitar && (
         <Vacio texto="No podrás administrar una vereda hasta que el superadmin apruebe tu solicitud." />
       )}
-    </AppShell>
+    </>
   );
+
+  if (loginPasswordEnCurso) {
+    return (
+      <div className="min-h-screen pb-24">
+        <main className="mx-auto max-w-3xl px-4 py-5">{contenidoAuth}</main>
+      </div>
+    );
+  }
+
+  return <AppShell>{contenidoAuth}</AppShell>;
 }
