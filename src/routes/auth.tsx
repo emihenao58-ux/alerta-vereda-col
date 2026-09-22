@@ -343,11 +343,13 @@ function Auth() {
         setLoginPasswordEnCurso(false);
         clearLoginSplash();
         const mensaje =
-          err instanceof Error && /invalid login credentials/i.test(err.message)
-            ? "Correo o contraseña incorrectos."
-            : err instanceof Error
-              ? err.message
-              : "No pudimos completar el inicio de sesión.";
+          err instanceof Error && /email not confirmed/i.test(err.message)
+            ? "Tu correo electrónico aún no ha sido confirmado. Revisa tu bandeja de entrada para confirmar tu cuenta."
+            : err instanceof Error && /invalid login credentials/i.test(err.message)
+              ? "Correo o contraseña incorrectos."
+              : err instanceof Error
+                ? err.message
+                : "No pudimos completar el inicio de sesión.";
         toast.error(mensaje);
       } else {
         toast.error(err instanceof Error ? err.message : "No pudimos completar la acción");
