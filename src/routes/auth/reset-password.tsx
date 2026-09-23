@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { TituloModulo } from "@/components/carta";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -70,7 +69,6 @@ function ResetPassword() {
 
       await supabase.auth.signOut();
       setEstado("guardado");
-      toast.success("Tu contraseña fue actualizada correctamente.");
     } catch (error) {
       setMensajeError(
         error instanceof Error ? error.message : "No pudimos actualizar la contraseña.",
@@ -137,7 +135,7 @@ function ResetPassword() {
                 disabled={guardando}
                 className="w-full rounded-md bg-[color:var(--bosque)] px-4 py-3 font-semibold text-[color:var(--card)] disabled:opacity-60"
               >
-                {guardando ? "Actualizando…" : "Guardar nueva contraseña"}
+                {guardando ? "Actualizando…" : "Actualizar contraseña"}
               </button>
             </form>
           )}
@@ -145,14 +143,15 @@ function ResetPassword() {
           {estado === "guardado" && (
             <>
               <p className="text-sm text-[color:var(--tinta-suave)]">
-                Ya puedes iniciar sesión con tu nueva contraseña.
+                Contraseña actualizada correctamente. Ahora puedes iniciar sesión con tu nueva
+                contraseña.
               </p>
               <button
                 type="button"
-                onClick={() => void navigate({ to: "/auth" })}
+                onClick={() => window.location.assign("/auth?mode=entrar")}
                 className="w-full rounded-md bg-[color:var(--bosque)] px-4 py-3 font-semibold text-[color:var(--card)]"
               >
-                Ir a iniciar sesión
+                Iniciar sesión
               </button>
             </>
           )}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { BellRing, ListChecks, MapPinned, ShieldCheck, Trees } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth, type Rol } from "@/hooks/use-auth";
@@ -78,6 +79,7 @@ export function clearLoginSplash() {
 }
 
 export function AuthSplash() {
+  const { pathname } = useLocation();
   const { perfil, cargandoAcceso } = useAuth();
   const [verificandoGoogle, setVerificandoGoogle] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -164,6 +166,8 @@ export function AuthSplash() {
         ? "administrador de vereda"
         : "tu acceso administrativo";
   const progress = Math.min(100, Math.round((elapsed / MINIMUM_MS) * 100));
+
+  if (pathname === "/auth/reset-password") return null;
 
   if (verificandoGoogle) {
     return (

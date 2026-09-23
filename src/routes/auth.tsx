@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +40,7 @@ const SIN_CUENTA_ADMINISTRATIVA_MESSAGE =
 
 function Auth() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { usuario, perfil, cargandoAcceso, esAdminVereda, esSuperadmin } = useAuth();
   const [loginPendiente, setLoginPendiente] = useState<"google" | "password" | null>(() => {
     if (typeof window === "undefined") return null;
@@ -49,7 +50,14 @@ function Auth() {
       return null;
     }
   });
-  const [modo, setModo] = useState<Modo>("inicio");
+  const [modo, setModo] = useState<Modo>(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("mode") === "entrar"
+        ? "entrar"
+        : "inicio";
+    }
+    return "inicio";
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
@@ -408,6 +416,10 @@ function Auth() {
     } finally {
       setCargando(false);
     }
+  }
+
+  if (pathname === "/auth/reset-password") {
+    return <Outlet />;
   }
 
   if (modo === "inicio") {
