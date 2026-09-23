@@ -22,6 +22,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminGestionRouteImport } from './routes/admin/gestion'
 import { Route as AdminJacRouteImport } from './routes/admin/jac'
 import { Route as AdminJacSuperadminRouteImport } from './routes/admin/jac-superadmin'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,11 +89,16 @@ const AdminJacSuperadminRoute = AdminJacSuperadminRouteImport.update({
   path: '/jac-superadmin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
   '/mi-vereda': typeof MiVeredaRoute
@@ -102,11 +108,12 @@ export interface FileRoutesByFullPath {
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
   '/mi-vereda': typeof MiVeredaRoute
@@ -116,13 +123,14 @@ export interface FileRoutesByTo {
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
   '/mi-vereda': typeof MiVeredaRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/auth/reset-password'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/auth/reset-password'
     | '/admin'
   id:
     | '__root__'
@@ -178,13 +189,14 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/auth/reset-password'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   AvisosRoute: typeof AvisosRoute
   EmergenciasRoute: typeof EmergenciasRoute
   MiVeredaRoute: typeof MiVeredaRoute
@@ -286,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminJacSuperadminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
@@ -305,10 +324,20 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AuthRouteChildren {
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   AvisosRoute: AvisosRoute,
   EmergenciasRoute: EmergenciasRoute,
   MiVeredaRoute: MiVeredaRoute,

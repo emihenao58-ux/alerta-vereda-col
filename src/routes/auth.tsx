@@ -32,7 +32,7 @@ export const Route = createFileRoute("/auth")({
 const campo =
   "mt-1 w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2 text-sm";
 
-type Modo = "inicio" | "entrar" | "solicitar";
+type Modo = "inicio" | "entrar" | "solicitar" | "recuperar";
 const CUENTA_SUSPENDIDA_MESSAGE =
   "Cuenta suspendida. Tu cuenta administrativa se encuentra suspendida. Si crees que esto es un error, contacta al administrador.";
 const SIN_CUENTA_ADMINISTRATIVA_MESSAGE =
@@ -318,6 +318,18 @@ function Auth() {
         return;
       }
 
+      if (modo === "recuperar") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) throw error;
+        toast.success(
+          "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.",
+        );
+        setModo("entrar");
+        return;
+      }
+
       if (modo !== "solicitar") return;
       if (!nombre.trim()) throw new Error("Escribe tu nombre completo.");
       if (!veredaSolicitadaId) throw new Error("Selecciona la vereda que deseas administrar.");
@@ -440,15 +452,24 @@ function Auth() {
   }
 
   const solicitar = modo === "solicitar";
+  const recuperar = modo === "recuperar";
 
   const contenidoAuth = (
     <>
       <TituloModulo
-        titulo={solicitar ? "Solicitar acceso de administrador" : "Iniciar sesión"}
+        titulo={
+          solicitar
+            ? "Solicitar acceso de administrador"
+            : recuperar
+              ? "Restablecer contraseña"
+              : "Iniciar sesión"
+        }
         bajada={
           solicitar
             ? "Este proceso es para personas autorizadas a administrar una vereda."
-            : "Usa tu correo y contraseña; no necesitas seleccionar una vereda."
+            : recuperar
+              ? "Te enviaremos un enlace seguro para establecer una nueva contraseña."
+              : "Usa tu correo y contraseña; no necesitas seleccionar una vereda."
         }
       />
       {solicitar && (
@@ -491,17 +512,19 @@ function Auth() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label className="block text-sm font-medium">
-          Contraseña
-          <input
-            className={campo}
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        {(modo === "entrar" || solicitar) && (
+          <label className="block text-sm font-medium">
+            Contraseña
+            <input
+              className={campo}
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+        )}
         {solicitar && (
           <label className="block text-sm font-medium">
             Vereda que solicitas administrar
@@ -528,14 +551,18 @@ function Auth() {
           {cargando
             ? solicitar
               ? "Procesando…"
-              : loginPasswordEnCurso
-                ? "Iniciando sesión…"
-                : "Procesando…"
+              : recuperar
+                ? "Enviando enlace…"
+                : loginPasswordEnCurso
+                  ? "Iniciando sesión…"
+                  : "Procesando…"
             : solicitar
               ? "Enviar solicitud"
-              : "Iniciar sesión"}
+              : recuperar
+                ? "Enviar enlace de recuperación"
+                : "Iniciar sesión"}
         </button>
-        {!solicitar && (
+        {!solicitar && !recuperar && (
           <button
             type="button"
             onClick={() => void conGoogle()}
@@ -545,12 +572,24 @@ function Auth() {
             Continuar con Google
           </button>
         )}
+        {!solicitar && !recuperar && (
+          <button
+            type="button"
+            onClick={() => {
+              setPassword("");
+              setModo("recuperar");
+            }}
+            className="w-full text-sm underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        )}
         <button
           type="button"
-          onClick={() => setModo("inicio")}
+          onClick={() => setModo(recuperar ? "entrar" : "inicio")}
           className="w-full text-sm underline"
         >
-          Volver a las opciones de acceso
+          {recuperar ? "Volver a iniciar sesión" : "Volver a las opciones de acceso"}
         </button>
       </form>
       {solicitar && (
