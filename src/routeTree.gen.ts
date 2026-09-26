@@ -19,6 +19,7 @@ import { Route as ReportarRouteImport } from './routes/reportar'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as ViasRouteImport } from './routes/vias'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminConfiguracionRouteImport } from './routes/admin/configuracion'
 import { Route as AdminGestionRouteImport } from './routes/admin/gestion'
 import { Route as AdminJacRouteImport } from './routes/admin/jac'
 import { Route as AdminJacSuperadminRouteImport } from './routes/admin/jac-superadmin'
@@ -74,6 +75,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConfiguracionRoute = AdminConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminGestionRoute = AdminGestionRouteImport.update({
   id: '/gestion',
   path: '/gestion',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
   '/admin/gestion': typeof AdminGestionRoute
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/configuracion'
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/configuracion'
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/reportar'
     | '/servicios'
     | '/vias'
+    | '/admin/configuracion'
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/configuracion': {
+      id: '/admin/configuracion'
+      path: '/configuracion'
+      fullPath: '/admin/configuracion'
+      preLoaderRoute: typeof AdminConfiguracionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/gestion': {
       id: '/admin/gestion'
       path: '/gestion'
@@ -309,6 +328,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminConfiguracionRoute: typeof AdminConfiguracionRoute
   AdminGestionRoute: typeof AdminGestionRoute
   AdminJacRoute: typeof AdminJacRoute
   AdminJacSuperadminRoute: typeof AdminJacSuperadminRoute
@@ -316,6 +336,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminConfiguracionRoute: AdminConfiguracionRoute,
   AdminGestionRoute: AdminGestionRoute,
   AdminJacRoute: AdminJacRoute,
   AdminJacSuperadminRoute: AdminJacSuperadminRoute,
