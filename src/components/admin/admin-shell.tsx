@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { ArrowLeft, LayoutDashboard, ShieldCheck, Trees } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Settings2, ShieldCheck, Trees } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { useAuth } from "@/hooks/use-auth";
@@ -84,6 +84,14 @@ export function AdminShell({ area, children }: { area: AdminArea; children: Reac
               >
                 <LayoutDashboard size={16} aria-hidden="true" />
                 <span>Centro de Gestión</span>
+              </Link>
+              <Link
+                to="/admin/configuracion"
+                className="admin-area-link"
+                activeProps={{ className: "admin-area-link admin-area-link-active" }}
+              >
+                <Settings2 size={16} aria-hidden="true" />
+                <span>Configuración del sistema</span>
               </Link>
             </>
           )}

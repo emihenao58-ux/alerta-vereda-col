@@ -3,6 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Carta, Vacio } from "@/components/carta";
+import {
+  GaleriaEvidencia,
+  PurgaPublicacion,
+  PurgaReporte,
+  type ReportePurgable,
+} from "@/components/admin/purga-definitiva";
 import { useAuth } from "@/hooks/use-auth";
 import {
   ETIQUETA_ESTADO,
@@ -14,6 +20,10 @@ import {
   type Severidad,
   type TipoServicio,
 } from "@/lib/alerta";
+import {
+  consultarPublicacionesCerradas,
+  type MiVeredaPublicacionCerrada,
+} from "@/lib/mi-vereda-cartelera";
 import type { Database } from "@/integrations/supabase/types";
 
 export type OperationScope = "local" | "global";
@@ -123,6 +133,12 @@ export function AdminOperation({
     },
   });
 
+  const publicacionesCerradas = useQuery({
+    queryKey: ["publicaciones-cerradas-admin"],
+    enabled: esSuperadmin,
+    queryFn: consultarPublicacionesCerradas,
+  });
+
   const veredas = useQuery({
     queryKey: ["veredas-public-admin"],
     enabled: esAdmin,
@@ -164,6 +180,7 @@ export function AdminOperation({
   const invalidar = () => {
     void qc.invalidateQueries({ queryKey: ["reportes-admin"] });
     void qc.invalidateQueries({ queryKey: ["publicaciones-admin"] });
+    void qc.invalidateQueries({ queryKey: ["publicaciones-cerradas-admin"] });
   };
 
   const aprobar = useMutation({
@@ -397,6 +414,7 @@ export function AdminOperation({
                 >
                   Rechazar
                 </button>
+                <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
               </div>
             </Carta>
           ))}
@@ -419,6 +437,24 @@ export function AdminOperation({
         />
       </section>
 
+      {scope === "global" && esSuperadmin && (
+        <section className="admin-panel-card">
+          <div className="admin-panel-heading">
+            <div>
+              <p className="admin-section-kicker">Purga controlada</p>
+              <h3>Publicaciones cerradas</h3>
+            </div>
+            <p className="admin-panel-note">Incluye solucionadas, no solucionadas y retiradas.</p>
+          </div>
+          <PublicacionesCerradas
+            publicaciones={publicacionesCerradas.data}
+            cargando={publicacionesCerradas.isLoading}
+            error={publicacionesCerradas.error}
+            onDone={invalidar}
+          />
+        </section>
+      )}
+
       <section className="admin-panel-card">
         <div className="admin-panel-heading">
           <div>
@@ -436,7 +472,11 @@ export function AdminOperation({
               titulo={reporte.titulo}
               meta={`${reporte.estado} · ${fecha(reporte.revisado_en)} · ${reporte.veredas?.nombre ?? "Vereda"}`}
             >
+              <GaleriaEvidencia fotos={[reporte.foto_url]} />
               {reporte.descripcion}
+              <div className="mt-3 flex flex-wrap gap-2">
+                <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
+              </div>
             </Carta>
           ))}
         </div>
@@ -448,6 +488,51 @@ export function AdminOperation({
           y en las RPC existentes.
         </p>
       )}
+    </div>
+  );
+}
+
+function PublicacionesCerradas({
+  publicaciones,
+  cargando,
+  error,
+  onDone,
+}: {
+  publicaciones: MiVeredaPublicacionCerrada[] | undefined;
+  cargando: boolean;
+  error: Error | null;
+  onDone: () => void;
+}) {
+  if (cargando) return <Vacio texto="Cargando publicaciones cerradas…" />;
+  if (error) {
+    return (
+      <div className="admin-access-card" role="alert">
+        No pudimos cargar las publicaciones cerradas. {error.message}
+      </div>
+    );
+  }
+  if (!publicaciones || publicaciones.length === 0) {
+    return <Vacio texto="No hay publicaciones cerradas para purgar." />;
+  }
+
+  return (
+    <div className="admin-card-stack">
+      {publicaciones.map((publicacion) => (
+        <Carta
+          key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+          titulo={publicacion.titulo}
+          meta={`${publicacion.categoria} · ${publicacion.vereda_nombre ?? "Vereda"} · Cerrada ${fecha(publicacion.cerrado_en)}`}
+        >
+          <p>{publicacion.descripcion}</p>
+          <GaleriaEvidencia fotos={[publicacion.foto_url]} />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm text-[color:var(--admin-muted)]">
+              Resultado: <strong>{publicacion.resultado}</strong>
+            </span>
+            <PurgaPublicacion publicacion={publicacion} onDone={onDone} />
+          </div>
+        </Carta>
+      ))}
     </div>
   );
 }
