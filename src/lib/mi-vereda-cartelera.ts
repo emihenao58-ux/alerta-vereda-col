@@ -37,6 +37,11 @@ export type MiVeredaHistorialPublicacion = Pick<
   | "created_at"
 >;
 
+export type MiVeredaPublicacionCerrada = MiVeredaPublicacion & {
+  cerrado_en: string;
+  resultado: "solucionado" | "no_solucionado" | "retirado";
+};
+
 export type MiVeredaVereda = {
   id: string;
   nombre: string;
@@ -71,6 +76,23 @@ type MiVeredaRpcClient = {
     data: unknown;
     error: { message: string; code?: string } | null;
   }>;
+};
+
+type ClosedPublicationsQuery = {
+  select: (columns: string) => ClosedPublicationsQuery;
+  not: (column: string, operator: "is", value: null) => ClosedPublicationsQuery;
+  in: (column: string, values: readonly string[]) => ClosedPublicationsQuery;
+  order: (
+    column: string,
+    options: { ascending: boolean },
+  ) => Promise<{
+    data: unknown;
+    error: { message: string; code?: string } | null;
+  }>;
+};
+
+type ClosedPublicationsClient = {
+  from: (table: "mi_vereda_publicaciones") => ClosedPublicationsQuery;
 };
 
 /**
@@ -119,6 +141,21 @@ export async function consultarHistorial(
 
   if (error) throw error;
   return Array.isArray(data) ? (data as MiVeredaHistorialPublicacion[]) : [];
+}
+
+export async function consultarPublicacionesCerradas(): Promise<MiVeredaPublicacionCerrada[]> {
+  const viewClient = supabase as unknown as ClosedPublicationsClient;
+  const { data, error } = await viewClient
+    .from("mi_vereda_publicaciones")
+    .select(
+      "publicacion_tabla, publicacion_id, vereda_id, categoria, titulo, descripcion, lugar, estado_operativo, resultado, cerrado_en, foto_url, fecha_evento, created_at, nivel, tipo, vereda_nombre",
+    )
+    .not("cerrado_en", "is", null)
+    .in("resultado", ["solucionado", "no_solucionado", "retirado"])
+    .order("cerrado_en", { ascending: false });
+
+  if (error) throw error;
+  return Array.isArray(data) ? (data as MiVeredaPublicacionCerrada[]) : [];
 }
 
 export async function consultarVeredas(): Promise<MiVeredaVereda[]> {
