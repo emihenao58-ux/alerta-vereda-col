@@ -4,10 +4,10 @@ import type { LucideIcon } from "lucide-react";
 import {
   AlertTriangle,
   ArrowRight,
+  Droplet,
   Megaphone,
   Plus,
   Route as RouteIcon,
-  Waves,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CartaCompacta, ChipSeveridad, Vacio } from "@/components/carta";
@@ -46,7 +46,7 @@ type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
 const ICONOS_ATAJO: Record<Atajo["to"], LucideIcon> = {
   "/emergencias": AlertTriangle,
   "/vias": RouteIcon,
-  "/servicios": Waves,
+  "/servicios": Droplet,
   "/avisos": Megaphone,
 };
 
@@ -161,7 +161,7 @@ function Portada() {
         {sinNovedades && (
           <div className="inicio-status">
             <ChipSeveridad severidad="normal" texto="Normal" />
-            <p>Sin novedades urgentes reportadas hoy.</p>
+            <p>Sin novedades urgentes activas.</p>
           </div>
         )}
 

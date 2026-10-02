@@ -94,8 +94,17 @@
 
   --fondo-escritorio: url("/images/backgrounds/fondo-dia-escritorio.webp");
   --fondo-movil: url("/images/backgrounds/fondo-dia-movil.webp");
-  --header-background: var(--bosque);
-  --header-foreground: var(--card);
+  --header-background: rgba(255, 255, 255, 0.82);
+  --header-foreground: var(--bosque-oscuro);
+  --header-accent: var(--bosque-oscuro);
+  --header-border: rgba(31, 68, 51, 0.18);
+  --account-background: var(--bosque-oscuro);
+  --account-foreground: #ffffff;
+  --account-border: transparent;
+  --emergency-bar-background: rgba(47, 93, 69, 0.9);
+  --emergency-bar-foreground: #ffffff;
+  --emergency-number-background: #ffffff;
+  --emergency-number-foreground: var(--bosque-oscuro);
 }
 
 .dark {
@@ -133,8 +142,17 @@
 
   --fondo-escritorio: url("/images/backgrounds/fondo-noche-escritorio.webp");
   --fondo-movil: url("/images/backgrounds/fondo-noche-movil.webp");
-  --header-background: #0b2f4c;
+  --header-background: rgba(11, 47, 76, 0.94);
   --header-foreground: #eef7f3;
+  --header-accent: #8fc5ad;
+  --header-border: rgba(143, 197, 173, 0.28);
+  --account-background: transparent;
+  --account-foreground: #eef7f3;
+  --account-border: #8fc5ad;
+  --emergency-bar-background: rgba(20, 74, 55, 0.92);
+  --emergency-bar-foreground: #eef7f3;
+  --emergency-number-background: #f7f3e8;
+  --emergency-number-foreground: #1f4433;
 }
 
 @layer base {
@@ -3475,5 +3493,265 @@ html.dark body::after {
   .carta-compacta,
   .mapa-construccion-back {
     transition: none;
+  }
+}
+
+/* Ronda frontend: identidad visual, encabezado y barra de emergencias. */
+.app-shell-header {
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid var(--header-border);
+  background: var(--header-background);
+  color: var(--header-foreground);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.app-shell-header .app-shell-nav-link {
+  display: block;
+  min-height: 2.75rem;
+  padding: 0.72rem 0.75rem 0.55rem;
+  border-bottom: 2px solid transparent;
+  border-radius: 0.4rem 0.4rem 0 0;
+  color: color-mix(in srgb, var(--header-foreground) 82%, transparent);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.app-shell-header .app-shell-nav-link:hover {
+  background: color-mix(in srgb, var(--header-accent) 12%, transparent);
+  color: var(--header-foreground);
+}
+
+.app-shell-header .app-shell-nav-link-active {
+  border-bottom-color: var(--header-accent);
+  color: var(--header-accent);
+  font-weight: 700;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  color: var(--header-foreground);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(226, 216, 190, 0.95);
+  border-radius: 0.7rem;
+  background: #f7f3e8;
+  padding: 0.18rem;
+  box-shadow: 0 2px 8px rgba(25, 47, 64, 0.14);
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.header-control-separator {
+  width: 1px;
+  height: 1.65rem;
+  background: color-mix(in srgb, var(--header-foreground) 34%, transparent);
+}
+
+.account-button {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 1px solid var(--account-border);
+  border-radius: 50%;
+  background: var(--account-background);
+  color: var(--account-foreground);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 160ms ease;
+}
+
+.account-button:hover {
+  border-color: var(--dorado);
+  background: color-mix(in srgb, var(--dorado) 22%, var(--account-background));
+}
+
+.account-button:active {
+  transform: scale(0.96);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  min-height: 2.75rem;
+  padding: 0.18rem;
+  border: 1px solid color-mix(in srgb, var(--header-foreground) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--header-background) 70%, transparent);
+  color: color-mix(in srgb, var(--header-foreground) 62%, transparent);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.theme-toggle-option {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.35rem;
+  min-width: 2.5rem;
+  min-height: 2.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 160ms ease;
+}
+
+.theme-toggle-option:hover {
+  background: color-mix(in srgb, var(--header-accent) 15%, transparent);
+  color: var(--header-foreground);
+}
+
+.theme-toggle-option.is-active {
+  background: var(--header-accent);
+  color: var(--header-background);
+}
+
+.theme-toggle-option:active {
+  transform: scale(0.94);
+}
+
+.theme-toggle-option:focus-visible,
+.account-button:focus-visible,
+.app-shell-nav-link:focus-visible,
+.brand-lockup:focus-visible,
+.app-emergency-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--dorado) 78%, white);
+  outline-offset: 3px;
+}
+
+.app-emergency-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  border-top: 1px solid color-mix(in srgb, var(--emergency-bar-foreground) 28%, transparent);
+  background: var(--emergency-bar-background);
+  color: var(--emergency-bar-foreground);
+  padding: 0.45rem max(0.75rem, env(safe-area-inset-left)) max(0.45rem, env(safe-area-inset-bottom))
+    max(0.75rem, env(safe-area-inset-right));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.app-emergency-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 2.75rem;
+  color: var(--emergency-bar-foreground);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.app-emergency-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.app-emergency-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.85rem;
+  min-height: 2.05rem;
+  border-radius: 999px;
+  background: var(--emergency-number-background);
+  color: var(--emergency-number-foreground);
+  padding: 0.2rem 0.7rem;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  line-height: 1;
+}
+
+.dark .inicio-report-cta {
+  background: #1f5d45;
+  color: #f7f3e8;
+}
+
+.dark .inicio-report-cta:hover {
+  background: #174636;
+}
+
+@media (max-width: 720px) {
+  body::before,
+  body::after {
+    background-position: 38% top;
+  }
+
+  .app-shell-dense {
+    background-image: var(--fondo-movil);
+    background-position: 38% top;
+    background-size: auto 100vh;
+  }
+
+  .app-shell-header > div:first-child {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .brand-wordmark {
+    font-size: 1.12rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .header-controls {
+    gap: 0.35rem;
+  }
+
+  .theme-toggle-option {
+    width: 2.35rem;
+    min-width: 2.35rem;
+  }
+
+  .app-emergency-link {
+    font-size: 0.86rem;
   }
 }
