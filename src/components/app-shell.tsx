@@ -2,13 +2,12 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { LayoutDashboard, Trees } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const MODULOS = [
-  { to: "/mi-vereda", label: "Mi Vereda" },
-  { to: "/emergencias", label: "Emergencias" },
-  { to: "/vias", label: "Vías" },
-  { to: "/servicios", label: "Servicios" },
-  { to: "/avisos", label: "Avisos" },
+  { to: "/", label: "Inicio" },
+  { to: "/mi-vereda", label: "Veredas" },
+  { to: "/mapa", label: "Mapa" },
   { to: "/reportar", label: "Reportar" },
 ] as const;
 
@@ -17,7 +16,7 @@ export function BotonEmergencias() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--bosque-oscuro)] bg-[color:var(--urgente)] px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
       <a
         href="tel:123"
-        className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-md px-4 py-3 text-base font-semibold tracking-wide text-[color:var(--card)]"
+        className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-md px-4 py-3 text-base font-semibold tracking-wide text-[color:var(--header-foreground)]"
       >
         <span aria-hidden>☎</span>
         Llamar a emergencias · 123
@@ -30,24 +29,16 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
   const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
 
   return (
-    <div className="min-h-screen pb-24">
-      <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
+    <div className={`min-h-screen pb-24 ${wide ? "app-shell-dense" : ""}`}>
+      <header className="app-shell-header">
         <div
           className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
         >
           <Link to="/" className="font-[family-name:var(--font-display)] text-xl font-bold">
             AlertaVereda
           </Link>
-          <div className="flex items-center gap-3 text-sm">
-            {esAdminVereda && (
-              <Link
-                to="/admin/jac"
-                className="flex items-center gap-1 underline underline-offset-4"
-              >
-                <Trees size={15} aria-hidden="true" />
-                Panel JAC
-              </Link>
-            )}
+          <div className="flex items-center gap-2 text-sm">
+            <ThemeToggle />
             {esSuperadmin && (
               <Link
                 to="/admin/gestion"
@@ -68,13 +59,16 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
             )}
           </div>
         </div>
-        <nav className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
+        <nav
+          className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
+          aria-label="Navegación principal"
+        >
           <ul className="flex gap-1 text-sm">
             {MODULOS.map((m) => (
               <li key={m.to}>
                 <Link
                   to={m.to}
-                  className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                  className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
                   activeProps={{
                     className:
                       "block whitespace-nowrap rounded-md px-3 py-1.5 bg-[color:var(--kraft)] text-[color:var(--bosque-oscuro)] font-semibold",
@@ -84,6 +78,21 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
                 </Link>
               </li>
             ))}
+            {esAdminVereda && (
+              <li>
+                <Link
+                  to="/admin/jac"
+                  className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                  activeProps={{
+                    className:
+                      "flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 bg-[color:var(--kraft)] text-[color:var(--bosque-oscuro)] font-semibold",
+                  }}
+                >
+                  <Trees size={15} aria-hidden="true" />
+                  Panel JAC
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </header>
@@ -91,7 +100,10 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
       <main className={`mx-auto px-4 py-5 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>{children}</main>
 
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
-        Herramienta comunitaria — complementa, no reemplaza, a las autoridades.
+        Herramienta comunitaria — complementa, no reemplaza a las autoridades.
+        <span className="mt-1 block italic">
+          Hecho para servir a nuestra comunidad, con Cristo en el centro. †
+        </span>
       </p>
 
       <BotonEmergencias />
