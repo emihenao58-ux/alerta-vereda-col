@@ -3645,8 +3645,8 @@ html.dark body::after {
 }
 
 .theme-toggle-option.is-active {
-  background: var(--header-accent);
-  color: var(--header-background);
+  background: color-mix(in srgb, var(--header-accent) 18%, var(--header-background));
+  color: var(--header-accent);
 }
 
 .theme-toggle-option:active {
@@ -3722,12 +3722,12 @@ html.dark body::after {
 @media (max-width: 720px) {
   body::before,
   body::after {
-    background-position: 38% top;
+    background-position: 72% top;
   }
 
   .app-shell-dense {
     background-image: var(--fondo-movil);
-    background-position: 38% top;
+    background-position: 72% top;
     background-size: auto 100vh;
   }
 
