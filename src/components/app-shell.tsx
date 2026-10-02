@@ -5,11 +5,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const MODULOS = [
-  { to: "/mi-vereda", label: "Mi Vereda" },
-  { to: "/emergencias", label: "Emergencias" },
-  { to: "/vias", label: "Vías" },
-  { to: "/servicios", label: "Servicios" },
-  { to: "/avisos", label: "Avisos" },
+  { to: "/", label: "Inicio" },
+  { to: "/mi-vereda", label: "Veredas" },
+  { to: "/mapa", label: "Mapa" },
   { to: "/reportar", label: "Reportar" },
 ] as const;
 
@@ -41,15 +39,6 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
           </Link>
           <div className="flex items-center gap-2 text-sm">
             <ThemeToggle />
-            {esAdminVereda && (
-              <Link
-                to="/admin/jac"
-                className="flex items-center gap-1 underline underline-offset-4"
-              >
-                <Trees size={15} aria-hidden="true" />
-                Panel JAC
-              </Link>
-            )}
             {esSuperadmin && (
               <Link
                 to="/admin/gestion"
@@ -70,7 +59,10 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
             )}
           </div>
         </div>
-        <nav className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
+        <nav
+          className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
+          aria-label="Navegación principal"
+        >
           <ul className="flex gap-1 text-sm">
             {MODULOS.map((m) => (
               <li key={m.to}>
@@ -86,6 +78,21 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
                 </Link>
               </li>
             ))}
+            {esAdminVereda && (
+              <li>
+                <Link
+                  to="/admin/jac"
+                  className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                  activeProps={{
+                    className:
+                      "flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 bg-[color:var(--kraft)] text-[color:var(--bosque-oscuro)] font-semibold",
+                  }}
+                >
+                  <Trees size={15} aria-hidden="true" />
+                  Panel JAC
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </header>

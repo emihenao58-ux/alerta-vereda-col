@@ -699,54 +699,59 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Link to="/" className="text-sm underline underline-offset-4">
-              Volver al inicio
-            </Link>
           </div>
         </div>
         <nav
           className="mx-auto max-w-3xl overflow-x-auto px-2 pb-2"
-          aria-label="Navegación de demostración"
+          aria-label="Navegación principal"
         >
           <ul className="flex gap-1 text-sm">
             <li>
               <Link
+                to="/"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                activeProps={{
+                  className:
+                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                }}
+              >
+                Inicio
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/mi-vereda"
-                className="block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                activeProps={{
+                  className:
+                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                }}
               >
-                Mi Vereda
+                Veredas
               </Link>
             </li>
             <li>
               <Link
-                to="/emergencias"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
+                to="/mapa"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                activeProps={{
+                  className:
+                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                }}
               >
-                Emergencias
+                Mapa
               </Link>
             </li>
             <li>
               <Link
-                to="/vias"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
+                to="/reportar"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                activeProps={{
+                  className:
+                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                }}
               >
-                Vías
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/servicios"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Servicios
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/avisos"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Avisos
+                Reportar
               </Link>
             </li>
           </ul>

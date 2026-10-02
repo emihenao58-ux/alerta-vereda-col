@@ -7,7 +7,6 @@ import {
   Megaphone,
   Plus,
   Route as RouteIcon,
-  Trees,
   Waves,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -35,7 +34,6 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
-  { to: "/mi-vereda", label: "Mi Vereda", color: "#5C7A47" },
   { to: "/emergencias", label: "Emergencias", color: "#C23B2E" },
   { to: "/vias", label: "Vías", color: "#DB7B33" },
   { to: "/servicios", label: "Servicios", color: "#2F5D45" },
@@ -46,7 +44,6 @@ type Atajo = (typeof ATAJOS)[number];
 type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
 
 const ICONOS_ATAJO: Record<Atajo["to"], LucideIcon> = {
-  "/mi-vereda": Trees,
   "/emergencias": AlertTriangle,
   "/vias": RouteIcon,
   "/servicios": Waves,
@@ -54,7 +51,6 @@ const ICONOS_ATAJO: Record<Atajo["to"], LucideIcon> = {
 };
 
 const DESCRIPCIONES_ATAJO: Record<Atajo["to"], string> = {
-  "/mi-vereda": "Consulta la cartelera de tu vereda.",
   "/emergencias": "Reporta situaciones urgentes.",
   "/vias": "Reporta daños o bloqueos en la vía.",
   "/servicios": "Reporta fallas en servicios públicos.",
