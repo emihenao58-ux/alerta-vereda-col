@@ -1,0 +1,19 @@
+{
+  "routes": [
+    { "path": "/", "title": "Inicio" },
+    { "path": "/mi-vereda", "title": "Mi Vereda" },
+    { "path": "/emergencias", "title": "Emergencias" },
+    { "path": "/vias", "title": "Vías" },
+    { "path": "/servicios", "title": "Servicios" },
+    { "path": "/avisos", "title": "Avisos" },
+    { "path": "/reportar", "title": "Reportar" },
+    { "path": "/mapa", "title": "Mapa" },
+    { "path": "/auth", "title": "Acceso" },
+    { "path": "/auth/reset-password", "title": "Restablecer contraseña" },
+    { "path": "/admin", "title": "Administración" },
+    { "path": "/admin/jac", "title": "Panel JAC" },
+    { "path": "/admin/jac-superadmin", "title": "Panel superadmin" },
+    { "path": "/admin/gestion", "title": "Centro de gestión" },
+    { "path": "/admin/configuracion", "title": "Configuración" }
+  ]
+}

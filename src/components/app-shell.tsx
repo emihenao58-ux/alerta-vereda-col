@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { LayoutDashboard, Trees } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const MODULOS = [
   { to: "/mi-vereda", label: "Mi Vereda" },
@@ -30,7 +31,7 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
   const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className={`min-h-screen pb-24 ${wide ? "app-shell-dense" : ""}`}>
       <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
         <div
           className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
@@ -38,7 +39,8 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
           <Link to="/" className="font-[family-name:var(--font-display)] text-xl font-bold">
             AlertaVereda
           </Link>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-2 text-sm">
+            <ThemeToggle />
             {esAdminVereda && (
               <Link
                 to="/admin/jac"

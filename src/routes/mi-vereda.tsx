@@ -32,6 +32,7 @@ import {
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/mi-vereda")({
   head: () => ({
@@ -696,9 +697,12 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
           >
             AlertaVereda
           </Link>
-          <Link to="/" className="text-sm underline underline-offset-4">
-            Volver al inicio
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link to="/" className="text-sm underline underline-offset-4">
+              Volver al inicio
+            </Link>
+          </div>
         </div>
         <nav
           className="mx-auto max-w-3xl overflow-x-auto px-2 pb-2"
