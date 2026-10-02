@@ -206,11 +206,6 @@ function Portada() {
             />
           ))}
         </section>
-
-        <footer className="inicio-footer">
-          <p>Herramienta comunitaria — complementa, no reemplaza a las autoridades.</p>
-          <p>Hecho para servir a nuestra comunidad, con Cristo en el centro. †</p>
-        </footer>
       </div>
     </AppShell>
   );

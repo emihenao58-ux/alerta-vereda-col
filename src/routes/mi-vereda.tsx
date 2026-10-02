@@ -689,7 +689,7 @@ function MiVereda() {
 function MiVeredaShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen pb-24">
-      <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
+      <header className="app-shell-header">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <Link
             to="/mi-vereda"
@@ -709,7 +709,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
                 activeProps={{
                   className:
                     "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
@@ -721,7 +721,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/mi-vereda"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
                 activeProps={{
                   className:
                     "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
@@ -733,7 +733,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/mapa"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
                 activeProps={{
                   className:
                     "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
@@ -745,7 +745,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/reportar"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
                 activeProps={{
                   className:
                     "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
