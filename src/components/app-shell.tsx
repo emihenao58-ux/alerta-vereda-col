@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Trees } from "lucide-react";
+import { LayoutDashboard, Trees, UserRound } from "lucide-react";
+import { BrandLockup } from "@/components/brand-lockup";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -13,15 +14,41 @@ const MODULOS = [
 
 export function BotonEmergencias() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--bosque-oscuro)] bg-[color:var(--urgente)] px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <div className="app-emergency-bar">
       <a
         href="tel:123"
-        className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-md px-4 py-3 text-base font-semibold tracking-wide text-[color:var(--header-foreground)]"
+        className="app-emergency-link"
+        aria-label="Llamar a la línea de emergencias 123"
       >
-        <span aria-hidden>☎</span>
-        Llamar a emergencias · 123
+        <span className="app-emergency-icon" aria-hidden="true">
+          ☎
+        </span>
+        <span>Línea de emergencias</span>
+        <span className="app-emergency-number">123</span>
       </a>
     </div>
+  );
+}
+
+function CuentaControl({ usuario, salir }: { usuario: boolean; salir: () => Promise<void> }) {
+  if (usuario) {
+    return (
+      <button
+        type="button"
+        className="account-button"
+        aria-label="Salir"
+        title="Salir"
+        onClick={() => void salir()}
+      >
+        <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
+      </button>
+    );
+  }
+
+  return (
+    <Link to="/auth" className="account-button" aria-label="Entrar" title="Entrar">
+      <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
+    </Link>
   );
 }
 
@@ -34,27 +61,19 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
         <div
           className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
         >
-          <Link to="/" className="font-[family-name:var(--font-display)] text-xl font-bold">
-            AlertaVereda
-          </Link>
-          <div className="flex items-center gap-2 text-sm">
+          <BrandLockup />
+          <div className="header-controls">
             <ThemeToggle />
+            <span className="header-control-separator" aria-hidden="true" />
+            <CuentaControl usuario={Boolean(usuario)} salir={salir} />
             {esSuperadmin && (
               <Link
                 to="/admin/gestion"
-                className="flex items-center gap-1 underline underline-offset-4"
+                className="superadmin-link flex items-center gap-1 whitespace-nowrap text-sm underline underline-offset-4"
+                title="Centro de Gestión"
               >
                 <LayoutDashboard size={15} aria-hidden="true" />
                 Centro de Gestión
-              </Link>
-            )}
-            {usuario ? (
-              <button onClick={() => void salir()} className="underline underline-offset-4">
-                Salir
-              </button>
-            ) : (
-              <Link to="/auth" className="underline underline-offset-4">
-                Entrar
               </Link>
             )}
           </div>
@@ -68,11 +87,8 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
               <li key={m.to}>
                 <Link
                   to={m.to}
-                  className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
-                  activeProps={{
-                    className:
-                      "block whitespace-nowrap rounded-md px-3 py-1.5 bg-[color:var(--kraft)] text-[color:var(--bosque-oscuro)] font-semibold",
-                  }}
+                  className="app-shell-nav-link"
+                  activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
                 >
                   {m.label}
                 </Link>
@@ -82,10 +98,10 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
               <li>
                 <Link
                   to="/admin/jac"
-                  className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                  className="app-shell-nav-link flex items-center gap-1"
                   activeProps={{
                     className:
-                      "flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 bg-[color:var(--kraft)] text-[color:var(--bosque-oscuro)] font-semibold",
+                      "app-shell-nav-link app-shell-nav-link-active flex items-center gap-1",
                   }}
                 >
                   <Trees size={15} aria-hidden="true" />

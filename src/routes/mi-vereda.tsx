@@ -32,6 +32,8 @@ import {
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
+import { BotonEmergencias } from "@/components/app-shell";
+import { BrandLockup } from "@/components/brand-lockup";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/mi-vereda")({
@@ -691,12 +693,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-24">
       <header className="app-shell-header">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
-          <Link
-            to="/mi-vereda"
-            className="font-[family-name:var(--font-display)] text-xl font-bold"
-          >
-            AlertaVereda
-          </Link>
+          <BrandLockup to="/mi-vereda" />
           <div className="flex items-center gap-2">
             <ThemeToggle />
           </div>
@@ -709,10 +706,9 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="app-shell-nav-link"
                 activeProps={{
-                  className:
-                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                  className: "app-shell-nav-link app-shell-nav-link-active",
                 }}
               >
                 Inicio
@@ -721,10 +717,9 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/mi-vereda"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="app-shell-nav-link"
                 activeProps={{
-                  className:
-                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                  className: "app-shell-nav-link app-shell-nav-link-active",
                 }}
               >
                 Veredas
@@ -733,10 +728,9 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/mapa"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="app-shell-nav-link"
                 activeProps={{
-                  className:
-                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                  className: "app-shell-nav-link app-shell-nav-link-active",
                 }}
               >
                 Mapa
@@ -745,10 +739,9 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
             <li>
               <Link
                 to="/reportar"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--header-foreground)]/85 transition-colors hover:bg-[color:var(--bosque-oscuro)]"
+                className="app-shell-nav-link"
                 activeProps={{
-                  className:
-                    "block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]",
+                  className: "app-shell-nav-link app-shell-nav-link-active",
                 }}
               >
                 Reportar
@@ -761,15 +754,7 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
         Vista de demostración — complementa, no reemplaza, a las autoridades.
       </p>
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--bosque-oscuro)] bg-[color:var(--urgente)] px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-        <a
-          href="tel:123"
-          className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-md px-4 py-3 text-base font-semibold tracking-wide text-[color:var(--card)]"
-        >
-          <span aria-hidden="true">☎</span>
-          Llamar a emergencias · 123
-        </a>
-      </div>
+      <BotonEmergencias />
     </div>
   );
 }

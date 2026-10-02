@@ -9,24 +9,33 @@ export function ThemeToggle() {
     setTheme(themeFromDocument());
   }, []);
 
-  const isDark = theme === "dark";
-  const nextTheme: AppTheme = isDark ? "light" : "dark";
+  const seleccionarTema = (nextTheme: AppTheme) => {
+    applyTheme(nextTheme);
+    setTheme(nextTheme);
+  };
 
   return (
-    <button
-      type="button"
-      className="theme-toggle"
-      aria-label={
-        theme === null ? "Cambiar tema" : isDark ? "Cambiar a modo día" : "Cambiar a modo noche"
-      }
-      aria-pressed={isDark}
-      onClick={() => {
-        applyTheme(nextTheme);
-        setTheme(nextTheme);
-      }}
-    >
-      {isDark ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
-      <span>{theme === null ? "Tema" : isDark ? "Modo día" : "Modo noche"}</span>
-    </button>
+    <div className="theme-toggle" role="group" aria-label="Seleccionar modo de color">
+      <button
+        type="button"
+        className={theme === "light" ? "theme-toggle-option is-active" : "theme-toggle-option"}
+        aria-label="Modo día"
+        aria-pressed={theme === "light"}
+        title="Modo día"
+        onClick={() => seleccionarTema("light")}
+      >
+        <Sun size={17} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        className={theme === "dark" ? "theme-toggle-option is-active" : "theme-toggle-option"}
+        aria-label="Modo noche"
+        aria-pressed={theme === "dark"}
+        title="Modo noche"
+        onClick={() => seleccionarTema("dark")}
+      >
+        <Moon size={17} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+    </div>
   );
 }
