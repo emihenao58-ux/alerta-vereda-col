@@ -8,7 +8,10 @@ import {
   CircleX,
   Filter,
   History,
+  Home,
+  Map as MapIcon,
   MapPin,
+  PencilLine,
   Search,
   Sparkles,
   Volume2,
@@ -692,63 +695,35 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen pb-24">
       <header className="app-shell-header">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+        <div className="app-shell-header-inner mx-auto max-w-6xl px-4 py-2">
           <BrandLockup to="/mi-vereda" />
-          <div className="flex items-center gap-2">
+          <nav className="app-shell-main-nav" aria-label="Navegación principal">
+            <ul className="flex gap-1">
+              {(
+                [
+                  ["/", "Inicio", Home],
+                  ["/mi-vereda", "Veredas", MapPin],
+                  ["/mapa", "Mapa", MapIcon],
+                  ["/reportar", "Reportar", PencilLine],
+                ] as const
+              ).map(([to, label, Icono]) => (
+                <li key={to}>
+                  <Link
+                    to={to as "/" | "/mi-vereda" | "/mapa" | "/reportar"}
+                    className="app-shell-nav-link"
+                    activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
+                  >
+                    <Icono size={16} strokeWidth={2.2} aria-hidden="true" />
+                    <span className="nav-link-label">{label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="header-controls">
             <ThemeToggle />
           </div>
         </div>
-        <nav
-          className="mx-auto max-w-3xl overflow-x-auto px-2 pb-2"
-          aria-label="Navegación principal"
-        >
-          <ul className="flex gap-1 text-sm">
-            <li>
-              <Link
-                to="/"
-                className="app-shell-nav-link"
-                activeProps={{
-                  className: "app-shell-nav-link app-shell-nav-link-active",
-                }}
-              >
-                Inicio
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/mi-vereda"
-                className="app-shell-nav-link"
-                activeProps={{
-                  className: "app-shell-nav-link app-shell-nav-link-active",
-                }}
-              >
-                Veredas
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/mapa"
-                className="app-shell-nav-link"
-                activeProps={{
-                  className: "app-shell-nav-link app-shell-nav-link-active",
-                }}
-              >
-                Mapa
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/reportar"
-                className="app-shell-nav-link"
-                activeProps={{
-                  className: "app-shell-nav-link app-shell-nav-link-active",
-                }}
-              >
-                Reportar
-              </Link>
-            </li>
-          </ul>
-        </nav>
       </header>
       <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">

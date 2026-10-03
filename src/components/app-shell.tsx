@@ -1,15 +1,23 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { LayoutDashboard, Trees, UserRound } from "lucide-react";
+import {
+  Home,
+  LayoutDashboard,
+  Map as MapIcon,
+  MapPin,
+  PencilLine,
+  Trees,
+  UserRound,
+} from "lucide-react";
 import { BrandLockup } from "@/components/brand-lockup";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const MODULOS = [
-  { to: "/", label: "Inicio" },
-  { to: "/mi-vereda", label: "Veredas" },
-  { to: "/mapa", label: "Mapa" },
-  { to: "/reportar", label: "Reportar" },
+  { to: "/", label: "Inicio", Icono: Home },
+  { to: "/mi-vereda", label: "Veredas", Icono: MapPin },
+  { to: "/mapa", label: "Mapa", Icono: MapIcon },
+  { to: "/reportar", label: "Reportar", Icono: PencilLine },
 ] as const;
 
 export function BotonEmergencias() {
@@ -58,10 +66,39 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
   return (
     <div className={`min-h-screen pb-24 ${wide ? "app-shell-dense" : ""}`}>
       <header className="app-shell-header">
-        <div
-          className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
-        >
+        <div className="app-shell-header-inner mx-auto max-w-6xl px-4 py-2">
           <BrandLockup />
+
+          <nav className="app-shell-main-nav" aria-label="Navegación principal">
+            <ul className="flex gap-1">
+              {MODULOS.map(({ to, label, Icono }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="app-shell-nav-link"
+                    activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
+                  >
+                    <Icono size={16} strokeWidth={2.2} aria-hidden="true" />
+                    <span className="nav-link-label">{label}</span>
+                  </Link>
+                </li>
+              ))}
+              {esAdminVereda && (
+                <li>
+                  <Link
+                    to="/admin/jac"
+                    className="app-shell-nav-link"
+                    activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
+                    title="Panel JAC"
+                  >
+                    <Trees size={16} strokeWidth={2.2} aria-hidden="true" />
+                    <span className="nav-link-label">Panel JAC</span>
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </nav>
+
           <div className="header-controls">
             <ThemeToggle />
             <span className="header-control-separator" aria-hidden="true" />
@@ -69,48 +106,16 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
             {esSuperadmin && (
               <Link
                 to="/admin/gestion"
-                className="superadmin-link flex items-center gap-1 whitespace-nowrap text-sm underline underline-offset-4"
+                className="superadmin-link"
+                aria-label="Centro de Gestión"
                 title="Centro de Gestión"
               >
-                <LayoutDashboard size={15} aria-hidden="true" />
-                Centro de Gestión
+                <LayoutDashboard size={17} aria-hidden="true" />
+                <span className="superadmin-label">Centro de Gestión</span>
               </Link>
             )}
           </div>
         </div>
-        <nav
-          className={`mx-auto overflow-x-auto px-2 pb-2 ${wide ? "max-w-6xl" : "max-w-3xl"}`}
-          aria-label="Navegación principal"
-        >
-          <ul className="flex gap-1 text-sm">
-            {MODULOS.map((m) => (
-              <li key={m.to}>
-                <Link
-                  to={m.to}
-                  className="app-shell-nav-link"
-                  activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
-                >
-                  {m.label}
-                </Link>
-              </li>
-            ))}
-            {esAdminVereda && (
-              <li>
-                <Link
-                  to="/admin/jac"
-                  className="app-shell-nav-link flex items-center gap-1"
-                  activeProps={{
-                    className:
-                      "app-shell-nav-link app-shell-nav-link-active flex items-center gap-1",
-                  }}
-                >
-                  <Trees size={15} aria-hidden="true" />
-                  Panel JAC
-                </Link>
-              </li>
-            )}
-          </ul>
-        </nav>
       </header>
 
       <main className={`mx-auto px-4 py-5 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>{children}</main>
