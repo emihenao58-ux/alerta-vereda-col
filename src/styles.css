@@ -3782,7 +3782,7 @@ html.dark body::after {
   max-width: none;
   margin: 0;
   color: var(--tinta);
-  font-size: clamp(2.35rem, 5.4vw, 4.75rem);
+  font-size: clamp(1.95rem, 4.5vw, 3.95rem);
   line-height: 0.93;
   text-shadow: 0 1px 9px color-mix(in srgb, var(--background) 34%, transparent);
 }
@@ -3960,7 +3960,7 @@ html.dark body::after {
   }
 
   .inicio-hero h1 {
-    font-size: clamp(2rem, 9.3vw, 3.2rem);
+    font-size: clamp(1.7rem, 8vw, 2.7rem);
   }
 
   .brand-mark {
@@ -3972,7 +3972,7 @@ html.dark body::after {
   .inicio-verse {
     justify-self: start;
     max-width: 100%;
-    margin-top: 0.3rem;
+    margin-top: 0.75rem;
   }
 
   .app-shell-header-inner {
