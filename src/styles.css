@@ -3437,6 +3437,10 @@ html.dark body::after {
     background-image: url("/images/backgrounds/fondo-noche-movil.webp");
   }
 
+  html.dark body::after {
+    background-position: calc(50% - 2.6vh) -11.1vh;
+  }
+
   .app-shell-dense {
     background-image: var(--fondo-escritorio);
     background-size: auto 36vh;
