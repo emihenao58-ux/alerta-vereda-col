@@ -8,7 +8,10 @@ import {
   CircleX,
   Filter,
   History,
+  Home,
+  Map as MapIcon,
   MapPin,
+  PencilLine,
   Search,
   Sparkles,
   Volume2,
@@ -32,6 +35,9 @@ import {
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
+import { BotonEmergencias } from "@/components/app-shell";
+import { BrandLockup } from "@/components/brand-lockup";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/mi-vereda")({
   head: () => ({
@@ -688,79 +694,42 @@ function MiVereda() {
 function MiVeredaShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen pb-24">
-      <header className="bg-[color:var(--bosque)] text-[color:var(--card)]">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
-          <Link
-            to="/mi-vereda"
-            className="font-[family-name:var(--font-display)] text-xl font-bold"
-          >
-            AlertaVereda
-          </Link>
-          <Link to="/" className="text-sm underline underline-offset-4">
-            Volver al inicio
-          </Link>
+      <header className="app-shell-header">
+        <div className="app-shell-header-inner mx-auto max-w-6xl px-4 py-2">
+          <BrandLockup to="/mi-vereda" />
+          <nav className="app-shell-main-nav" aria-label="Navegación principal">
+            <ul className="flex gap-1">
+              {(
+                [
+                  ["/", "Inicio", Home],
+                  ["/mi-vereda", "Veredas", MapPin],
+                  ["/mapa", "Mapa", MapIcon],
+                  ["/reportar", "Reportar", PencilLine],
+                ] as const
+              ).map(([to, label, Icono]) => (
+                <li key={to}>
+                  <Link
+                    to={to as "/" | "/mi-vereda" | "/mapa" | "/reportar"}
+                    className="app-shell-nav-link"
+                    activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
+                  >
+                    <Icono size={16} strokeWidth={2.2} aria-hidden="true" />
+                    <span className="nav-link-label">{label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="header-controls">
+            <ThemeToggle />
+          </div>
         </div>
-        <nav
-          className="mx-auto max-w-3xl overflow-x-auto px-2 pb-2"
-          aria-label="Navegación de demostración"
-        >
-          <ul className="flex gap-1 text-sm">
-            <li>
-              <Link
-                to="/mi-vereda"
-                className="block whitespace-nowrap rounded-md bg-[color:var(--kraft)] px-3 py-1.5 font-semibold text-[color:var(--bosque-oscuro)]"
-              >
-                Mi Vereda
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/emergencias"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Emergencias
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/vias"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Vías
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/servicios"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Servicios
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/avisos"
-                className="block whitespace-nowrap rounded-md px-3 py-1.5 text-[color:var(--card)]/85"
-              >
-                Avisos
-              </Link>
-            </li>
-          </ul>
-        </nav>
       </header>
       <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
         Vista de demostración — complementa, no reemplaza, a las autoridades.
       </p>
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--bosque-oscuro)] bg-[color:var(--urgente)] px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-        <a
-          href="tel:123"
-          className="mx-auto flex max-w-md items-center justify-center gap-2 rounded-md px-4 py-3 text-base font-semibold tracking-wide text-[color:var(--card)]"
-        >
-          <span aria-hidden="true">☎</span>
-          Llamar a emergencias · 123
-        </a>
-      </div>
+      <BotonEmergencias />
     </div>
   );
 }

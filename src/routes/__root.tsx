@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { AuthSplash } from "@/components/admin/auth-splash";
 import { Toaster } from "@/components/ui/sonner";
+import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -100,6 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/alertavereda-192.png", sizes: "192x192" },
     ],
   }),
   shellComponent: RootShell,
@@ -110,11 +113,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
         <HeadContent />
       </head>
-      <body style={{ backgroundColor: "#ede6d3" }}>
+      <body>
         {children}
         <Scripts />
       </body>

@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import type { ComponentType, CSSProperties } from "react";
+import type { LucideProps } from "lucide-react";
+import { AlertTriangle, ArrowRight, Droplet, Megaphone, Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { Carta, ChipSeveridad, Vacio } from "@/components/carta";
-import { URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
-import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
+import { CartaCompacta, ChipSeveridad, Vacio } from "@/components/carta";
+import { URL_FOTO, severidadDeNivel } from "@/lib/alerta";
+import { consultarCartelera, type MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,15 +28,47 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
-  { to: "/mi-vereda", label: "Mi Vereda", color: "#5C7A47" },
-  { to: "/emergencias", label: "Emergencias", color: "#C23B2E" },
-  { to: "/vias", label: "Vías", color: "#DB7B33" },
-  { to: "/servicios", label: "Servicios", color: "#2F5D45" },
-  { to: "/avisos", label: "Avisos", color: "#C99A2E" },
+  { to: "/emergencias", label: "Emergencias", color: "#DA3F4C" },
+  { to: "/vias", label: "Vías", color: "#E58129" },
+  { to: "/servicios", label: "Servicios", color: "#228E6C" },
+  { to: "/avisos", label: "Avisos", color: "#E7A836" },
 ] as const;
 
+type Atajo = (typeof ATAJOS)[number];
+type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
+
+function RoadIcon({ size = 48, color = "currentColor", ...props }: LucideProps) {
+  return (
+    <svg {...props} width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <path d="M16 4h16l11 40H5L16 4Z" fill={color} />
+      <path d="M22 9h4v7h-4V9Zm0 12h4v7h-4v-7Zm0 12h4v7h-4v-7Z" fill="var(--icon-cutout)" />
+    </svg>
+  );
+}
+
+const ICONOS_ATAJO: Record<Atajo["to"], ComponentType<LucideProps>> = {
+  "/emergencias": AlertTriangle,
+  "/vias": RoadIcon,
+  "/servicios": Droplet,
+  "/avisos": Megaphone,
+};
+
+const DESCRIPCIONES_ATAJO: Record<Atajo["to"], string> = {
+  "/emergencias": "Reporta situaciones urgentes.",
+  "/vias": "Reporta daños o bloqueos en la vía.",
+  "/servicios": "Reporta fallas en servicios públicos.",
+  "/avisos": "Comparte información importante.",
+};
+
+const ACENTOS_CATEGORIA: Record<TarjetaInicioRuta, string> = {
+  "/emergencias": "#DA3F4C",
+  "/vias": "#E58129",
+  "/servicios": "#228E6C",
+  "/avisos": "#E7A836",
+};
+
 function Portada() {
-  const { data, isLoading } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ["portada"],
     queryFn: async () => {
       const [emergencias, vias, servicios, avisos] = await Promise.all([
@@ -70,97 +105,160 @@ function Portada() {
     data.servicios.length === 0;
 
   return (
-    <AppShell>
-      <section>
-        <h1 className="text-3xl leading-tight font-bold">¿Qué está pasando en la vereda?</h1>
-        <p className="mt-1 text-sm text-[color:var(--tinta-suave)]">
-          Cartelera comunitaria de las veredas de Ebéjico, Antioquia.
-        </p>
-      </section>
+    <AppShell wide>
+      <div className="inicio-page">
+        <section className="inicio-hero" aria-labelledby="inicio-titulo">
+          <div>
+            <h1 id="inicio-titulo">
+              <span>¿Qué está pasando</span>
+              <span>en la vereda?</span>
+            </h1>
+            <p className="inicio-hero-lead">Reporta, consulta y mantente informado.</p>
+          </div>
+          <blockquote className="inicio-verse">
+            <span className="inicio-verse-symbol" aria-hidden="true">
+              †
+            </span>
+            <div>
+              <p>“Sobrellevad los unos las cargas de los otros.”</p>
+              <cite>Gálatas 6:2</cite>
+            </div>
+          </blockquote>
+        </section>
 
-      <nav className="mt-4 grid grid-cols-2 gap-2">
-        {ATAJOS.map((a) => (
-          <Link
-            key={a.to}
-            to={a.to}
-            className="rounded-md px-4 py-4 text-center font-semibold text-[color:var(--card)]"
-            style={{ backgroundColor: a.color }}
-          >
-            {a.label}
-          </Link>
-        ))}
-      </nav>
+        <nav className="inicio-category-grid" aria-label="Categorías de la cartelera">
+          {ATAJOS.map((atajo) => {
+            const Icono = ICONOS_ATAJO[atajo.to];
+            return (
+              <Link
+                key={atajo.to}
+                to={atajo.to}
+                className="inicio-category-card"
+                style={{ backgroundColor: atajo.color }}
+              >
+                <span className="inicio-category-card-inner">
+                  <span className="inicio-category-icon" aria-hidden="true">
+                    <Icono
+                      size={48}
+                      strokeWidth={1.8}
+                      fill="currentColor"
+                      stroke="var(--icon-cutout)"
+                      style={{ "--icon-cutout": atajo.color } as CSSProperties}
+                    />
+                  </span>
+                  <span>
+                    <strong>{atajo.label}</strong>
+                    <small>{DESCRIPCIONES_ATAJO[atajo.to]}</small>
+                  </span>
+                  <span className="inicio-category-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      <Link
-        to="/reportar"
-        className="mt-2 block rounded-md bg-[color:var(--terracota)] px-4 py-4 text-center font-semibold text-[color:var(--card)]"
-      >
-        Reportar algo en mi vereda
-      </Link>
+        <Link to="/reportar" className="inicio-report-cta">
+          <Plus size={24} strokeWidth={2.5} aria-hidden="true" />
+          Reportar algo en mi vereda
+          <ArrowRight size={18} aria-hidden="true" />
+        </Link>
 
-      {isLoading && <Vacio texto="Cargando la cartelera…" />}
-      {sinNovedades && (
-        <div className="mt-6 flex items-center gap-2 rounded-md bg-[color:var(--kraft-oscuro)] p-4">
-          <ChipSeveridad severidad="normal" />
-          <p className="text-sm">Sin novedades urgentes reportadas hoy.</p>
-        </div>
-      )}
+        {isLoading && <Vacio texto="Cargando la cartelera…" />}
+        {isError && (
+          <Vacio texto="No fue posible cargar la cartelera. Intenta de nuevo más tarde." />
+        )}
+        {sinNovedades && (
+          <div className="inicio-status">
+            <ChipSeveridad severidad="normal" texto="Normal" />
+            <p>Sin novedades urgentes activas.</p>
+          </div>
+        )}
 
-      {data?.emergencias.map((e) => (
-        <Carta
-          key={e.publicacion_id}
-          titulo={e.titulo}
-          severidad={severidadDeNivel(e.nivel)}
-          etiqueta={e.estado_operativo ?? "Activa"}
-          meta={`Emergencia · ${e.vereda_nombre ?? ""} · ${fecha(e.created_at)}`}
-        >
-          {e.descripcion}
-          {URL_FOTO(e.foto_url) && (
-            <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />
-          )}
-        </Carta>
-      ))}
+        <section className="inicio-feed" aria-labelledby="inicio-feed-titulo">
+          <div className="inicio-feed-heading">
+            <div>
+              <h2 id="inicio-feed-titulo">Últimos avisos</h2>
+            </div>
+          </div>
 
-      {data?.vias.map((v) => (
-        <Carta
-          key={v.publicacion_id}
-          titulo={v.titulo}
-          severidad={severidadDeNivel(v.nivel)}
-          etiqueta={v.estado_operativo ?? ""}
-          meta={`Vía · ${v.vereda_nombre ?? ""} · ${fecha(v.created_at)}`}
-        >
-          {v.descripcion}
-          {URL_FOTO(v.foto_url) && (
-            <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />
-          )}
-        </Carta>
-      ))}
-
-      {data?.servicios.map((s) => (
-        <Carta
-          key={s.publicacion_id}
-          titulo={s.tipo ? `Servicio de ${s.tipo === "senal" ? "señal" : s.tipo}` : "Servicio"}
-          severidad={severidadDeNivel(s.nivel)}
-          etiqueta={s.estado_operativo ?? ""}
-          meta={`${s.vereda_nombre ?? ""} · ${fecha(s.created_at)}`}
-        >
-          {s.descripcion}
-          {URL_FOTO(s.foto_url) && (
-            <img src={URL_FOTO(s.foto_url)!} alt={s.titulo} className="mt-2 w-full rounded-md" />
-          )}
-        </Carta>
-      ))}
-
-      {data?.avisos.map((a) => (
-        <Carta
-          key={a.publicacion_id}
-          titulo={a.titulo}
-          acento="#C99A2E"
-          meta={`Aviso de la JAC · ${a.vereda_nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${a.fecha_evento ? ` · ${fecha(a.fecha_evento)}` : ""}`}
-        >
-          {a.descripcion}
-        </Carta>
-      ))}
+          {data?.emergencias.map((publicacion) => (
+            <TarjetaInicio
+              key={publicacion.publicacion_id}
+              to="/emergencias"
+              publicacion={publicacion}
+              categoria="emergencia"
+            />
+          ))}
+          {data?.vias.map((publicacion) => (
+            <TarjetaInicio
+              key={publicacion.publicacion_id}
+              to="/vias"
+              publicacion={publicacion}
+              categoria="via"
+            />
+          ))}
+          {data?.servicios.map((publicacion) => (
+            <TarjetaInicio
+              key={publicacion.publicacion_id}
+              to="/servicios"
+              publicacion={publicacion}
+              categoria="servicio"
+            />
+          ))}
+          {data?.avisos.map((publicacion) => (
+            <TarjetaInicio
+              key={publicacion.publicacion_id}
+              to="/avisos"
+              publicacion={publicacion}
+              categoria="aviso"
+            />
+          ))}
+        </section>
+      </div>
     </AppShell>
   );
+}
+
+function TarjetaInicio({
+  to,
+  publicacion,
+  categoria,
+}: {
+  to: TarjetaInicioRuta;
+  publicacion: MiVeredaPublicacion;
+  categoria: "emergencia" | "via" | "servicio" | "aviso";
+}) {
+  return (
+    <Link to={to} className="carta-compacta-link">
+      <CartaCompacta
+        categoria={categoria}
+        titulo={publicacion.titulo}
+        descripcion={publicacion.descripcion}
+        fotoUrl={URL_FOTO(publicacion.foto_url)}
+        vereda={publicacion.vereda_nombre ?? publicacion.lugar}
+        momento={tiempoRelativo(publicacion.fecha_evento ?? publicacion.created_at)}
+        severidad={severidadDeNivel(publicacion.nivel)}
+        etiqueta={publicacion.estado_operativo ?? undefined}
+        acento={ACENTOS_CATEGORIA[to]}
+      />
+    </Link>
+  );
+}
+
+function tiempoRelativo(valor: string | null | undefined) {
+  if (!valor) return null;
+  const diferencia = Date.now() - new Date(valor).getTime();
+  const minutos = Math.max(0, Math.round(diferencia / 60_000));
+  if (minutos < 1) return "Ahora";
+  if (minutos < 60) return `Hace ${minutos} min`;
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return `Hace ${horas} h`;
+  const dias = Math.round(horas / 24);
+  if (dias < 7) return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
+  return new Date(valor).toLocaleDateString("es-CO", {
+    day: "2-digit",
+    month: "short",
+  });
 }

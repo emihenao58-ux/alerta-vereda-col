@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AvisosRouteImport } from './routes/avisos'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
+import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MiVeredaRouteImport } from './routes/mi-vereda'
 import { Route as ReportarRouteImport } from './routes/reportar'
 import { Route as ServiciosRouteImport } from './routes/servicios'
@@ -48,6 +49,11 @@ const AvisosRoute = AvisosRouteImport.update({
 const EmergenciasRoute = EmergenciasRouteImport.update({
   id: '/emergencias',
   path: '/emergencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapaRoute = MapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MiVeredaRoute = MiVeredaRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
   '/emergencias': typeof EmergenciasRoute
+  '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
   '/servicios': typeof ServiciosRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avisos'
     | '/emergencias'
+    | '/mapa'
     | '/mi-vereda'
     | '/reportar'
     | '/servicios'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avisos'
     | '/emergencias'
+    | '/mapa'
     | '/mi-vereda'
     | '/reportar'
     | '/servicios'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/avisos'
     | '/emergencias'
+    | '/mapa'
     | '/mi-vereda'
     | '/reportar'
     | '/servicios'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   AvisosRoute: typeof AvisosRoute
   EmergenciasRoute: typeof EmergenciasRoute
+  MapaRoute: typeof MapaRoute
   MiVeredaRoute: typeof MiVeredaRoute
   ReportarRoute: typeof ReportarRoute
   ServiciosRoute: typeof ServiciosRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/emergencias'
       fullPath: '/emergencias'
       preLoaderRoute: typeof EmergenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa': {
+      id: '/mapa'
+      path: '/mapa'
+      fullPath: '/mapa'
+      preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mi-vereda': {
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   AvisosRoute: AvisosRoute,
   EmergenciasRoute: EmergenciasRoute,
+  MapaRoute: MapaRoute,
   MiVeredaRoute: MiVeredaRoute,
   ReportarRoute: ReportarRoute,
   ServiciosRoute: ServiciosRoute,
