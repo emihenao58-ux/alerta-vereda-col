@@ -4038,3 +4038,9 @@ html.dark body::after {
     height: 2.8rem;
   }
 }
+
+@media (min-width: 721px) {
+  html:not(.dark) .inicio-verse {
+    transform: translateX(-6rem);
+  }
+}
