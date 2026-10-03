@@ -3032,6 +3032,11 @@ html.dark body::after {
   background-size: auto 48vh;
 }
 
+.app-shell-dense:has(.inicio-page) {
+  background-color: transparent;
+  background-image: none;
+}
+
 .app-shell-header {
   background: var(--header-background);
   color: var(--header-foreground);
@@ -3720,15 +3725,9 @@ html.dark body::after {
 }
 
 @media (max-width: 720px) {
-  body::before,
-  body::after {
-    background-position: 72% top;
-  }
-
   .app-shell-dense {
-    background-image: var(--fondo-movil);
-    background-position: 72% top;
-    background-size: auto 100vh;
+    background-image: var(--fondo-escritorio);
+    background-size: auto 36vh;
   }
 
   .app-shell-header > div:first-child {
