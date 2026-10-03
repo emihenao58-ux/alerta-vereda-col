@@ -3755,3 +3755,287 @@ html.dark body::after {
     font-size: 0.86rem;
   }
 }
+
+/* Prompt 4: réplica estricta de Inicio_Dia.jpeg. */
+.inicio-page {
+  width: min(85vw, 72rem);
+  margin-inline: auto;
+  gap: 0.9rem;
+  padding-bottom: 1rem;
+}
+
+.inicio-hero {
+  grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 0.7fr);
+  align-items: end;
+  gap: clamp(1rem, 4vw, 3.5rem);
+  padding: 1.1rem 0 0.45rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.inicio-hero .eyebrow {
+  display: none;
+}
+
+.inicio-hero h1 {
+  max-width: none;
+  margin: 0;
+  color: var(--tinta);
+  font-size: clamp(2.35rem, 5.4vw, 4.75rem);
+  line-height: 0.93;
+  text-shadow: 0 1px 9px color-mix(in srgb, var(--background) 34%, transparent);
+}
+
+.inicio-hero h1 span {
+  display: block;
+  white-space: nowrap;
+}
+
+.inicio-hero-lead {
+  margin-top: 0.65rem;
+  color: var(--tinta);
+  font-size: clamp(0.88rem, 1.45vw, 1.08rem);
+}
+
+.inicio-verse {
+  justify-self: end;
+  align-self: end;
+  max-width: 18rem;
+  margin-bottom: 0.1rem;
+  padding: 0.65rem 0 0.15rem;
+  color: var(--tinta);
+}
+
+.inicio-verse p {
+  font-size: 0.96rem;
+  text-shadow: 0 1px 7px color-mix(in srgb, var(--background) 30%, transparent);
+}
+
+.inicio-category-grid {
+  gap: 0.72rem;
+}
+
+.inicio-category-card {
+  min-height: 5.35rem;
+  border: 1px solid color-mix(in srgb, white 42%, transparent);
+  border-radius: 0.78rem;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(25, 47, 64, 0.18);
+}
+
+.inicio-category-card-inner {
+  grid-template-columns: 3.55rem minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+}
+
+.inicio-category-icon {
+  width: 3.15rem;
+  height: 3.15rem;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
+}
+
+.inicio-category-icon svg {
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  color: #ffffff;
+}
+
+.inicio-category-card strong {
+  font-size: clamp(1.08rem, 2vw, 1.35rem);
+}
+
+.inicio-category-card small {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+}
+
+.inicio-category-arrow {
+  font-size: 1.85rem;
+}
+
+.inicio-report-cta {
+  min-height: 3.5rem;
+  border-radius: 0.78rem;
+  background: #1a6453;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: clamp(0.98rem, 1.8vw, 1.18rem);
+  box-shadow: 0 3px 10px rgba(25, 47, 64, 0.18);
+}
+
+.inicio-report-cta:hover {
+  background: #155343;
+}
+
+.inicio-status {
+  min-height: 3rem;
+  border: 1px solid color-mix(in srgb, #e6efec 72%, #a9c4ba);
+  border-radius: 0.78rem;
+  background: #e6efec;
+  color: #1a6453;
+}
+
+.inicio-status > p {
+  margin: 0;
+  color: #1a6453;
+}
+
+.inicio-feed {
+  gap: 0.7rem;
+}
+
+.inicio-feed-heading {
+  padding-top: 0.45rem;
+}
+
+.inicio-feed-heading h2 {
+  color: var(--tinta);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.app-shell-header-inner {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.65rem, 2vw, 1.5rem);
+  min-height: 3.65rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-shell-header-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.app-shell-header-inner > .brand-lockup,
+.app-shell-header-inner > .header-controls {
+  flex: 0 0 auto;
+}
+
+.app-shell-main-nav {
+  flex: 1 1 auto;
+  min-width: max-content;
+}
+
+.app-shell-main-nav ul {
+  align-items: center;
+}
+
+.app-shell-header .app-shell-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-height: 2.6rem;
+  padding: 0.62rem 0.62rem 0.48rem;
+  border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.superadmin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: 50%;
+  color: var(--header-foreground);
+}
+
+.superadmin-link:hover {
+  background: color-mix(in srgb, var(--header-accent) 12%, transparent);
+}
+
+@media (max-width: 720px) {
+  .inicio-page {
+    width: min(85vw, 72rem);
+  }
+
+  .inicio-hero {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding-top: 0.45rem;
+  }
+
+  .inicio-hero h1 {
+    font-size: clamp(2rem, 9.3vw, 3.2rem);
+  }
+
+  .brand-mark {
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0.12rem;
+  }
+
+  .inicio-verse {
+    justify-self: start;
+    max-width: 100%;
+    margin-top: 0.3rem;
+  }
+
+  .app-shell-header-inner {
+    gap: 0.4rem;
+    padding-right: 0.65rem;
+    padding-left: 0.65rem;
+  }
+
+  .brand-wordmark {
+    font-size: 0.88rem;
+  }
+
+  .app-shell-main-nav {
+    flex: 0 0 auto;
+  }
+
+  .app-shell-header .app-shell-nav-link {
+    min-width: 1.95rem;
+    padding-inline: 0.25rem;
+  }
+
+  .app-shell-header .nav-link-label,
+  .superadmin-label {
+    display: none;
+  }
+
+  .header-controls {
+    gap: 0.22rem;
+  }
+
+  .theme-toggle-option {
+    width: 1.85rem;
+    min-width: 1.85rem;
+    height: 1.95rem;
+    min-height: 1.95rem;
+  }
+
+  .account-button {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .inicio-hero h1 span {
+    white-space: normal;
+  }
+
+  .inicio-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inicio-category-card-inner {
+    grid-template-columns: 3.35rem minmax(0, 1fr) auto;
+    padding-inline: 0.7rem;
+  }
+
+  .inicio-category-icon,
+  .inicio-category-icon svg {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+}

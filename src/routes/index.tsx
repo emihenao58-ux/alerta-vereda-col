@@ -1,14 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import type { LucideIcon } from "lucide-react";
-import {
-  AlertTriangle,
-  ArrowRight,
-  Droplet,
-  Megaphone,
-  Plus,
-  Route as RouteIcon,
-} from "lucide-react";
+import type { ComponentType, CSSProperties } from "react";
+import type { LucideProps } from "lucide-react";
+import { AlertTriangle, ArrowRight, Droplet, Megaphone, Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CartaCompacta, ChipSeveridad, Vacio } from "@/components/carta";
 import { URL_FOTO, severidadDeNivel } from "@/lib/alerta";
@@ -34,18 +28,27 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
-  { to: "/emergencias", label: "Emergencias", color: "#C23B2E" },
-  { to: "/vias", label: "Vías", color: "#DB7B33" },
-  { to: "/servicios", label: "Servicios", color: "#2F5D45" },
-  { to: "/avisos", label: "Avisos", color: "#C99A2E" },
+  { to: "/emergencias", label: "Emergencias", color: "#DA3F4C" },
+  { to: "/vias", label: "Vías", color: "#E58129" },
+  { to: "/servicios", label: "Servicios", color: "#228E6C" },
+  { to: "/avisos", label: "Avisos", color: "#E7A836" },
 ] as const;
 
 type Atajo = (typeof ATAJOS)[number];
 type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
 
-const ICONOS_ATAJO: Record<Atajo["to"], LucideIcon> = {
+function RoadIcon({ size = 48, color = "currentColor", ...props }: LucideProps) {
+  return (
+    <svg {...props} width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <path d="M16 4h16l11 40H5L16 4Z" fill={color} />
+      <path d="M22 9h4v7h-4V9Zm0 12h4v7h-4v-7Zm0 12h4v7h-4v-7Z" fill="var(--icon-cutout)" />
+    </svg>
+  );
+}
+
+const ICONOS_ATAJO: Record<Atajo["to"], ComponentType<LucideProps>> = {
   "/emergencias": AlertTriangle,
-  "/vias": RouteIcon,
+  "/vias": RoadIcon,
   "/servicios": Droplet,
   "/avisos": Megaphone,
 };
@@ -58,10 +61,10 @@ const DESCRIPCIONES_ATAJO: Record<Atajo["to"], string> = {
 };
 
 const ACENTOS_CATEGORIA: Record<TarjetaInicioRuta, string> = {
-  "/emergencias": "#C23B2E",
-  "/vias": "#DB7B33",
-  "/servicios": "#2F5D45",
-  "/avisos": "#C99A2E",
+  "/emergencias": "#DA3F4C",
+  "/vias": "#E58129",
+  "/servicios": "#228E6C",
+  "/avisos": "#E7A836",
 };
 
 function Portada() {
@@ -102,12 +105,14 @@ function Portada() {
     data.servicios.length === 0;
 
   return (
-    <AppShell>
+    <AppShell wide>
       <div className="inicio-page">
         <section className="inicio-hero" aria-labelledby="inicio-titulo">
           <div>
-            <p className="eyebrow">Cartelera comunitaria</p>
-            <h1 id="inicio-titulo">¿Qué está pasando en la vereda?</h1>
+            <h1 id="inicio-titulo">
+              <span>¿Qué está pasando</span>
+              <span>en la vereda?</span>
+            </h1>
             <p className="inicio-hero-lead">Reporta, consulta y mantente informado.</p>
           </div>
           <blockquote className="inicio-verse">
@@ -133,7 +138,13 @@ function Portada() {
               >
                 <span className="inicio-category-card-inner">
                   <span className="inicio-category-icon" aria-hidden="true">
-                    <Icono size={23} strokeWidth={2.2} />
+                    <Icono
+                      size={48}
+                      strokeWidth={1.8}
+                      fill="currentColor"
+                      stroke="var(--icon-cutout)"
+                      style={{ "--icon-cutout": atajo.color } as CSSProperties}
+                    />
                   </span>
                   <span>
                     <strong>{atajo.label}</strong>
@@ -168,8 +179,7 @@ function Portada() {
         <section className="inicio-feed" aria-labelledby="inicio-feed-titulo">
           <div className="inicio-feed-heading">
             <div>
-              <h2 id="inicio-feed-titulo">Lo que pasa hoy</h2>
-              <p>Publicaciones activas de la cartelera comunitaria.</p>
+              <h2 id="inicio-feed-titulo">Últimos avisos</h2>
             </div>
           </div>
 
