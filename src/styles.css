@@ -4048,3 +4048,107 @@ html.dark body::after {
     transform: translateX(-6rem);
   }
 }
+
+/* Ronda PR #11: responsive del footer, espacio inferior y paleta de Inicio. */
+:root {
+  --app-emergency-space: calc(3.2rem + max(0.45rem, env(safe-area-inset-bottom)));
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app-shell-page {
+  min-height: 100vh;
+  padding-bottom: var(--app-emergency-space);
+}
+
+.app-community-note {
+  display: none;
+}
+
+.app-community-tagline {
+  display: block;
+}
+
+.app-emergency-link {
+  max-width: 72rem;
+  margin-inline: auto;
+  gap: clamp(0.7rem, 2vw, 1.6rem);
+  white-space: nowrap;
+}
+
+.app-emergency-community {
+  border-left: 1px solid color-mix(in srgb, var(--emergency-bar-foreground) 38%, transparent);
+  padding-left: clamp(0.7rem, 2vw, 1.6rem);
+  color: color-mix(in srgb, var(--emergency-bar-foreground) 88%, transparent);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.inicio-category-card small {
+  color: inherit;
+  opacity: 0.82;
+}
+
+@media (max-width: 720px) {
+  body::before {
+    background-position: calc(50% - 8vw) top;
+  }
+
+  .app-shell-header-inner {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .app-shell-main-nav {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .app-shell-main-nav ul {
+    justify-content: space-between;
+  }
+
+  .app-emergency-link {
+    max-width: none;
+    gap: 0;
+  }
+
+  .app-emergency-icon,
+  .app-emergency-label,
+  .app-emergency-community {
+    display: none;
+  }
+
+  .app-emergency-number {
+    margin-inline: auto;
+  }
+
+  .app-community-note {
+    display: block;
+  }
+
+  .guia-hablada-bubble-derecha {
+    transform: translate3d(calc(var(--burbuja-x, 92px) - 0.75rem), var(--burbuja-y, 84px), 0)
+      translate(2.8rem, -50%);
+  }
+}
+
+@media (min-width: 560px) and (max-width: 720px) {
+  .app-shell-header .app-shell-nav-link {
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 3.2rem;
+    padding: 0.36rem 0.25rem 0.3rem;
+  }
+
+  .app-shell-header .nav-link-label {
+    display: block;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+}

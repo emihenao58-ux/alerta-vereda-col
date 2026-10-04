@@ -28,10 +28,10 @@ export const Route = createFileRoute("/")({
 });
 
 const ATAJOS = [
-  { to: "/emergencias", label: "Emergencias", color: "#DA3F4C" },
-  { to: "/vias", label: "Vías", color: "#E58129" },
-  { to: "/servicios", label: "Servicios", color: "#228E6C" },
-  { to: "/avisos", label: "Avisos", color: "#E7A836" },
+  { to: "/emergencias", label: "Emergencias", color: "#D83644", textColor: "#FFFFFF" },
+  { to: "/vias", label: "Vías", color: "#E58129", textColor: "#1B2B24" },
+  { to: "/servicios", label: "Servicios", color: "#208666", textColor: "#FFFFFF" },
+  { to: "/avisos", label: "Avisos", color: "#E7A836", textColor: "#1B2B24" },
 ] as const;
 
 type Atajo = (typeof ATAJOS)[number];
@@ -61,9 +61,9 @@ const DESCRIPCIONES_ATAJO: Record<Atajo["to"], string> = {
 };
 
 const ACENTOS_CATEGORIA: Record<TarjetaInicioRuta, string> = {
-  "/emergencias": "#DA3F4C",
+  "/emergencias": "#D83644",
   "/vias": "#E58129",
-  "/servicios": "#228E6C",
+  "/servicios": "#208666",
   "/avisos": "#E7A836",
 };
 
@@ -134,10 +134,14 @@ function Portada() {
                 key={atajo.to}
                 to={atajo.to}
                 className="inicio-category-card"
-                style={{ backgroundColor: atajo.color }}
+                style={{ backgroundColor: atajo.color, color: atajo.textColor }}
               >
                 <span className="inicio-category-card-inner">
-                  <span className="inicio-category-icon" aria-hidden="true">
+                  <span
+                    className="inicio-category-icon"
+                    aria-hidden="true"
+                    style={{ color: atajo.textColor }}
+                  >
                     <Icono
                       size={48}
                       strokeWidth={1.8}
