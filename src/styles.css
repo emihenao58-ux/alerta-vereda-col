@@ -3438,6 +3438,7 @@ html.dark body::after {
   }
 
   html.dark body::after {
+    background-size: auto calc(100% + 11.1vh);
     background-position: calc(50% - 2.6vh) -11.1vh;
   }
 
@@ -3704,6 +3705,12 @@ html.dark body::after {
   line-height: 1;
 }
 
+.app-emergency-mobile-label {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .app-emergency-number {
   display: inline-flex;
   align-items: center;
@@ -3887,6 +3894,16 @@ html.dark body::after {
 .inicio-status > p {
   margin: 0;
   color: #1a6453;
+}
+
+html.dark .inicio-status {
+  border-color: #3f6381;
+  background: rgba(11, 32, 55, 0.88);
+  color: #c7d8d4;
+}
+
+html.dark .inicio-status > p {
+  color: #c7d8d4;
 }
 
 .inicio-feed {
@@ -4115,7 +4132,7 @@ body {
 
   .app-emergency-link {
     max-width: none;
-    gap: 0;
+    gap: 0.45rem;
   }
 
   .app-emergency-icon,
@@ -4124,8 +4141,12 @@ body {
     display: none;
   }
 
+  .app-emergency-mobile-label {
+    display: inline-flex;
+  }
+
   .app-emergency-number {
-    margin-inline: auto;
+    margin-inline: 0;
   }
 
   .app-community-note {

@@ -32,6 +32,9 @@ export function BotonEmergencias() {
           ☎
         </span>
         <span className="app-emergency-label">Línea de emergencias</span>
+        <span className="app-emergency-mobile-label">
+          <span aria-hidden="true">☎</span> Llamar al
+        </span>
         <span className="app-emergency-number">123</span>
         <span className="app-emergency-community">
           Herramienta comunitaria — complementa, no reemplaza a las autoridades
