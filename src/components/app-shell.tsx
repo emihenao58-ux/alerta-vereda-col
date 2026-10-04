@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
-  Home,
+  House,
   LayoutDashboard,
   Map as MapIcon,
-  MapPin,
-  PencilLine,
+  Mountain,
+  Pencil,
   Trees,
   UserRound,
 } from "lucide-react";
@@ -14,10 +14,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const MODULOS = [
-  { to: "/", label: "Inicio", Icono: Home },
-  { to: "/mi-vereda", label: "Veredas", Icono: MapPin },
+  { to: "/", label: "Inicio", Icono: House },
+  { to: "/mi-vereda", label: "Veredas", Icono: Mountain },
   { to: "/mapa", label: "Mapa", Icono: MapIcon },
-  { to: "/reportar", label: "Reportar", Icono: PencilLine },
+  { to: "/reportar", label: "Reportar", Icono: Pencil },
 ] as const;
 
 export function BotonEmergencias() {
@@ -31,8 +31,11 @@ export function BotonEmergencias() {
         <span className="app-emergency-icon" aria-hidden="true">
           ☎
         </span>
-        <span>Línea de emergencias</span>
+        <span className="app-emergency-label">Línea de emergencias</span>
         <span className="app-emergency-number">123</span>
+        <span className="app-emergency-community">
+          Herramienta comunitaria — complementa, no reemplaza a las autoridades
+        </span>
       </a>
     </div>
   );
@@ -64,7 +67,7 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
   const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
 
   return (
-    <div className={`min-h-screen pb-24 ${wide ? "app-shell-dense" : ""}`}>
+    <div className={`app-shell-page min-h-screen ${wide ? "app-shell-dense" : ""}`}>
       <header className="app-shell-header">
         <div className="app-shell-header-inner mx-auto max-w-6xl px-4 py-2">
           <BrandLockup />
@@ -121,8 +124,10 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
       <main className={`mx-auto px-4 py-5 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>{children}</main>
 
       <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
-        Herramienta comunitaria — complementa, no reemplaza a las autoridades.
-        <span className="mt-1 block italic">
+        <span className="app-community-note">
+          Herramienta comunitaria — complementa, no reemplaza a las autoridades
+        </span>
+        <span className="app-community-tagline mt-1 block italic">
           Hecho para servir a nuestra comunidad, con Cristo en el centro. †
         </span>
       </p>
