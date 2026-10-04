@@ -4113,7 +4113,7 @@ body {
 
 @media (max-width: 720px) {
   body::before {
-    background-position: calc(50% - 8vw) top;
+    background-position: calc(50% - 15vw) top;
   }
 
   .app-shell-header-inner {
@@ -4171,5 +4171,56 @@ body {
     display: block;
     font-size: 0.6rem;
     line-height: 1;
+  }
+}
+
+/* Mini-ronda PR #11: un único paisaje móvil fijo para todas las pantallas. */
+.app-shell-dense {
+  background-color: transparent;
+  background-image: none;
+}
+
+@media (max-width: 720px) {
+  body::before,
+  body::after {
+    background-size: cover;
+    background-position: calc(50% - 15vw) top;
+  }
+
+  html.dark body::after {
+    background-size: cover;
+    background-position: calc(50% - 15vw) top;
+  }
+
+  .app-shell-dense {
+    background-color: transparent;
+    background-image: none;
+  }
+
+  .app-shell-page:not(:has(.inicio-page)) > main > div:first-child:has(> h1) {
+    max-width: 72%;
+    margin-right: auto;
+  }
+
+  .app-shell-page:not(:has(.inicio-page)) > main .carta,
+  .app-shell-page:not(:has(.inicio-page)) > main .mapa-construccion,
+  .app-shell-page:not(:has(.inicio-page)) > main .mi-vereda-selector,
+  .app-shell-page:not(:has(.inicio-page)) > main .mi-vereda-board,
+  .app-shell-page:not(:has(.inicio-page)) > main .mi-vereda-card,
+  .app-shell-page:not(:has(.inicio-page)) > main .mi-vereda-empty,
+  .app-shell-page:not(:has(.inicio-page)) > main .mi-vereda-demo-note {
+    background: color-mix(in srgb, var(--card) 68%, transparent);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .mi-vereda-hero {
+    background:
+      radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.24), transparent 26%),
+      linear-gradient(135deg, rgba(31, 68, 51, 0.72), rgba(47, 113, 94, 0.68));
+  }
+
+  .mi-vereda-hero-copy {
+    max-width: 72%;
   }
 }
