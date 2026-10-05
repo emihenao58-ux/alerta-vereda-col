@@ -1,5 +1,24 @@
 import type { ReactNode } from "react";
+import { AlertTriangle, Megaphone, Route, Siren, Waves } from "lucide-react";
 import { COLOR_SEVERIDAD, LABEL_SEVERIDAD, type Severidad } from "@/lib/alerta";
+
+export type CartaCategoria = "emergencia" | "via" | "servicio" | "aviso" | "otro";
+
+const ICONO_CATEGORIA: Record<CartaCategoria, typeof AlertTriangle> = {
+  emergencia: Siren,
+  via: Route,
+  servicio: Waves,
+  aviso: Megaphone,
+  otro: Megaphone,
+};
+
+const ETIQUETA_CATEGORIA: Record<CartaCategoria, string> = {
+  emergencia: "Emergencia",
+  via: "Vía",
+  servicio: "Servicio",
+  aviso: "Aviso",
+  otro: "Aviso comunitario",
+};
 
 export function ChipSeveridad({
   severidad,
@@ -55,6 +74,58 @@ export function Carta({
       </div>
       {meta && <p className="mt-1 text-xs text-[color:var(--tinta-suave)]">{meta}</p>}
       {children && <div className="mt-2 text-sm text-[color:var(--tinta-suave)]">{children}</div>}
+    </article>
+  );
+}
+
+export function CartaCompacta({
+  categoria,
+  titulo,
+  descripcion,
+  fotoUrl,
+  vereda,
+  momento,
+  severidad,
+  etiqueta,
+  acento,
+}: {
+  categoria: CartaCategoria;
+  titulo: string;
+  descripcion?: string | null;
+  fotoUrl?: string | null;
+  vereda?: string | null;
+  momento?: string | null;
+  severidad?: Severidad | undefined;
+  etiqueta?: string | undefined;
+  acento: string;
+}) {
+  const Icono = ICONO_CATEGORIA[categoria];
+
+  return (
+    <article className="carta-compacta" style={{ borderLeftColor: acento }}>
+      <div className="carta-compacta-media" style={{ color: acento }}>
+        {fotoUrl ? (
+          <img src={fotoUrl} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <Icono size={28} strokeWidth={1.9} aria-hidden="true" />
+        )}
+      </div>
+      <div className="carta-compacta-body">
+        <div className="carta-compacta-topline">
+          <span className="carta-compacta-category">
+            <Icono size={13} aria-hidden="true" />
+            {ETIQUETA_CATEGORIA[categoria]}
+          </span>
+          {severidad && <ChipSeveridad severidad={severidad} texto={etiqueta} />}
+        </div>
+        <h3>{titulo}</h3>
+        {descripcion && <p className="carta-compacta-description">{descripcion}</p>}
+        <div className="carta-compacta-meta">
+          {vereda && <span>{vereda}</span>}
+          {vereda && momento && <span aria-hidden="true">·</span>}
+          {momento && <span className="carta-compacta-time">{momento}</span>}
+        </div>
+      </div>
     </article>
   );
 }
