@@ -36,9 +36,10 @@ import {
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
-import { BotonEmergencias } from "@/components/app-shell";
+import { BotonEmergencias, CuentaControl } from "@/components/app-shell";
 import { BrandLockup } from "@/components/brand-lockup";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/mi-vereda")({
   head: () => ({
@@ -693,6 +694,8 @@ function MiVereda() {
 }
 
 function MiVeredaShell({ children }: { children: ReactNode }) {
+  const { usuario, salir } = useAuth();
+
   return (
     <div className="app-shell-page min-h-screen">
       <header className="app-shell-header">
@@ -723,6 +726,8 @@ function MiVeredaShell({ children }: { children: ReactNode }) {
           </nav>
           <div className="header-controls">
             <ThemeToggle />
+            <span className="header-control-separator" aria-hidden="true" />
+            <CuentaControl usuario={Boolean(usuario)} salir={salir} />
           </div>
         </div>
       </header>

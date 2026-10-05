@@ -4224,3 +4224,122 @@ body {
     max-width: 72%;
   }
 }
+
+/* Bloqueo PR #11: encabezado de dos filas en pantallas muy angostas. */
+@media (max-width: 480px) {
+  .app-shell-header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand controls"
+      "nav nav";
+    gap: 0.35rem 0.55rem;
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+    padding: 0.45rem 0.65rem 0.35rem;
+  }
+
+  .app-shell-header-inner > .brand-lockup {
+    grid-area: brand;
+    min-width: 0;
+  }
+
+  .app-shell-header-inner > .app-shell-main-nav {
+    grid-area: nav;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .app-shell-header-inner > .header-controls {
+    grid-area: controls;
+    min-width: 0;
+    justify-self: end;
+    gap: 0.25rem;
+  }
+
+  .app-shell-main-nav ul {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.15rem;
+  }
+
+  .app-shell-header .app-shell-nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.3rem 0.12rem 0.25rem;
+    flex-direction: column;
+    gap: 0.16rem;
+  }
+
+  .app-shell-header .app-shell-nav-link svg {
+    flex: 0 0 auto;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .app-shell-header .nav-link-label {
+    display: block;
+    overflow: hidden;
+    max-width: 100%;
+    font-size: 0.6875rem;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand-lockup {
+    min-height: 2.75rem;
+  }
+
+  .brand-wordmark {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.88rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .theme-toggle {
+    min-height: 2.75rem;
+    padding: 0.12rem;
+  }
+
+  .theme-toggle-option {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .account-button {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .guia-hablada-bubble {
+    width: min(15.5rem, calc(100vw - 1rem));
+    max-width: calc(100vw - 1rem);
+  }
+
+  .guia-hablada-bubble-derecha {
+    right: 0.5rem;
+    left: auto;
+    transform: translate3d(0, var(--burbuja-y, 84px), 0) translateY(-50%);
+  }
+
+  .guia-hablada-bubble-izquierda {
+    right: 0.5rem;
+    left: auto;
+    transform: translate3d(0, var(--burbuja-y, 84px), 0) translateY(-50%);
+  }
+}

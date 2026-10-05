@@ -44,7 +44,13 @@ export function BotonEmergencias() {
   );
 }
 
-function CuentaControl({ usuario, salir }: { usuario: boolean; salir: () => Promise<unknown> }) {
+export function CuentaControl({
+  usuario,
+  salir,
+}: {
+  usuario: boolean;
+  salir: () => Promise<unknown>;
+}) {
   if (usuario) {
     return (
       <button
