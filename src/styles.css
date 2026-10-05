@@ -2957,7 +2957,11 @@ body::before,
 body::after {
   position: fixed;
   z-index: -1;
-  inset: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100vh;
+  height: 100lvh;
   background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;
@@ -3435,11 +3439,6 @@ html.dark body::after {
 
   body::after {
     background-image: url("/images/backgrounds/fondo-noche-movil.webp");
-  }
-
-  html.dark body::after {
-    background-size: auto calc(100% + 11.1vh);
-    background-position: calc(50% - 2.6vh) -11.1vh;
   }
 
   .app-shell-dense {
