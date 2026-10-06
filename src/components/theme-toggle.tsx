@@ -1,6 +1,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { applyTheme, themeFromDocument, type AppTheme } from "@/lib/theme";
+import { themeFromDocument, type AppTheme } from "@/lib/theme";
+import { transitionToTheme } from "@/lib/theme-transition";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<AppTheme | null>(null);
@@ -10,7 +11,7 @@ export function ThemeToggle() {
   }, []);
 
   const seleccionarTema = (nextTheme: AppTheme) => {
-    applyTheme(nextTheme);
+    transitionToTheme(nextTheme);
     setTheme(nextTheme);
   };
 
