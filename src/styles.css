@@ -4337,7 +4337,6 @@ body {
   --landscape-camera-scale: 1;
   --landscape-camera-x: 0px;
   --landscape-camera-y: 0px;
-  will-change: opacity;
 }
 
 .landscape-layer-night {
@@ -4382,19 +4381,44 @@ body {
   transform: translate3d(calc(-50% + var(--landscape-camera-x)), var(--landscape-camera-y), 0)
     scale(var(--landscape-camera-scale));
   transform-origin: center center;
-  will-change: transform;
 }
 
-html.dark:not(.theme-transition) .landscape-layer-day {
+html.dark:not(.theme-transition-full):not(.theme-transition-lite) .landscape-layer-day {
   opacity: 0;
 }
 
-.theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
+html.theme-transition-full .app-shell-header,
+html.theme-transition-full .app-shell-header .app-shell-nav-link,
+html.theme-transition-full .brand-lockup,
+html.theme-transition-full .account-button,
+html.theme-transition-full .theme-toggle,
+html.theme-transition-full .theme-toggle-option,
+html.theme-transition-full .inicio-hero,
+html.theme-transition-full .inicio-hero h1,
+html.theme-transition-full .inicio-hero-lead,
+html.theme-transition-full .inicio-verse,
+html.theme-transition-full .inicio-verse-symbol,
+html.theme-transition-full .inicio-verse p,
+html.theme-transition-full .inicio-verse cite,
+html.theme-transition-full .inicio-status,
+html.theme-transition-full .inicio-category-card,
+html.theme-transition-full .inicio-report-cta,
+html.theme-transition-full .carta-compacta,
+html.theme-transition-full .carta-compacta-media,
+html.theme-transition-full .carta-compacta-category,
+html.theme-transition-full .carta-compacta h3,
+html.theme-transition-full .carta-compacta-description,
+html.theme-transition-full .carta-compacta-meta,
+html.theme-transition-full .mapa-construccion,
+html.theme-transition-full .mi-vereda-hero,
+html.theme-transition-full .mi-vereda-selector,
+html.theme-transition-full .mi-vereda-board,
+html.theme-transition-full .mi-vereda-card,
+html.theme-transition-full .mi-vereda-empty,
+html.theme-transition-full .app-emergency-bar {
   transition:
     color var(--theme-transition-duration, 2200ms) linear,
+    background var(--theme-transition-duration, 2200ms) linear,
     background-color var(--theme-transition-duration, 2200ms) linear,
     border-color var(--theme-transition-duration, 2200ms) linear,
     outline-color var(--theme-transition-duration, 2200ms) linear,
@@ -4403,8 +4427,18 @@ html.dark:not(.theme-transition) .landscape-layer-day {
     text-shadow var(--theme-transition-duration, 2200ms) linear;
 }
 
+html.theme-transition-full .landscape-layer,
+html.theme-transition-lite .landscape-layer {
+  will-change: transform, opacity;
+}
+
+html.theme-transition-full .landscape-layer img,
+html.theme-transition-lite .landscape-layer img {
+  will-change: transform;
+}
+
 /* Solo el elemento dueño de estos tokens anima los extremos de los degradados. */
-html.theme-transition {
+html.theme-transition-full {
   transition:
     --gradient-bosque var(--theme-transition-duration, 2200ms) linear,
     --gradient-bosque-oscuro var(--theme-transition-duration, 2200ms) linear,
@@ -4414,9 +4448,28 @@ html.theme-transition {
     --gradient-admin-surface var(--theme-transition-duration, 2200ms) linear;
 }
 
-/* El versículo mantiene su propio trayecto además de las propiedades de color. */
+/* En lite el velo hace el cambio de modo legible sin animar superficies. */
+html.theme-transition-lite .landscape-dusk {
+  z-index: 40;
+  opacity: 0.35;
+  transition: opacity var(--theme-transition-duration, 600ms) linear;
+}
+
+/* Quitar blur mientras cambia el paisaje evita recalcular siete filtros por cuadro. */
+html.theme-transition-no-blur .guia-hablada-bubble,
+html.theme-transition-no-blur .app-shell-header,
+html.theme-transition-no-blur .app-emergency-bar,
+html.theme-transition-no-blur .carta,
+html.theme-transition-no-blur .mapa-construccion,
+html.theme-transition-no-blur .mi-vereda-card,
+html.theme-transition-no-blur .mi-vereda-board {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* El versículo mantiene su trayecto además de las propiedades de color. */
 @media (min-width: 721px) {
-  .theme-transition .inicio-verse {
+  html.theme-transition-full .inicio-verse {
     transition:
       transform var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
       color var(--theme-transition-duration, 2200ms) linear,

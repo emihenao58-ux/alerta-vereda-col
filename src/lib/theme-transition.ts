@@ -3,11 +3,20 @@ import { THEME_STORAGE_KEY, type AppTheme } from "@/lib/theme";
 
 export const THEME_TRANSITION_DURATION = 2200;
 export const THEME_TRANSITION_REDUCED_DURATION = 200;
+export const THEME_TRANSITION_LITE_DURATION = 600;
 
 const DAY_DESKTOP = "/images/backgrounds/fondo-dia-escritorio.webp";
 const DAY_MOBILE = "/images/backgrounds/fondo-dia-movil.webp";
 const NIGHT_DESKTOP = "/images/backgrounds/fondo-noche-escritorio.webp";
 const NIGHT_MOBILE = "/images/backgrounds/fondo-noche-movil.webp";
+const QUALITY_QUERY_PARAM = "tema";
+const QUALITY_SESSION_KEY = "alertavereda-theme-transition-downgraded";
+const QUALITY_MEASURE_WINDOW = 400;
+const QUALITY_MEDIAN_LIMIT = 28;
+const QUALITY_FRAME_LIMIT = 70;
+
+type TransitionQuality = "full" | "lite";
+type ForcedQuality = TransitionQuality | null;
 
 type TransitionElements = {
   day: HTMLElement;
@@ -23,6 +32,12 @@ const state: {
   frame: number | null;
   startedAt: number;
   startProgress: number;
+  lastFrameAt: number | null;
+  frameIntervals: number[];
+  quality: TransitionQuality;
+  forcedQuality: ForcedQuality;
+  liteFadeOnly: boolean;
+  transitionDuration: number;
   elements: TransitionElements | null;
   preloaded: Set<string>;
   preloadStarted: boolean;
@@ -34,6 +49,12 @@ const state: {
   frame: null,
   startedAt: 0,
   startProgress: 0,
+  lastFrameAt: null,
+  frameIntervals: [],
+  quality: "full",
+  forcedQuality: null,
+  liteFadeOnly: false,
+  transitionDuration: THEME_TRANSITION_DURATION,
   elements: null,
   preloaded: new Set(),
   preloadStarted: false,
@@ -97,8 +118,61 @@ function isMobileViewport(): boolean {
   return window.matchMedia("(max-width: 720px)").matches;
 }
 
-function duration(): number {
-  return isReducedMotion() ? THEME_TRANSITION_REDUCED_DURATION : THEME_TRANSITION_DURATION;
+function isMobileDevice(): boolean {
+  return isMobileViewport() || window.matchMedia("(pointer: coarse)").matches;
+}
+
+function connectionSaveData(): boolean {
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  return connection?.saveData === true;
+}
+
+function readForcedQuality(): ForcedQuality {
+  const value = new URLSearchParams(window.location.search).get(QUALITY_QUERY_PARAM);
+  // Banderas de prueba: solo afectan esta carga de página y nunca se persisten.
+  if (value === "lite") return "lite";
+  if (value === "full" && !isReducedMotion()) return "full";
+  return null;
+}
+
+function readDowngradedDecision(): boolean {
+  try {
+    return window.sessionStorage.getItem(QUALITY_SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeDowngradedDecision() {
+  try {
+    window.sessionStorage.setItem(QUALITY_SESSION_KEY, "1");
+  } catch {
+    // Storage may be unavailable in a restricted browser context.
+  }
+}
+
+function resolveQuality(): { quality: TransitionQuality; forced: ForcedQuality } {
+  const forced = readForcedQuality();
+  if (isReducedMotion()) return { quality: "lite", forced: forced === "lite" ? "lite" : null };
+  if (forced) return { quality: forced, forced };
+  if (readDowngradedDecision() || isMobileDevice() || connectionSaveData()) {
+    return { quality: "lite", forced: null };
+  }
+  return { quality: "full", forced: null };
+}
+
+function setQualityClasses(quality: TransitionQuality, active: boolean) {
+  const root = document.documentElement;
+  root.classList.toggle("theme-transition-full", active && quality === "full");
+  root.classList.toggle("theme-transition-lite", active && quality === "lite");
+  root.classList.toggle("theme-transition-no-blur", active);
+  root.dataset["themeTransitionQuality"] = quality;
+}
+
+function configuredDuration(): number {
+  if (isReducedMotion()) return THEME_TRANSITION_REDUCED_DURATION;
+  if (state.quality === "lite") return THEME_TRANSITION_LITE_DURATION;
+  return THEME_TRANSITION_DURATION;
 }
 
 function setCamera(element: HTMLElement, camera: Camera) {
@@ -112,25 +186,35 @@ function setLayerStyles(progress: number) {
   if (!elements) return;
   const reducedMotion = isReducedMotion();
   const viewportHeight = document.documentElement.clientHeight;
+  const useCamera = !reducedMotion && !(state.quality === "lite" && state.liteFadeOnly);
   const cameras = cameraAtProgress(
     progress,
     window.innerWidth,
     viewportHeight,
     isMobileViewport(),
-    reducedMotion,
+    !useCamera,
   );
   setCamera(elements.day, cameras.day);
   setCamera(elements.night, cameras.night);
   elements.day.style.opacity = String(1 - smoothstep(0.3, 0.7, progress));
   elements.night.style.opacity = "1";
-  elements.dusk.style.opacity = reducedMotion ? "0" : String(Math.sin(Math.PI * progress) * 0.6);
+  elements.dusk.style.opacity =
+    reducedMotion || state.quality === "full" ? String(Math.sin(Math.PI * progress) * 0.6) : "0";
   const tintRise = smoothstep(0.15, 0.6, progress);
   elements.nightTint.style.opacity = reducedMotion ? "0" : String(tintRise * (1 - progress) * 0.38);
+  if (state.quality === "lite") {
+    elements.dusk.style.opacity = reducedMotion ? "0" : String(Math.sin(Math.PI * progress) * 0.35);
+  }
 }
 
 function clearSurfaceTransition() {
-  document.documentElement.classList.remove("theme-transition");
-  document.documentElement.style.removeProperty("--theme-transition-duration");
+  const root = document.documentElement;
+  root.classList.remove(
+    "theme-transition-full",
+    "theme-transition-lite",
+    "theme-transition-no-blur",
+  );
+  root.style.removeProperty("--theme-transition-duration");
 }
 
 function stopAnimation() {
@@ -163,18 +247,29 @@ function targetImageReady(theme: AppTheme): boolean {
 function preloadImage(url: string) {
   if (state.preloaded.has(url)) return;
   const image = new Image();
-  image.onload = () => state.preloaded.add(url);
+  const markReady = () => {
+    state.preloaded.add(url);
+  };
+  image.onload = () => {
+    void image
+      .decode()
+      .catch(() => undefined)
+      .finally(markReady);
+  };
   image.onerror = () => undefined;
   image.src = url;
-  if (image.complete && image.naturalWidth > 0) state.preloaded.add(url);
+  if (image.complete && image.naturalWidth > 0) {
+    void image
+      .decode()
+      .catch(() => undefined)
+      .finally(markReady);
+  }
 }
 
 function preloadOtherTheme() {
   if (state.preloadStarted) return;
   state.preloadStarted = true;
-  const otherTheme: AppTheme = getThemeTarget() === "dark" ? "light" : "dark";
-  preloadImage(otherTheme === "dark" ? NIGHT_DESKTOP : DAY_DESKTOP);
-  preloadImage(otherTheme === "dark" ? NIGHT_MOBILE : DAY_MOBILE);
+  [DAY_DESKTOP, DAY_MOBILE, NIGHT_DESKTOP, NIGHT_MOBILE].forEach(preloadImage);
 }
 
 function schedulePreload() {
@@ -185,10 +280,55 @@ function schedulePreload() {
   window.addEventListener("load", preloadOtherTheme, { once: true });
 }
 
+function median(values: number[]): number {
+  const ordered = [...values].sort((a, b) => a - b);
+  if (!ordered.length) return 0;
+  const middle = Math.floor(ordered.length / 2);
+  const current = ordered[middle] ?? 0;
+  const previous = ordered[middle - 1] ?? current;
+  return ordered.length % 2 ? current : (previous + current) / 2;
+}
+
+function maybeDowngradeQuality(timestamp: number) {
+  if (timestamp - state.startedAt < QUALITY_MEASURE_WINDOW) return;
+  const slow =
+    median(state.frameIntervals) > QUALITY_MEDIAN_LIMIT ||
+    Math.max(...state.frameIntervals, 0) > QUALITY_FRAME_LIMIT;
+  if (state.quality === "lite") {
+    if (slow && median(state.frameIntervals) > 1000 / 24) state.liteFadeOnly = true;
+    return;
+  }
+  if (state.forcedQuality === "full" || !slow) return;
+  state.quality = "lite";
+  writeDowngradedDecision();
+  setQualityClasses("lite", true);
+  document.documentElement.style.setProperty(
+    "--theme-transition-duration",
+    `${state.transitionDuration}ms`,
+  );
+}
+
+function maybeSwitchLiteTheme(progress: number) {
+  if (
+    state.quality === "lite" &&
+    state.target !== targetToProgress(themeFromRoot()) &&
+    progress >= 0.5
+  ) {
+    setInterfaceTheme(state.target === 1 ? "dark" : "light");
+  }
+}
+
 function animate(timestamp: number) {
-  const elapsed = Math.min(1, (timestamp - state.startedAt) / duration());
+  if (state.lastFrameAt !== null) {
+    const interval = timestamp - state.lastFrameAt;
+    if (timestamp - state.startedAt <= QUALITY_MEASURE_WINDOW) state.frameIntervals.push(interval);
+  }
+  state.lastFrameAt = timestamp;
+  maybeDowngradeQuality(timestamp);
+  const elapsed = Math.min(1, (timestamp - state.startedAt) / state.transitionDuration);
   const eased = easeInOut(elapsed);
   state.progress = state.startProgress + (state.target - state.startProgress) * eased;
+  maybeSwitchLiteTheme(state.progress);
   setLayerStyles(state.progress);
   if (elapsed < 1) {
     state.frame = window.requestAnimationFrame(animate);
@@ -197,6 +337,7 @@ function animate(timestamp: number) {
   state.frame = null;
   state.progress = state.target;
   setLayerStyles(state.progress);
+  setInterfaceTheme(state.target === 1 ? "dark" : "light");
   clearSurfaceTransition();
 }
 
@@ -204,10 +345,14 @@ export function registerThemeTransitionLayers(elements: TransitionElements) {
   state.elements = elements;
   if (!state.initialized) {
     const initialTheme = themeFromRoot();
+    const resolved = resolveQuality();
     state.targetTheme = initialTheme;
     state.target = targetToProgress(initialTheme);
     state.progress = state.target;
+    state.quality = resolved.quality;
+    state.forcedQuality = resolved.forced;
     state.initialized = true;
+    setQualityClasses(state.quality, false);
   }
   setLayerStyles(state.progress);
   schedulePreload();
@@ -236,19 +381,20 @@ export function transitionToTheme(theme: AppTheme) {
   stopAnimation();
   state.target = target;
   state.startProgress = state.progress;
+  state.liteFadeOnly = false;
   if (state.startProgress === target) {
     finishTransition(theme);
     return;
   }
 
-  // El valor inicial transiciona desde la pantalla actual y conserva el remanente
-  // al invertir; ninguna superficie salta por una clase cambiada sin transición.
   const root = document.documentElement;
-  root.style.setProperty("--theme-transition-duration", `${duration()}ms`);
-  root.classList.add("theme-transition");
-  // No hay transición al primer pintado: esta sincronización solo ocurre tras pulsar.
+  state.transitionDuration = configuredDuration();
+  root.style.setProperty("--theme-transition-duration", `${state.transitionDuration}ms`);
+  setQualityClasses(state.quality, true);
   void root.offsetWidth;
-  setInterfaceTheme(theme);
+  if (state.quality === "full") setInterfaceTheme(theme);
   state.startedAt = performance.now();
+  state.lastFrameAt = null;
+  state.frameIntervals = [];
   state.frame = window.requestAnimationFrame(animate);
 }
