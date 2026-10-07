@@ -27,12 +27,12 @@ export function themeFromDocument(): AppTheme {
 export function applyTheme(theme: AppTheme, withTransition = true) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  root.dataset["theme"] = theme;
+  root.style.colorScheme = theme;
   if (withTransition) {
     root.classList.add("theme-transition");
     window.setTimeout(() => root.classList.remove("theme-transition"), 420);
   }
-  root.classList.toggle("dark", theme === "dark");
-  root.dataset["theme"] = theme;
-  root.style.colorScheme = theme;
   window.localStorage.setItem(THEME_STORAGE_KEY, theme);
 }

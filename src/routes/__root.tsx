@@ -11,6 +11,7 @@ import { useEffect, useMemo, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthSplash } from "@/components/admin/auth-splash";
+import { ThemeTransitionLayers } from "@/components/theme-transition-layers";
 import { Toaster } from "@/components/ui/sonner";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -125,6 +126,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <ThemeTransitionLayers />
         {children}
         <Scripts />
       </body>

@@ -1,0 +1,1 @@
+{"routes":[{"path":"/","title":"Inicio"},{"path":"/mi-vereda","title":"Mi Vereda"},{"path":"/emergencias","title":"Emergencias"},{"path":"/vias","title":"Vías"},{"path":"/servicios","title":"Servicios"},{"path":"/avisos","title":"Avisos"},{"path":"/reportar","title":"Reportar"},{"path":"/auth","title":"Acceso"},{"path":"/mapa","title":"Mapa"}]}
