@@ -4337,10 +4337,7 @@ body {
   --landscape-camera-scale: 1;
   --landscape-camera-x: 0px;
   --landscape-camera-y: 0px;
-  transform: translate3d(var(--landscape-camera-x), var(--landscape-camera-y), 0)
-    scale(var(--landscape-camera-scale));
-  transform-origin: center center;
-  will-change: transform, opacity;
+  will-change: opacity;
 }
 
 .landscape-layer-night {
@@ -4382,7 +4379,10 @@ body {
   object-fit: cover;
   object-position: center top;
   user-select: none;
-  transform: translateX(-50%);
+  transform: translate3d(calc(-50% + var(--landscape-camera-x)), var(--landscape-camera-y), 0)
+    scale(var(--landscape-camera-scale));
+  transform-origin: center center;
+  will-change: transform;
 }
 
 html.dark:not(.theme-transition) .landscape-layer-day {
@@ -4394,24 +4394,24 @@ html.dark:not(.theme-transition) .landscape-layer-day {
 .theme-transition *::before,
 .theme-transition *::after {
   transition:
-    color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    background-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    border-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    outline-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    fill var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    stroke var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    text-shadow var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+    color var(--theme-transition-duration, 2200ms) linear,
+    background-color var(--theme-transition-duration, 2200ms) linear,
+    border-color var(--theme-transition-duration, 2200ms) linear,
+    outline-color var(--theme-transition-duration, 2200ms) linear,
+    fill var(--theme-transition-duration, 2200ms) linear,
+    stroke var(--theme-transition-duration, 2200ms) linear,
+    text-shadow var(--theme-transition-duration, 2200ms) linear;
 }
 
 /* Solo el elemento dueño de estos tokens anima los extremos de los degradados. */
 html.theme-transition {
   transition:
-    --gradient-bosque var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    --gradient-bosque-oscuro var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    --gradient-card var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    --gradient-dorado var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    --gradient-kraft var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-    --gradient-admin-surface var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+    --gradient-bosque var(--theme-transition-duration, 2200ms) linear,
+    --gradient-bosque-oscuro var(--theme-transition-duration, 2200ms) linear,
+    --gradient-card var(--theme-transition-duration, 2200ms) linear,
+    --gradient-dorado var(--theme-transition-duration, 2200ms) linear,
+    --gradient-kraft var(--theme-transition-duration, 2200ms) linear,
+    --gradient-admin-surface var(--theme-transition-duration, 2200ms) linear;
 }
 
 /* El versículo mantiene su propio trayecto además de las propiedades de color. */
@@ -4419,15 +4419,20 @@ html.theme-transition {
   .theme-transition .inicio-verse {
     transition:
       transform var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-      color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
-      border-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+      color var(--theme-transition-duration, 2200ms) linear,
+      border-color var(--theme-transition-duration, 2200ms) linear;
   }
 }
 
 @media (max-width: 720px) {
   .landscape-layer img {
     width: calc(100% + 30vw);
-    transform: translateX(calc(-50% - 15vw));
+    transform: translate3d(
+        calc(-50% - 15vw + var(--landscape-camera-x)),
+        var(--landscape-camera-y),
+        0
+      )
+      scale(var(--landscape-camera-scale));
   }
 }
 
