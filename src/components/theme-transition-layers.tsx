@@ -12,14 +12,16 @@ export function ThemeTransitionLayers() {
   const dayRef = useRef<HTMLDivElement>(null);
   const nightRef = useRef<HTMLDivElement>(null);
   const duskRef = useRef<HTMLDivElement>(null);
+  const nightTintRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!dayRef.current || !nightRef.current || !duskRef.current) return;
+    if (!dayRef.current || !nightRef.current || !duskRef.current || !nightTintRef.current) return;
 
     return registerThemeTransitionLayers({
       day: dayRef.current,
       night: nightRef.current,
       dusk: duskRef.current,
+      nightTint: nightTintRef.current,
     });
   }, []);
 
@@ -38,6 +40,7 @@ export function ThemeTransitionLayers() {
         </picture>
       </div>
       <div className="landscape-dusk" ref={duskRef} aria-hidden="true" />
+      <div className="landscape-night-tint" ref={nightTintRef} aria-hidden="true" />
     </>
   );
 }

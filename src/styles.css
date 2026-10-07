@@ -4,6 +4,39 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Solo los extremos de degradados usan colores registrados. Los tokens de texto,
+   superficies y bordes conservan un destino fijo para evitar una doble transición. */
+@property --gradient-bosque {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2f5d45;
+}
+@property --gradient-bosque-oscuro {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f4433;
+}
+@property --gradient-card {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f7f3e8;
+}
+@property --gradient-dorado {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c99a2e;
+}
+@property --gradient-kraft {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ede6d3;
+}
+@property --gradient-admin-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f7f3e8;
+}
+
 /*
  * AlertaVereda — sistema de diseño.
  * Metáfora: cartelera comunitaria (tarjetas pinchadas sobre papel kraft).
@@ -92,6 +125,12 @@
   --input: #d6c9a8;
   --ring: var(--bosque);
 
+  --gradient-bosque: #2f5d45;
+  --gradient-bosque-oscuro: #1f4433;
+  --gradient-card: #f7f3e8;
+  --gradient-dorado: #c99a2e;
+  --gradient-kraft: #ede6d3;
+  --gradient-admin-surface: #f7f3e8;
   --fondo-escritorio: url("/images/backgrounds/fondo-dia-escritorio.webp");
   --fondo-movil: url("/images/backgrounds/fondo-dia-movil.webp");
   --header-background: rgba(255, 255, 255, 0.82);
@@ -140,6 +179,12 @@
   --input: #3f6381;
   --ring: #f2c96a;
 
+  --gradient-bosque: #8fc5ad;
+  --gradient-bosque-oscuro: #d2ebe0;
+  --gradient-card: rgba(11, 32, 55, 0.88);
+  --gradient-dorado: #f2c96a;
+  --gradient-kraft: #102b49;
+  --gradient-admin-surface: #f4f6f0;
   --fondo-escritorio: url("/images/backgrounds/fondo-noche-escritorio.webp");
   --fondo-movil: url("/images/backgrounds/fondo-noche-movil.webp");
   --header-background: rgba(11, 47, 76, 0.94);
@@ -212,7 +257,7 @@
   color: var(--card);
   background:
     radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.33), transparent 26%),
-    linear-gradient(135deg, var(--bosque-oscuro), var(--bosque));
+    linear-gradient(135deg, var(--gradient-bosque-oscuro), var(--gradient-bosque));
   box-shadow: 0 8px 24px rgba(31, 68, 51, 0.16);
 }
 
@@ -697,8 +742,8 @@
   border-radius: 0.85rem;
   background: linear-gradient(
     100deg,
-    color-mix(in srgb, var(--dorado) 16%, var(--card)),
-    var(--card)
+    color-mix(in srgb, var(--gradient-dorado) 16%, var(--gradient-card)),
+    var(--gradient-card)
   );
   color: var(--bosque-oscuro);
 }
@@ -748,8 +793,8 @@
   border-radius: 1rem;
   background: linear-gradient(
     130deg,
-    color-mix(in srgb, var(--bosque) 11%, var(--card)),
-    var(--card)
+    color-mix(in srgb, var(--gradient-bosque) 11%, var(--gradient-card)),
+    var(--gradient-card)
   );
   box-shadow: 0 5px 18px rgba(31, 68, 51, 0.11);
 }
@@ -1104,7 +1149,7 @@
       color-mix(in srgb, var(--dorado) 36%, transparent),
       transparent 29%
     ),
-    linear-gradient(160deg, var(--bosque-oscuro), var(--bosque));
+    linear-gradient(160deg, var(--gradient-bosque-oscuro), var(--gradient-bosque));
 }
 
 .guia-hablada-scene-halo {
@@ -2071,8 +2116,8 @@
   border-radius: 1.15rem;
   background: linear-gradient(
     115deg,
-    color-mix(in srgb, var(--card) 98%, white),
-    color-mix(in srgb, var(--kraft) 70%, white)
+    color-mix(in srgb, var(--gradient-card) 98%, white),
+    color-mix(in srgb, var(--gradient-kraft) 70%, white)
   );
   padding: 1rem 1.15rem;
   box-shadow: 0 14px 30px rgba(31, 68, 51, 0.1);
@@ -4274,7 +4319,8 @@ body {
 
 /* PR #13: paisaje global real y transición Día↔Noche. */
 .landscape-layer,
-.landscape-dusk {
+.landscape-dusk,
+.landscape-night-tint {
   position: fixed;
   top: 0;
   right: 0;
@@ -4288,6 +4334,13 @@ body {
 
 .landscape-layer {
   isolation: isolate;
+  --landscape-camera-scale: 1;
+  --landscape-camera-x: 0px;
+  --landscape-camera-y: 0px;
+  transform: translate3d(var(--landscape-camera-x), var(--landscape-camera-y), 0)
+    scale(var(--landscape-camera-scale));
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
 .landscape-layer-night {
@@ -4306,6 +4359,12 @@ body {
   opacity: 0;
 }
 
+.landscape-night-tint {
+  z-index: -1;
+  background: #102b49;
+  opacity: 0;
+}
+
 .landscape-layer picture {
   position: absolute;
   inset: 0;
@@ -4313,55 +4372,62 @@ body {
 }
 
 .landscape-layer img {
-  --landscape-camera-scale: 1;
-  --landscape-camera-x: 0px;
-  --landscape-camera-y: 0px;
   position: absolute;
   top: 0;
   left: 50%;
   display: block;
   width: 100%;
-  min-width: 100%;
-  height: auto;
-  min-height: 100%;
+  height: 100%;
   max-width: none;
+  object-fit: cover;
+  object-position: center top;
   user-select: none;
-  transform: translate3d(calc(-50% + var(--landscape-camera-x)), var(--landscape-camera-y), 0)
-    scale(var(--landscape-camera-scale));
-  transform-origin: center top;
-  will-change: transform, opacity;
+  transform: translateX(-50%);
 }
 
-html.dark .landscape-layer-day {
+html.dark:not(.theme-transition) .landscape-layer-day {
   opacity: 0;
 }
 
-.theme-transition .app-shell-header,
-.theme-transition .app-shell-page,
-.theme-transition .app-shell-page main,
-.theme-transition .inicio-hero,
-.theme-transition .inicio-category-card,
-.theme-transition .carta,
-.theme-transition .mapa-construccion,
-.theme-transition .mi-vereda-hero,
-.theme-transition .mi-vereda-selector,
-.theme-transition .mi-vereda-board,
-.theme-transition .mi-vereda-card,
-.theme-transition .mi-vereda-empty,
-.theme-transition .mi-vereda-demo-note {
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
   transition:
-    background-color 300ms ease,
-    color 300ms ease,
-    border-color 300ms ease;
+    color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    background-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    border-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    outline-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    fill var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    stroke var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    text-shadow var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+/* Solo el elemento dueño de estos tokens anima los extremos de los degradados. */
+html.theme-transition {
+  transition:
+    --gradient-bosque var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    --gradient-bosque-oscuro var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    --gradient-card var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    --gradient-dorado var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    --gradient-kraft var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+    --gradient-admin-surface var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+/* El versículo mantiene su propio trayecto además de las propiedades de color. */
+@media (min-width: 721px) {
+  .theme-transition .inicio-verse {
+    transition:
+      transform var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+      color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1),
+      border-color var(--theme-transition-duration, 2200ms) cubic-bezier(0.42, 0, 0.58, 1);
+  }
 }
 
 @media (max-width: 720px) {
   .landscape-layer img {
-    --landscape-camera-x: -15vw;
-    width: auto;
-    min-width: 0;
-    height: 100%;
-    min-height: 100%;
+    width: calc(100% + 30vw);
+    transform: translateX(calc(-50% - 15vw));
   }
 }
 

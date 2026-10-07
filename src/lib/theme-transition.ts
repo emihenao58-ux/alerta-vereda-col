@@ -1,3 +1,4 @@
+import { cameraAtProgress, type Camera } from "@/lib/theme-camera";
 import { THEME_STORAGE_KEY, type AppTheme } from "@/lib/theme";
 
 export const THEME_TRANSITION_DURATION = 2200;
@@ -8,6 +9,14 @@ const DAY_MOBILE = "/images/backgrounds/fondo-dia-movil.webp";
 const NIGHT_DESKTOP = "/images/backgrounds/fondo-noche-escritorio.webp";
 const NIGHT_MOBILE = "/images/backgrounds/fondo-noche-movil.webp";
 
+type TransitionElements = {
+  day: HTMLElement;
+  night: HTMLElement;
+  dusk: HTMLElement;
+  nightTint: HTMLElement;
+};
+
+const listeners = new Set<() => void>();
 const state: {
   progress: number;
   target: 0 | 1;
@@ -17,6 +26,8 @@ const state: {
   elements: TransitionElements | null;
   preloaded: Set<string>;
   preloadStarted: boolean;
+  initialized: boolean;
+  targetTheme: AppTheme;
 } = {
   progress: 0,
   target: 0,
@@ -26,24 +37,41 @@ const state: {
   elements: null,
   preloaded: new Set(),
   preloadStarted: false,
+  initialized: false,
+  targetTheme: "light",
 };
 
-type TransitionElements = {
-  day: HTMLElement;
-  night: HTMLElement;
-  dusk: HTMLElement;
-};
-
-function themeToProgress(theme: AppTheme): 0 | 1 {
+function targetToProgress(theme: AppTheme): 0 | 1 {
   return theme === "dark" ? 1 : 0;
 }
 
-function progressToTheme(progress: number): AppTheme {
-  return progress >= 0.5 ? "dark" : "light";
+// React lee un destino estable incluso al montar el selector en mitad de otra página.
+export function getThemeTarget(): AppTheme {
+  return state.initialized ? state.targetTheme : themeFromRoot();
+}
+
+export function subscribeThemeTarget(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function notifyTarget(theme: AppTheme) {
+  if (state.targetTheme === theme) return;
+  state.targetTheme = theme;
+  listeners.forEach((listener) => listener());
+}
+
+function themeFromRoot(): AppTheme {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
 function easeInOut(value: number): number {
   return value * value * (3 - 2 * value);
+}
+
+function smoothstep(start: number, end: number, value: number): number {
+  const fraction = Math.min(1, Math.max(0, (value - start) / (end - start)));
+  return easeInOut(fraction);
 }
 
 function setStoredTheme(theme: AppTheme) {
@@ -56,34 +84,9 @@ function setStoredTheme(theme: AppTheme) {
 
 function setInterfaceTheme(theme: AppTheme) {
   const root = document.documentElement;
-  const isDark = theme === "dark";
-  root.classList.toggle("dark", isDark);
+  root.classList.toggle("dark", theme === "dark");
   root.dataset["theme"] = theme;
   root.style.colorScheme = theme;
-  root.classList.remove("theme-transition");
-  void root.offsetWidth;
-  root.classList.add("theme-transition");
-  window.setTimeout(() => root.classList.remove("theme-transition"), 320);
-}
-
-function setLayerStyles(progress: number) {
-  const elements = state.elements;
-  if (!elements) return;
-
-  elements.day.style.opacity = String(1 - progress);
-  elements.night.style.opacity = "1";
-  elements.dusk.style.opacity = String(Math.sin(Math.PI * progress) * 0.46);
-}
-
-function finishTransition(theme: AppTheme) {
-  if (state.frame !== null) {
-    window.cancelAnimationFrame(state.frame);
-    state.frame = null;
-  }
-  state.progress = themeToProgress(theme);
-  state.target = themeToProgress(theme);
-  setLayerStyles(state.progress);
-  setInterfaceTheme(theme);
 }
 
 function isReducedMotion(): boolean {
@@ -92,6 +95,56 @@ function isReducedMotion(): boolean {
 
 function isMobileViewport(): boolean {
   return window.matchMedia("(max-width: 720px)").matches;
+}
+
+function duration(): number {
+  return isReducedMotion() ? THEME_TRANSITION_REDUCED_DURATION : THEME_TRANSITION_DURATION;
+}
+
+function setCamera(element: HTMLElement, camera: Camera) {
+  element.style.setProperty("--landscape-camera-scale", String(camera.scale));
+  element.style.setProperty("--landscape-camera-x", `${camera.x}px`);
+  element.style.setProperty("--landscape-camera-y", `${camera.y}px`);
+}
+
+function setLayerStyles(progress: number) {
+  const elements = state.elements;
+  if (!elements) return;
+  const reducedMotion = isReducedMotion();
+  const viewportHeight = document.documentElement.clientHeight;
+  const cameras = cameraAtProgress(
+    progress,
+    window.innerWidth,
+    viewportHeight,
+    isMobileViewport(),
+    reducedMotion,
+  );
+  setCamera(elements.day, cameras.day);
+  setCamera(elements.night, cameras.night);
+  elements.day.style.opacity = String(1 - smoothstep(0.3, 0.7, progress));
+  elements.night.style.opacity = "1";
+  elements.dusk.style.opacity = reducedMotion ? "0" : String(Math.sin(Math.PI * progress) * 0.6);
+  const tintRise = smoothstep(0.15, 0.6, progress);
+  elements.nightTint.style.opacity = reducedMotion ? "0" : String(tintRise * (1 - progress) * 0.38);
+}
+
+function clearSurfaceTransition() {
+  document.documentElement.classList.remove("theme-transition");
+  document.documentElement.style.removeProperty("--theme-transition-duration");
+}
+
+function stopAnimation() {
+  if (state.frame !== null) window.cancelAnimationFrame(state.frame);
+  state.frame = null;
+}
+
+function finishTransition(theme: AppTheme) {
+  stopAnimation();
+  state.progress = targetToProgress(theme);
+  state.target = targetToProgress(theme);
+  setLayerStyles(state.progress);
+  setInterfaceTheme(theme);
+  clearSurfaceTransition();
 }
 
 function targetImageUrl(theme: AppTheme): string {
@@ -119,89 +172,83 @@ function preloadImage(url: string) {
 function preloadOtherTheme() {
   if (state.preloadStarted) return;
   state.preloadStarted = true;
-  const currentTheme: AppTheme = document.documentElement.classList.contains("dark")
-    ? "dark"
-    : "light";
-  const otherTheme: AppTheme = currentTheme === "dark" ? "light" : "dark";
+  const otherTheme: AppTheme = getThemeTarget() === "dark" ? "light" : "dark";
   preloadImage(otherTheme === "dark" ? NIGHT_DESKTOP : DAY_DESKTOP);
   preloadImage(otherTheme === "dark" ? NIGHT_MOBILE : DAY_MOBILE);
 }
 
 function schedulePreload() {
-  const callback = () => preloadOtherTheme();
   if (document.readyState === "complete") {
-    window.setTimeout(callback, 0);
+    window.setTimeout(preloadOtherTheme, 0);
     return;
   }
-  window.addEventListener("load", callback, { once: true });
+  window.addEventListener("load", preloadOtherTheme, { once: true });
 }
 
 function animate(timestamp: number) {
-  const distance = state.target - state.startProgress;
-  const duration = isReducedMotion()
-    ? THEME_TRANSITION_REDUCED_DURATION
-    : THEME_TRANSITION_DURATION;
-  const elapsed = Math.min(1, (timestamp - state.startedAt) / duration);
+  const elapsed = Math.min(1, (timestamp - state.startedAt) / duration());
   const eased = easeInOut(elapsed);
-  const progress = state.startProgress + distance * eased;
-  const previousTheme = progressToTheme(state.progress);
-
-  state.progress = progress;
-  setLayerStyles(progress);
-
-  const nextTheme = progressToTheme(progress);
-  if (nextTheme !== previousTheme) setInterfaceTheme(nextTheme);
-
+  state.progress = state.startProgress + (state.target - state.startProgress) * eased;
+  setLayerStyles(state.progress);
   if (elapsed < 1) {
     state.frame = window.requestAnimationFrame(animate);
     return;
   }
-
   state.frame = null;
   state.progress = state.target;
   setLayerStyles(state.progress);
-  setInterfaceTheme(progressToTheme(state.progress));
+  clearSurfaceTransition();
 }
 
 export function registerThemeTransitionLayers(elements: TransitionElements) {
   state.elements = elements;
-  const initialTheme: AppTheme = document.documentElement.classList.contains("dark")
-    ? "dark"
-    : "light";
-  state.progress = themeToProgress(initialTheme);
-  state.target = themeToProgress(initialTheme);
+  if (!state.initialized) {
+    const initialTheme = themeFromRoot();
+    state.targetTheme = initialTheme;
+    state.target = targetToProgress(initialTheme);
+    state.progress = state.target;
+    state.initialized = true;
+  }
   setLayerStyles(state.progress);
   schedulePreload();
-
+  const onResize = () => setLayerStyles(state.progress);
+  window.addEventListener("resize", onResize);
   return () => {
+    window.removeEventListener("resize", onResize);
     if (state.elements?.day === elements.day) {
-      if (state.frame !== null) window.cancelAnimationFrame(state.frame);
-      state.frame = null;
       state.elements = null;
+      // No reiniciar progress/target si React remonta el layout durante una animación.
     }
   };
 }
 
 export function transitionToTheme(theme: AppTheme) {
   if (typeof window === "undefined" || typeof document === "undefined") return;
-
-  const target = themeToProgress(theme);
+  notifyTarget(theme);
   setStoredTheme(theme);
+  const target = targetToProgress(theme);
 
   if (!state.elements || !targetImageReady(theme)) {
     finishTransition(theme);
     return;
   }
 
-  if (state.frame !== null) window.cancelAnimationFrame(state.frame);
+  stopAnimation();
   state.target = target;
   state.startProgress = state.progress;
-
   if (state.startProgress === target) {
     finishTransition(theme);
     return;
   }
 
+  // El valor inicial transiciona desde la pantalla actual y conserva el remanente
+  // al invertir; ninguna superficie salta por una clase cambiada sin transición.
+  const root = document.documentElement;
+  root.style.setProperty("--theme-transition-duration", `${duration()}ms`);
+  root.classList.add("theme-transition");
+  // No hay transición al primer pintado: esta sincronización solo ocurre tras pulsar.
+  void root.offsetWidth;
+  setInterfaceTheme(theme);
   state.startedAt = performance.now();
   state.frame = window.requestAnimationFrame(animate);
 }
