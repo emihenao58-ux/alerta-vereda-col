@@ -12,7 +12,7 @@ export type TerritorioMock = {
 
 export const COLORES_CORREGIMIENTO = {
   "el-brasil": "#6B8F71",
-  guayabal: "#B98257",
+  guayabal: "#4F9384",
   "la-clara": "#6C8FBF",
   "el-zarzal": "#9A78B5",
   sevilla: "#C28A45",
