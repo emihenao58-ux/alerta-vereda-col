@@ -24,7 +24,9 @@ export function ReportarReviewStep({
   const territorio = territorioPorId(draft.territorioId);
   const territorioPadre = territorioPorId(draft.territorioPadreId);
   const territorioResumen = territorio
-    ? `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
+    ? draft.tipoLugar === "casco_urbano" && territorio.id === "cabecera-municipal"
+      ? "Cabecera municipal"
+      : `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
     : "Sin territorio";
 
   return (

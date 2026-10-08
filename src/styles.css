@@ -5425,7 +5425,7 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-territory-selected {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: 0.7rem;
   padding: 0.85rem;
@@ -5448,10 +5448,6 @@ html.theme-transition-no-blur .mi-vereda-board {
 .reportar-territory-selected strong {
   color: var(--tinta);
   font-size: 1rem;
-}
-
-.reportar-territory-selected .reportar-text-button {
-  white-space: nowrap;
 }
 
 .reportar-text-button {
@@ -5489,15 +5485,6 @@ html.theme-transition-no-blur .mi-vereda-board {
 
   .reportar-category-copy small {
     font-size: 0.68rem;
-  }
-
-  .reportar-territory-selected {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .reportar-territory-selected .reportar-text-button {
-    grid-column: 2;
-    justify-self: start;
   }
 }
 

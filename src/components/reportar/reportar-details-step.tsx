@@ -18,19 +18,19 @@ const TIPO_LUGAR_OPTIONS: readonly {
   {
     tipo: "corregimiento",
     label: "Corregimiento",
-    description: "Elige primero el corregimiento y luego su vereda.",
+    description: "Selecciona un corregimiento.",
     Icon: Building2,
   },
   {
     tipo: "vereda",
     label: "Vereda",
-    description: "Elige directamente una vereda del catálogo local.",
+    description: "Selecciona una vereda.",
     Icon: Leaf,
   },
   {
     tipo: "casco_urbano",
-    label: "Casco urbano",
-    description: "Elige un barrio o sector del casco urbano.",
+    label: "Cabecera municipal",
+    description: "Puedes indicar el barrio o sector.",
     Icon: MapPin,
   },
 ];
@@ -63,13 +63,10 @@ export function ReportarDetailsStep({
   onNext: () => void;
 }) {
   const territorioSeleccionado = territorioPorId(territorioId);
-  const padreSeleccionado = territorioPorId(
-    tipoLugar === "corregimiento" ? territorioId : territorioPadreId,
-  );
   const corregimientos = territoriosDeTipo("corregimiento");
-  const veredasDirectas = territoriosDeTipo("vereda");
-  const sectores = hijosDe("ebejico-casco-urbano");
-  const finalSeleccionado = tipoLugar !== "corregimiento" && Boolean(territorioSeleccionado);
+  const veredas = territoriosDeTipo("vereda");
+  const barrios = hijosDe("cabecera-municipal");
+  const finalSeleccionado = Boolean(territorioSeleccionado);
 
   const elegirTipo = (tipo: TipoLugar) => {
     onChange({
@@ -98,20 +95,29 @@ export function ReportarDetailsStep({
     });
   };
 
-  const elegirVereda = (id: string, parentId: string | null) => {
+  const elegirVereda = (id: string) => {
     onChange({
       tipoLugar: "vereda",
       territorioId: id,
-      territorioPadreId: parentId,
+      territorioPadreId: null,
       veredaId: id,
     });
   };
 
-  const elegirSector = (id: string) => {
+  const elegirBarrio = (id: string) => {
     onChange({
       tipoLugar: "casco_urbano",
       territorioId: id,
-      territorioPadreId: "ebejico-casco-urbano",
+      territorioPadreId: null,
+      veredaId: null,
+    });
+  };
+
+  const elegirCabeceraSinBarrio = () => {
+    onChange({
+      tipoLugar: "casco_urbano",
+      territorioId: "cabecera-municipal",
+      territorioPadreId: null,
       veredaId: null,
     });
   };
@@ -120,7 +126,7 @@ export function ReportarDetailsStep({
     <ReportarStepShell
       eyebrow="Paso 2 · Lugar del reporte"
       title="¿Dónde ocurrió el reporte?"
-      description="Primero selecciona el tipo de lugar. Después verás únicamente las opciones que corresponden a esa zona."
+      description="Primero selecciona el tipo de lugar. Después verás las opciones correspondientes."
     >
       <div className="reportar-territory-block" aria-labelledby="reportar-territory-title">
         <div className="reportar-subcategory-heading">
@@ -159,85 +165,37 @@ export function ReportarDetailsStep({
           </div>
         )}
 
-        {tipoLugar && !finalSeleccionado && tipoLugar === "corregimiento" && (
-          <>
-            {!padreSeleccionado && (
-              <div
-                className="reportar-territory-options"
-                role="radiogroup"
-                aria-label="Corregimientos"
-              >
-                {corregimientos.map((territorio) => (
-                  <button
-                    key={territorio.id}
-                    type="button"
-                    className="reportar-territory-option"
-                    onClick={() => elegirCorregimiento(territorio.id)}
-                  >
-                    <span>
-                      <strong>{territorio.nombre}</strong>
-                      <small>Ver sus veredas</small>
-                    </span>
-                    <ChevronRight size={20} aria-hidden="true" />
-                  </button>
-                ))}
-              </div>
-            )}
-            {padreSeleccionado && (
-              <div className="reportar-territory-child-block">
-                <div className="reportar-territory-breadcrumb">
-                  <span>Corregimiento</span>
-                  <strong>{padreSeleccionado.nombre}</strong>
-                  <button
-                    type="button"
-                    className="reportar-text-button"
-                    onClick={() =>
-                      onChange({ territorioId: null, territorioPadreId: null, veredaId: null })
-                    }
-                  >
-                    Elegir otro
-                  </button>
-                </div>
-                <p className="reportar-help">
-                  Selecciona únicamente una vereda perteneciente a este corregimiento.
-                </p>
-                <div
-                  className="reportar-territory-options"
-                  role="radiogroup"
-                  aria-label={`Veredas de ${padreSeleccionado.nombre}`}
-                >
-                  {hijosDe(padreSeleccionado.id).map((territorio) => (
-                    <button
-                      key={territorio.id}
-                      type="button"
-                      className="reportar-territory-option"
-                      onClick={() => elegirVereda(territorio.id, padreSeleccionado.id)}
-                    >
-                      <span>
-                        <strong>{territorio.nombre}</strong>
-                        <small>Vereda</small>
-                      </span>
-                      <ChevronRight size={20} aria-hidden="true" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {tipoLugar === "vereda" && !finalSeleccionado && (
-          <div className="reportar-territory-options" role="radiogroup" aria-label="Veredas">
-            {veredasDirectas.map((territorio) => (
+        {tipoLugar === "corregimiento" && !finalSeleccionado && (
+          <div className="reportar-territory-options" role="radiogroup" aria-label="Corregimientos">
+            {corregimientos.map((territorio) => (
               <button
                 key={territorio.id}
                 type="button"
                 className="reportar-territory-option"
-                onClick={() => elegirVereda(territorio.id, territorio.parentId)}
+                onClick={() => elegirCorregimiento(territorio.id)}
               >
                 <span>
                   <strong>{territorio.nombre}</strong>
-                  <small>{nombreTerritorio(territorio.parentId) ?? "Vereda"}</small>
+                  <small>Corregimiento</small>
+                </span>
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {tipoLugar === "vereda" && !finalSeleccionado && (
+          <div className="reportar-territory-options" role="radiogroup" aria-label="Veredas">
+            {veredas.map((territorio) => (
+              <button
+                key={territorio.id}
+                type="button"
+                className="reportar-territory-option"
+                onClick={() => elegirVereda(territorio.id)}
+              >
+                <span>
+                  <strong>{territorio.nombre}</strong>
+                  <small>Vereda</small>
                 </span>
                 <ChevronRight size={20} aria-hidden="true" />
               </button>
@@ -249,18 +207,29 @@ export function ReportarDetailsStep({
           <div
             className="reportar-territory-options"
             role="radiogroup"
-            aria-label="Barrios y sectores del casco urbano"
+            aria-label="Barrios de la cabecera municipal"
           >
-            {sectores.map((territorio) => (
+            <button
+              type="button"
+              className="reportar-territory-option"
+              onClick={elegirCabeceraSinBarrio}
+            >
+              <span>
+                <strong>No sé el barrio / continuar sin especificar</strong>
+                <small>El reporte quedará asociado a la cabecera municipal.</small>
+              </span>
+              <ChevronRight size={20} aria-hidden="true" />
+            </button>
+            {barrios.map((territorio) => (
               <button
                 key={territorio.id}
                 type="button"
                 className="reportar-territory-option"
-                onClick={() => elegirSector(territorio.id)}
+                onClick={() => elegirBarrio(territorio.id)}
               >
                 <span>
                   <strong>{territorio.nombre}</strong>
-                  <small>Casco urbano</small>
+                  <small>Barrio o sector</small>
                 </span>
                 <ChevronRight size={20} aria-hidden="true" />
               </button>
@@ -278,14 +247,11 @@ export function ReportarDetailsStep({
               <strong>{territorioSeleccionado.nombre}</strong>
               {territorioPadreId && <small>{nombreTerritorio(territorioPadreId)}</small>}
             </div>
-            <button type="button" className="reportar-text-button" onClick={limpiarTerritorio}>
-              Cambiar
-            </button>
           </div>
         )}
 
         <small className="reportar-help">
-          Catálogo territorial local provisional; la relación definitiva se revisará en PR #15.
+          Catálogo local del frontend para PR #14; la relación definitiva se revisará en PR #15.
         </small>
       </div>
 
