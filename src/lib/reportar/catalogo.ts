@@ -9,12 +9,12 @@ import {
   Megaphone,
   Mountain,
   Radio,
-  Route,
   Users,
   Waves,
   Zap,
   type LucideIcon,
 } from "lucide-react";
+import { RoadIcon } from "@/components/road-icon";
 import type { ReporteCategoria, SinEvidenciaMotivo } from "@/lib/reportar/types";
 
 export type ReporteSubcategoria = {
@@ -58,7 +58,7 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
     description: "Un problema que afecta el paso por una vía o camino.",
     color: "#E58129",
     textColor: "#1B2B24",
-    Icon: Route,
+    Icon: RoadIcon,
     subcategorias: [
       { id: "derrumbe_via", label: "Derrumbe en la vía", Icon: Mountain },
       { id: "puente", label: "Puente o paso dañado", Icon: Construction },
