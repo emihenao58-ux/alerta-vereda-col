@@ -1,3 +1,6 @@
+export const MAX_VIDEO_DURATION_SECONDS = 15;
+export const MAX_VIDEO_BYTES = 15 * 1024 * 1024;
+
 export function detenerStream(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
 }

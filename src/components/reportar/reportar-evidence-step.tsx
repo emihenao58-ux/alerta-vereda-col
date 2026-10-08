@@ -10,7 +10,7 @@ export function ReportarEvidenceStep({
   evidencias,
   fotoCount,
   videoCount,
-  fotoObligatoria,
+  evidenciaObligatoria,
   sinEvidencia,
   error,
   onOpenCapture,
@@ -24,7 +24,7 @@ export function ReportarEvidenceStep({
   evidencias: readonly ReporteEvidencia[];
   fotoCount: number;
   videoCount: number;
-  fotoObligatoria: boolean;
+  evidenciaObligatoria: boolean;
   sinEvidencia: SinEvidencia | null;
   error: string | null;
   onOpenCapture: (mode: "foto" | "video") => void;
@@ -89,26 +89,26 @@ export function ReportarEvidenceStep({
 
       <ReportarEvidenceList evidencias={evidencias} onRemove={onRemove} onEdit={onEdit} />
 
-      {fotoObligatoria && fotoCount === 0 && !sinEvidencia && (
+      {evidenciaObligatoria && evidencias.length === 0 && !sinEvidencia && (
         <div className="reportar-evidence-required">
-          <strong>Para esta categoría la foto es obligatoria.</strong>
+          <strong>Para esta categoría se requiere al menos una evidencia visual.</strong>
           <p>
-            Si existe un problema técnico real que te impide tomarla, puedes registrarlo para
-            continuar.
+            Si existe un problema técnico real que te impide aportar una foto o un video, puedes
+            registrarlo para continuar.
           </p>
           <button
             type="button"
             className="reportar-text-button"
             onClick={() => setMostrarExcepcion(true)}
           >
-            ¿No puedes tomar una foto?
+            ¿No puedes aportar ninguna evidencia visual?
           </button>
         </div>
       )}
 
-      {mostrarExcepcion && fotoObligatoria && fotoCount === 0 && (
+      {mostrarExcepcion && evidenciaObligatoria && evidencias.length === 0 && (
         <div className="reportar-no-evidence-card">
-          <h3>Reportar sin foto</h3>
+          <h3>Reportar sin evidencia</h3>
           <p>Selecciona la razón técnica. Esta decisión quedará visible en la revisión local.</p>
           <label className="reportar-field">
             <span>Justificación</span>
@@ -138,7 +138,7 @@ export function ReportarEvidenceStep({
           </label>
           <div className="reportar-inline-actions">
             <Button type="button" onClick={guardarExcepcion}>
-              Continuar sin foto
+              Continuar sin evidencia
             </Button>
             {sinEvidencia && (
               <button
@@ -158,7 +158,7 @@ export function ReportarEvidenceStep({
 
       {sinEvidencia && (
         <div className="reportar-no-evidence-confirmed" role="status">
-          <strong>Reporte sin evidencia fotográfica registrado</strong>
+          <strong>Reporte sin evidencia visual registrado</strong>
           <span>
             {MOTIVOS_SIN_EVIDENCIA.find((item) => item.value === sinEvidencia.motivo)?.label}
           </span>

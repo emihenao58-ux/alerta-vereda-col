@@ -113,7 +113,7 @@ export function subcategoriasDe(categoria: ReporteCategoria | null) {
   return categoriaConfig(categoria)?.subcategorias ?? [];
 }
 
-export function fotoObligatoriaPara(categoria: ReporteCategoria | null) {
+export function evidenciaObligatoriaPara(categoria: ReporteCategoria | null) {
   return categoria === "emergencia" || categoria === "via";
 }
 

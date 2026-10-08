@@ -124,7 +124,7 @@ export function ReportarFlow() {
           evidencias={flow.draft.evidencias}
           fotoCount={flow.fotoCount}
           videoCount={flow.videoCount}
-          fotoObligatoria={flow.fotoObligatoria}
+          evidenciaObligatoria={flow.evidenciaObligatoria}
           sinEvidencia={flow.draft.sinEvidencia}
           error={flow.ui.error}
           onOpenCapture={setCaptureMode}

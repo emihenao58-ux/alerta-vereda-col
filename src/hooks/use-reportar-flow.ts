@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRef } from "react";
-import { fotoObligatoriaPara } from "@/lib/reportar/catalogo";
+import { evidenciaObligatoriaPara } from "@/lib/reportar/catalogo";
 import {
   createEmptyDraft,
   createInitialUiState,
@@ -129,9 +129,10 @@ export function useReportarFlow() {
         );
       }
       if (step === "evidencias") {
-        const fotoCount = contar(draft, "foto");
         return (
-          !fotoObligatoriaPara(draft.categoria) || fotoCount > 0 || draft.sinEvidencia !== null
+          !evidenciaObligatoriaPara(draft.categoria) ||
+          draft.evidencias.length > 0 ||
+          draft.sinEvidencia !== null
         );
       }
       return true;
@@ -148,7 +149,7 @@ export function useReportarFlow() {
             ? "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
               ? "Completa el tipo de lugar, la zona, qué pasó y dónde ocurrió."
-              : "Adjunta una foto o registra por qué no puedes hacerlo.",
+              : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
       }));
       return false;
     }
@@ -189,7 +190,7 @@ export function useReportarFlow() {
 
   const fotoCount = useMemo(() => contar(draft, "foto"), [draft]);
   const videoCount = useMemo(() => contar(draft, "video"), [draft]);
-  const fotoObligatoria = fotoObligatoriaPara(draft.categoria);
+  const evidenciaObligatoria = evidenciaObligatoriaPara(draft.categoria);
 
   return {
     draft,
@@ -197,7 +198,7 @@ export function useReportarFlow() {
     steps: STEPS,
     fotoCount,
     videoCount,
-    fotoObligatoria,
+    evidenciaObligatoria,
     updateDraft,
     elegirCategoria,
     agregarEvidencias,

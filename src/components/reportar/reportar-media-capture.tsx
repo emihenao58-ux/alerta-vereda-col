@@ -13,6 +13,8 @@ import {
   detenerStream,
   extensionDeMime,
   mensajeDeErrorMedia,
+  MAX_VIDEO_BYTES,
+  MAX_VIDEO_DURATION_SECONDS,
   recorderMimeType,
   solicitarStream,
   videoDisponible,
@@ -158,10 +160,18 @@ export function ReportarMediaCapture({
         return;
       }
       const duration = Math.min(
-        30,
+        MAX_VIDEO_DURATION_SECONDS,
         Math.max(1, Math.round((Date.now() - (startedAtRef.current ?? Date.now())) / 1000)),
       );
       const blob = new Blob(chunksRef.current, { type: mimeType });
+      if (blob.size > MAX_VIDEO_BYTES) {
+        recorderRef.current = null;
+        chunksRef.current = [];
+        stopTimer();
+        setRecording(false);
+        setError("El video supera el límite de 15 MB. Inténtalo de nuevo.");
+        return;
+      }
       const file = new File(
         [blob],
         `evidencia-alertavereda-${Date.now()}.${extensionDeMime(mimeType)}`,
@@ -176,8 +186,8 @@ export function ReportarMediaCapture({
     recorder.start();
     timerRef.current = window.setInterval(() => {
       const elapsed = Math.floor((Date.now() - (startedAtRef.current ?? Date.now())) / 1000);
-      setSeconds(Math.min(30, elapsed));
-      if (elapsed >= 30) stopRecording();
+      setSeconds(Math.min(MAX_VIDEO_DURATION_SECONDS, elapsed));
+      if (elapsed >= MAX_VIDEO_DURATION_SECONDS) stopRecording();
     }, 250);
   };
 
@@ -200,7 +210,7 @@ export function ReportarMediaCapture({
           {!ready && !error && <span className="reportar-media-status">Preparando la cámara…</span>}
           {recording && (
             <span className="reportar-recording-badge">
-              <Circle size={12} fill="currentColor" /> {seconds}s / 30s
+              <Circle size={12} fill="currentColor" /> {seconds}s / {MAX_VIDEO_DURATION_SECONDS}s
             </span>
           )}
         </div>
