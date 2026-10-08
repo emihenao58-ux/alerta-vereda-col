@@ -1,6 +1,11 @@
-import { Building2, ChevronRight, Leaf, MapPin, RotateCcw } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
+import { Building2, ChevronRight, Leaf, MapPin, RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
+  buscarVeredas,
+  colorDeTerritorio,
+  contextoVereda,
   etiquetaTipoLugar,
   hijosDe,
   territorioPorId,
@@ -24,7 +29,7 @@ const TIPO_LUGAR_OPTIONS: readonly {
   {
     tipo: "vereda",
     label: "Vereda",
-    description: "Selecciona una vereda.",
+    description: "Busca tu vereda.",
     Icon: Leaf,
   },
   {
@@ -34,6 +39,9 @@ const TIPO_LUGAR_OPTIONS: readonly {
     Icon: MapPin,
   },
 ];
+
+const estiloZona = (color: string | null): CSSProperties | undefined =>
+  color ? ({ "--reportar-territory-accent": color } as CSSProperties) : undefined;
 
 function nombreTerritorio(id: string | null) {
   return territorioPorId(id)?.nombre ?? null;
@@ -62,13 +70,15 @@ export function ReportarDetailsStep({
   onBack: () => void;
   onNext: () => void;
 }) {
+  const [veredaQuery, setVeredaQuery] = useState("");
   const territorioSeleccionado = territorioPorId(territorioId);
   const corregimientos = territoriosDeTipo("corregimiento");
-  const veredas = territoriosDeTipo("vereda");
   const barrios = hijosDe("cabecera-municipal");
+  const resultadosVereda = useMemo(() => buscarVeredas(veredaQuery), [veredaQuery]);
   const finalSeleccionado = Boolean(territorioSeleccionado);
 
   const elegirTipo = (tipo: TipoLugar) => {
+    setVeredaQuery("");
     onChange({
       tipoLugar: tipo,
       territorioId: null,
@@ -78,6 +88,7 @@ export function ReportarDetailsStep({
   };
 
   const limpiarTerritorio = () => {
+    setVeredaQuery("");
     onChange({
       tipoLugar: null,
       territorioId: null,
@@ -96,10 +107,11 @@ export function ReportarDetailsStep({
   };
 
   const elegirVereda = (id: string) => {
+    const territorio = territorioPorId(id);
     onChange({
       tipoLugar: "vereda",
       territorioId: id,
-      territorioPadreId: null,
+      territorioPadreId: territorio?.parentId ?? null,
       veredaId: id,
     });
   };
@@ -172,6 +184,7 @@ export function ReportarDetailsStep({
                 key={territorio.id}
                 type="button"
                 className="reportar-territory-option"
+                style={estiloZona(colorDeTerritorio(territorio))}
                 onClick={() => elegirCorregimiento(territorio.id)}
               >
                 <span>
@@ -185,21 +198,61 @@ export function ReportarDetailsStep({
         )}
 
         {tipoLugar === "vereda" && !finalSeleccionado && (
-          <div className="reportar-territory-options" role="radiogroup" aria-label="Veredas">
-            {veredas.map((territorio) => (
-              <button
-                key={territorio.id}
-                type="button"
-                className="reportar-territory-option"
-                onClick={() => elegirVereda(territorio.id)}
-              >
-                <span>
-                  <strong>{territorio.nombre}</strong>
-                  <small>Vereda</small>
-                </span>
-                <ChevronRight size={20} aria-hidden="true" />
-              </button>
-            ))}
+          <div className="reportar-vereda-search">
+            <label className="reportar-search-label" htmlFor="reportar-vereda-search-input">
+              VEREDA
+            </label>
+            <div className="reportar-search-control">
+              <Search size={19} aria-hidden="true" />
+              <input
+                id="reportar-vereda-search-input"
+                className="reportar-input"
+                type="search"
+                value={veredaQuery}
+                onChange={(event) => setVeredaQuery(event.target.value)}
+                placeholder="Buscar vereda..."
+                autoComplete="off"
+              />
+            </div>
+            <p className="reportar-search-hint">
+              {veredaQuery.trim()
+                ? "Resultados aproximados; no necesitas escribir el nombre exacto."
+                : "Escribe una parte del nombre para encontrarla rápidamente."}
+            </p>
+            <div
+              className="reportar-territory-options"
+              role="listbox"
+              aria-label="Resultados de veredas"
+            >
+              {resultadosVereda.map((territorio) => {
+                const color = colorDeTerritorio(territorio);
+                const contexto = contextoVereda(territorio);
+                return (
+                  <button
+                    key={territorio.id}
+                    type="button"
+                    className="reportar-territory-option"
+                    style={estiloZona(color)}
+                    onClick={() => elegirVereda(territorio.id)}
+                    role="option"
+                    aria-label={`${territorio.nombre}. Vereda · ${contexto}`}
+                  >
+                    <span>
+                      <strong>{territorio.nombre}</strong>
+                      <small>
+                        <Leaf size={13} aria-hidden="true" /> Vereda · {contexto}
+                      </small>
+                    </span>
+                    <ChevronRight size={20} aria-hidden="true" />
+                  </button>
+                );
+              })}
+            </div>
+            {resultadosVereda.length === 0 && (
+              <p className="reportar-search-empty" role="status">
+                No encontramos esa vereda. Prueba con otra parte del nombre.
+              </p>
+            )}
           </div>
         )}
 
@@ -238,20 +291,29 @@ export function ReportarDetailsStep({
         )}
 
         {finalSeleccionado && territorioSeleccionado && (
-          <div className="reportar-territory-selected" role="status">
+          <div
+            className="reportar-territory-selected"
+            style={estiloZona(colorDeTerritorio(territorioSeleccionado))}
+            role="status"
+          >
             <span className="reportar-location-type-icon" aria-hidden="true">
-              <MapPin size={24} />
+              {tipoLugar === "vereda" ? <Leaf size={24} /> : <MapPin size={24} />}
             </span>
             <div>
               <span>{etiquetaTipoLugar(tipoLugar)}</span>
               <strong>{territorioSeleccionado.nombre}</strong>
-              {territorioPadreId && <small>{nombreTerritorio(territorioPadreId)}</small>}
+              {tipoLugar === "vereda" ? (
+                <small>Vereda · {contextoVereda(territorioSeleccionado)}</small>
+              ) : (
+                territorioPadreId && <small>{nombreTerritorio(territorioPadreId)}</small>
+              )}
             </div>
           </div>
         )}
 
         <small className="reportar-help">
-          Catálogo local del frontend para PR #14; la relación definitiva se revisará en PR #15.
+          Catálogo local del frontend para PR #14; la clasificación definitiva de backend se
+          revisará en PR #15.
         </small>
       </div>
 

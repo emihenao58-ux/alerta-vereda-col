@@ -5390,6 +5390,62 @@ html.theme-transition-no-blur .mi-vereda-board {
   grid-template-columns: minmax(0, 1fr) auto;
   min-height: 3.75rem;
   padding: 0.75rem 0.9rem;
+  border-inline-start: 4px solid var(--reportar-territory-accent, var(--border));
+}
+
+.reportar-vereda-search {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.reportar-search-label {
+  color: var(--tinta-suave);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.reportar-search-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.reportar-search-control > svg {
+  position: absolute;
+  left: 0.9rem;
+  z-index: 1;
+  color: var(--tinta-suave);
+  pointer-events: none;
+}
+
+.reportar-search-control .reportar-input {
+  width: 100%;
+  padding-inline-start: 2.65rem;
+}
+
+.reportar-search-control input[type="search"]::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.reportar-search-hint,
+.reportar-search-empty {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.reportar-search-empty {
+  padding: 0.8rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.7rem;
+}
+
+.reportar-territory-option small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
 }
 
 .reportar-territory-child-block {
@@ -5430,6 +5486,7 @@ html.theme-transition-no-blur .mi-vereda-board {
   gap: 0.7rem;
   padding: 0.85rem;
   border: 2px solid var(--bosque);
+  border-inline-start: 5px solid var(--reportar-territory-accent, var(--bosque));
   border-radius: 0.78rem;
   background: color-mix(in srgb, var(--bosque) 12%, var(--card));
 }

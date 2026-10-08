@@ -4,7 +4,7 @@ import {
   etiquetaMotivoSinEvidencia,
   subcategoriasDe,
 } from "@/lib/reportar/catalogo";
-import { etiquetaTipoLugar, territorioPorId } from "@/lib/reportar/mock-data";
+import { contextoVereda, etiquetaTipoLugar, territorioPorId } from "@/lib/reportar/mock-data";
 import type { ReporteDraft } from "@/lib/reportar/types";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
 
@@ -24,9 +24,11 @@ export function ReportarReviewStep({
   const territorio = territorioPorId(draft.territorioId);
   const territorioPadre = territorioPorId(draft.territorioPadreId);
   const territorioResumen = territorio
-    ? draft.tipoLugar === "casco_urbano" && territorio.id === "cabecera-municipal"
-      ? "Cabecera municipal"
-      : `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
+    ? draft.tipoLugar === "vereda"
+      ? `Vereda · ${contextoVereda(territorio)}`
+      : draft.tipoLugar === "casco_urbano" && territorio.id === "cabecera-municipal"
+        ? "Cabecera municipal"
+        : `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
     : "Sin territorio";
 
   return (
@@ -54,7 +56,9 @@ export function ReportarReviewStep({
           <div>
             <span className="reportar-review-label">Lugar del reporte</span>
             <strong>{territorioResumen}</strong>
-            {territorioPadre && <span>Dentro de {territorioPadre.nombre}</span>}
+            {territorioPadre && draft.tipoLugar !== "vereda" && (
+              <span>Dentro de {territorioPadre.nombre}</span>
+            )}
             <span>{draft.lugar}</span>
             <p>{draft.descripcion}</p>
             {draft.nombre && <span>Reporta: {draft.nombre}</span>}
