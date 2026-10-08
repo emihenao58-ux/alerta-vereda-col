@@ -1,6 +1,14 @@
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { Building2, ChevronRight, Leaf, MapPin, RotateCcw, Search } from "lucide-react";
+import {
+  Building2,
+  ChevronDown,
+  ChevronRight,
+  Leaf,
+  MapPin,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   buscarVeredas,
@@ -71,14 +79,24 @@ export function ReportarDetailsStep({
   onNext: () => void;
 }) {
   const [veredaQuery, setVeredaQuery] = useState("");
+  const [veredasExpandidas, setVeredasExpandidas] = useState(false);
   const territorioSeleccionado = territorioPorId(territorioId);
   const corregimientos = territoriosDeTipo("corregimiento");
   const barrios = hijosDe("cabecera-municipal");
-  const resultadosVereda = useMemo(() => buscarVeredas(veredaQuery), [veredaQuery]);
+  const resultadosVereda = useMemo(
+    () =>
+      veredaQuery.trim()
+        ? buscarVeredas(veredaQuery)
+        : veredasExpandidas
+          ? territoriosDeTipo("vereda")
+          : buscarVeredas(""),
+    [veredaQuery, veredasExpandidas],
+  );
   const finalSeleccionado = Boolean(territorioSeleccionado);
 
   const elegirTipo = (tipo: TipoLugar) => {
     setVeredaQuery("");
+    setVeredasExpandidas(false);
     onChange({
       tipoLugar: tipo,
       territorioId: null,
@@ -89,6 +107,7 @@ export function ReportarDetailsStep({
 
   const limpiarTerritorio = () => {
     setVeredaQuery("");
+    setVeredasExpandidas(false);
     onChange({
       tipoLugar: null,
       territorioId: null,
@@ -209,7 +228,10 @@ export function ReportarDetailsStep({
                 className="reportar-input"
                 type="search"
                 value={veredaQuery}
-                onChange={(event) => setVeredaQuery(event.target.value)}
+                onChange={(event) => {
+                  setVeredaQuery(event.target.value);
+                  setVeredasExpandidas(false);
+                }}
                 placeholder="Buscar vereda..."
                 autoComplete="off"
               />
@@ -248,6 +270,16 @@ export function ReportarDetailsStep({
                 );
               })}
             </div>
+            {!veredaQuery.trim() && !veredasExpandidas && (
+              <button
+                type="button"
+                className="reportar-text-button reportar-more-button"
+                onClick={() => setVeredasExpandidas(true)}
+                aria-expanded={false}
+              >
+                Ver más <ChevronDown size={17} aria-hidden="true" />
+              </button>
+            )}
             {resultadosVereda.length === 0 && (
               <p className="reportar-search-empty" role="status">
                 No encontramos esa vereda. Prueba con otra parte del nombre.

@@ -5442,6 +5442,12 @@ html.theme-transition-no-blur .mi-vereda-board {
   border-radius: 0.7rem;
 }
 
+.reportar-more-button {
+  justify-self: center;
+  min-height: 2.75rem;
+  padding-inline: 0.8rem;
+}
+
 .reportar-territory-option small {
   display: inline-flex;
   align-items: center;

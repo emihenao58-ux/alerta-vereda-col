@@ -7,6 +7,7 @@ export type TerritorioMock = {
   nombre: string;
   tipo: TipoLugar;
   parentId: string | null;
+  aliases?: readonly string[];
 };
 
 export const COLORES_CORREGIMIENTO = {
@@ -144,31 +145,82 @@ function normalizar(texto: string) {
     .trim();
 }
 
-function distanciaLevenshtein(a: string, b: string) {
-  const anterior = Array.from({ length: b.length + 1 }, (_, index) => index);
+function distanciaDamerau(a: string, b: string) {
+  const anteriorAnterior = Array.from({ length: b.length + 1 }, (_, index) => index);
+  let anterior = anteriorAnterior;
   for (let i = 1; i <= a.length; i += 1) {
     const actual = [i];
     for (let j = 1; j <= b.length; j += 1) {
-      actual[j] = Math.min(
+      let valor = Math.min(
         actual[j - 1]! + 1,
         anterior[j]! + 1,
         anterior[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1),
       );
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        valor = Math.min(valor, anteriorAnterior[j - 2]! + 1);
+      }
+      actual[j] = valor;
     }
-    for (let j = 0; j <= b.length; j += 1) anterior[j] = actual[j]!;
+    for (let j = 0; j <= b.length; j += 1) anteriorAnterior[j] = anterior[j]!;
+    anterior = actual;
   }
   return anterior[b.length]!;
 }
 
-function relevanciaVereda(query: string, nombre: string) {
-  const texto = normalizar(nombre);
+function distanciaMaxima(query: string) {
+  return Math.min(3, Math.max(1, Math.floor((query.length + 1) / 4)));
+}
+
+function esSubsecuencia(query: string, candidato: string) {
+  let posicion = 0;
+  for (const caracter of candidato) {
+    if (caracter === query[posicion]) posicion += 1;
+  }
+  return posicion === query.length;
+}
+
+function candidatosDeTexto(texto: string, longitudConsulta: number) {
+  const palabras = texto.split(" ").filter(Boolean);
+  const candidatos = [texto, ...palabras];
+  const longitudes = new Set([
+    Math.max(1, longitudConsulta - 1),
+    longitudConsulta,
+    longitudConsulta + 1,
+  ]);
+
+  for (const palabra of palabras) {
+    for (const longitud of longitudes) {
+      for (let inicio = 0; inicio + longitud <= palabra.length; inicio += 1) {
+        candidatos.push(palabra.slice(inicio, inicio + longitud));
+      }
+    }
+  }
+  return candidatos;
+}
+
+function relevanciaTexto(query: string, textoOriginal: string) {
+  const texto = normalizar(textoOriginal);
+  if (!texto) return Number.POSITIVE_INFINITY;
   if (texto === query) return 0;
   if (texto.startsWith(query)) return 10;
   if (texto.includes(query)) return 20;
 
-  const distancia = distanciaLevenshtein(query, texto);
-  const maximo = query.length < 5 ? 1 : 2;
-  return distancia <= maximo ? 40 + distancia : Number.POSITIVE_INFINITY;
+  const maximo = distanciaMaxima(query);
+  let mejor = Number.POSITIVE_INFINITY;
+  for (const candidato of candidatosDeTexto(texto, query.length)) {
+    const distancia = distanciaDamerau(query, candidato);
+    const esErrorPequeno = distancia <= 1;
+    const conservaElOrden = esSubsecuencia(query, candidato);
+    if (distancia <= maximo && (esErrorPequeno || conservaElOrden)) {
+      mejor = Math.min(mejor, 40 + distancia);
+    }
+  }
+  return mejor;
+}
+
+function relevanciaVereda(query: string, territorio: TerritorioMock) {
+  const textos = [territorio.nombre, ...(territorio.aliases ?? [])];
+  return Math.min(...textos.map((texto) => relevanciaTexto(query, texto)));
 }
 
 export function territorioPorId(id: string | null) {
@@ -209,7 +261,7 @@ export function buscarVeredas(query: string) {
   return veredas
     .map((territorio) => ({
       territorio,
-      relevancia: relevanciaVereda(normalizado, normalizar(territorio.nombre)),
+      relevancia: relevanciaVereda(normalizado, territorio),
     }))
     .filter(({ relevancia }) => Number.isFinite(relevancia))
     .sort(
