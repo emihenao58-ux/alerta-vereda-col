@@ -124,7 +124,9 @@ export function useReportarFlow() {
         return Boolean(draft.categoria && draft.subcategoria);
       }
       if (step === "detalle") {
-        return Boolean(draft.veredaId && draft.descripcion.trim() && draft.lugar.trim());
+        return Boolean(
+          draft.tipoLugar && draft.territorioId && draft.descripcion.trim() && draft.lugar.trim(),
+        );
       }
       if (step === "evidencias") {
         const fotoCount = contar(draft, "foto");
@@ -145,7 +147,7 @@ export function useReportarFlow() {
           actual.step === "categoria"
             ? "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
-              ? "Completa la comunidad, qué pasó y dónde ocurrió."
+              ? "Completa el tipo de lugar, la zona, qué pasó y dónde ocurrió."
               : "Adjunta una foto o registra por qué no puedes hacerlo.",
       }));
       return false;

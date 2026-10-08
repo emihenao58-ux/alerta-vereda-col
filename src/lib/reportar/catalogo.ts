@@ -1,9 +1,26 @@
-import { Megaphone, Route, Siren, Waves, type LucideIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  Car,
+  CircleHelp,
+  Construction,
+  Droplet,
+  Flame,
+  HeartPulse,
+  Megaphone,
+  Mountain,
+  Radio,
+  Route,
+  Users,
+  Waves,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import type { ReporteCategoria, SinEvidenciaMotivo } from "@/lib/reportar/types";
 
 export type ReporteSubcategoria = {
   id: string;
   label: string;
+  Icon: LucideIcon;
 };
 
 export type ReporteCategoriaConfig = {
@@ -11,63 +28,69 @@ export type ReporteCategoriaConfig = {
   label: string;
   description: string;
   color: string;
+  textColor: string;
   Icon: LucideIcon;
   subcategorias: ReporteSubcategoria[];
 };
 
-// Catálogo provisional de PR #14. Los identificadores se reemplazarán si PR #15
-// define un catálogo persistido en el backend.
+// Catálogo declarativo local de PR #14. Los identificadores y subcategorías se
+// reemplazarán si PR #15 define un catálogo persistido en el backend.
 export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
   {
     value: "emergencia",
-    label: "Emergencia",
+    label: "Emergencias",
     description: "Una situación que puede poner en riesgo a personas o viviendas.",
-    color: "#c23b2e",
-    Icon: Siren,
+    color: "#D83644",
+    textColor: "#FFFFFF",
+    Icon: AlertTriangle,
     subcategorias: [
-      { id: "deslizamiento", label: "Deslizamiento o derrumbe" },
-      { id: "inundacion", label: "Inundación" },
-      { id: "incendio", label: "Incendio" },
-      { id: "accidente", label: "Accidente" },
-      { id: "otra_emergencia", label: "Otra emergencia" },
+      { id: "accidente", label: "Accidente", Icon: Car },
+      { id: "incendio", label: "Incendio", Icon: Flame },
+      { id: "deslizamiento", label: "Deslizamiento o derrumbe", Icon: Mountain },
+      { id: "inundacion", label: "Inundación", Icon: Waves },
+      { id: "atencion_medica", label: "Atención médica", Icon: HeartPulse },
+      { id: "otra_emergencia", label: "Otra emergencia", Icon: CircleHelp },
     ],
   },
   {
     value: "via",
     label: "Vías",
     description: "Un problema que afecta el paso por una vía o camino.",
-    color: "#db7b33",
+    color: "#E58129",
+    textColor: "#1B2B24",
     Icon: Route,
     subcategorias: [
-      { id: "derrumbe_via", label: "Derrumbe en la vía" },
-      { id: "puente", label: "Puente o paso dañado" },
-      { id: "paso_restringido", label: "Paso restringido" },
-      { id: "otro_problema_vial", label: "Otro problema vial" },
+      { id: "derrumbe_via", label: "Derrumbe en la vía", Icon: Mountain },
+      { id: "puente", label: "Puente o paso dañado", Icon: Construction },
+      { id: "paso_restringido", label: "Paso restringido", Icon: Construction },
+      { id: "otro_problema_vial", label: "Otro problema vial", Icon: CircleHelp },
     ],
   },
   {
     value: "servicio",
     label: "Servicios",
     description: "Una interrupción o dificultad con un servicio de la comunidad.",
-    color: "#3c8a5b",
-    Icon: Waves,
+    color: "#208666",
+    textColor: "#FFFFFF",
+    Icon: Droplet,
     subcategorias: [
-      { id: "agua", label: "Agua" },
-      { id: "energia", label: "Energía" },
-      { id: "senal", label: "Señal o comunicación" },
-      { id: "otro_servicio", label: "Otro servicio" },
+      { id: "agua", label: "Agua", Icon: Droplet },
+      { id: "energia", label: "Energía", Icon: Zap },
+      { id: "senal", label: "Señal o comunicación", Icon: Radio },
+      { id: "otro_servicio", label: "Otro servicio", Icon: CircleHelp },
     ],
   },
   {
     value: "otro",
     label: "Avisos",
     description: "Información útil para las personas de la comunidad.",
-    color: "#c99a2e",
+    color: "#E7A836",
+    textColor: "#1B2B24",
     Icon: Megaphone,
     subcategorias: [
-      { id: "reunion", label: "Reunión o convocatoria" },
-      { id: "aviso_comunitario", label: "Aviso comunitario" },
-      { id: "otro_aviso", label: "Otro aviso" },
+      { id: "reunion", label: "Reunión o convocatoria", Icon: Users },
+      { id: "aviso_comunitario", label: "Aviso comunitario", Icon: Megaphone },
+      { id: "otro_aviso", label: "Otro aviso", Icon: CircleHelp },
     ],
   },
 ];

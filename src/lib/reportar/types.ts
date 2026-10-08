@@ -3,6 +3,8 @@ export type ReporteCategoria = "emergencia" | "via" | "servicio" | "otro";
 export type ReporteStep =
   "categoria" | "detalle" | "ubicacion" | "evidencias" | "revision" | "confirmacion";
 
+export type TipoLugar = "corregimiento" | "vereda" | "casco_urbano";
+
 export type EvidenciaTipo = "foto" | "video";
 export type EvidenciaFuente = "camara" | "galeria";
 
@@ -34,7 +36,12 @@ export type ReporteEvidencia = {
 export type ReporteDraft = {
   categoria: ReporteCategoria | null;
   subcategoria: string | null;
+  // Compatibilidad temporal con el backend actual. Sólo se llena cuando la
+  // selección final es una vereda; PR #15 definirá el contrato definitivo.
   veredaId: string | null;
+  tipoLugar: TipoLugar | null;
+  territorioId: string | null;
+  territorioPadreId: string | null;
   descripcion: string;
   lugar: string;
   nombre: string;
@@ -55,6 +62,9 @@ export function createEmptyDraft(): ReporteDraft {
     categoria: null,
     subcategoria: null,
     veredaId: null,
+    tipoLugar: null,
+    territorioId: null,
+    territorioPadreId: null,
     descripcion: "",
     lugar: "",
     nombre: "",

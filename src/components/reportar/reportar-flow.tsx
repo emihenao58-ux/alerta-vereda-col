@@ -99,7 +99,9 @@ export function ReportarFlow() {
       )}
       {step === "detalle" && (
         <ReportarDetailsStep
-          veredaId={flow.draft.veredaId}
+          tipoLugar={flow.draft.tipoLugar}
+          territorioId={flow.draft.territorioId}
+          territorioPadreId={flow.draft.territorioPadreId}
           descripcion={flow.draft.descripcion}
           lugar={flow.draft.lugar}
           nombre={flow.draft.nombre}

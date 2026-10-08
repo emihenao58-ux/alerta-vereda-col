@@ -4,7 +4,7 @@ import {
   etiquetaMotivoSinEvidencia,
   subcategoriasDe,
 } from "@/lib/reportar/catalogo";
-import { COMUNIDADES_MOCK } from "@/lib/reportar/mock-data";
+import { etiquetaTipoLugar, territorioPorId } from "@/lib/reportar/mock-data";
 import type { ReporteDraft } from "@/lib/reportar/types";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
 
@@ -21,7 +21,11 @@ export function ReportarReviewStep({
   const subcategoria = subcategoriasDe(draft.categoria).find(
     (item) => item.id === draft.subcategoria,
   )?.label;
-  const comunidad = COMUNIDADES_MOCK.find((item) => item.id === draft.veredaId)?.nombre;
+  const territorio = territorioPorId(draft.territorioId);
+  const territorioPadre = territorioPorId(draft.territorioPadreId);
+  const territorioResumen = territorio
+    ? `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
+    : "Sin territorio";
 
   return (
     <ReportarStepShell
@@ -46,8 +50,9 @@ export function ReportarReviewStep({
         </article>
         <article>
           <div>
-            <span className="reportar-review-label">Datos</span>
-            <strong>{comunidad ?? "Sin comunidad"}</strong>
+            <span className="reportar-review-label">Lugar del reporte</span>
+            <strong>{territorioResumen}</strong>
+            {territorioPadre && <span>Dentro de {territorioPadre.nombre}</span>}
             <span>{draft.lugar}</span>
             <p>{draft.descripcion}</p>
             {draft.nombre && <span>Reporta: {draft.nombre}</span>}
@@ -58,7 +63,7 @@ export function ReportarReviewStep({
         </article>
         <article>
           <div>
-            <span className="reportar-review-label">Ubicación</span>
+            <span className="reportar-review-label">Ubicación GPS</span>
             <strong>
               {draft.ubicacion
                 ? `Compartida · ±${Math.round(draft.ubicacion.precision)} m`
