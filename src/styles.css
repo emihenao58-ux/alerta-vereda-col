@@ -5417,6 +5417,10 @@ html.theme-transition-no-blur .mi-vereda-board {
   color: var(--reportar-accent);
 }
 
+.reportar-subcategory-icon.has-illustration {
+  background: transparent;
+}
+
 .reportar-subcategory-image {
   display: block;
   width: 100%;

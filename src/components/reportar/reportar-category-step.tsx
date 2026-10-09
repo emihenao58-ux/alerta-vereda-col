@@ -137,7 +137,10 @@ export function ReportarCategoryStep({
                   role="radio"
                   aria-checked={seleccionado}
                 >
-                  <span className="reportar-subcategory-icon" aria-hidden="true">
+                  <span
+                    className={`reportar-subcategory-icon ${ilustracion ? "has-illustration" : ""}`}
+                    aria-hidden="true"
+                  >
                     {ilustracion ? (
                       <img
                         src={ilustracion}
