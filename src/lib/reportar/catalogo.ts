@@ -21,8 +21,6 @@ import {
   PhoneOff,
   Radio,
   ShieldAlert,
-  SignalLow,
-  SignalZero,
   Skull,
   Sparkles,
   Trash2,
@@ -36,6 +34,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { RoadIcon } from "@/components/road-icon";
+import { SignalNoCoverageIcon, SignalWeakIcon } from "@/components/reportar/reportar-signal-icons";
 import type { ReporteCategoria, SinEvidenciaMotivo } from "@/lib/reportar/types";
 
 export type ReporteSubcategoria = {
@@ -77,8 +76,8 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
       { id: "deslizamiento", label: "Deslizamiento o derrumbe", Icon: Mountain },
       { id: "inundacion", label: "Inundación", Icon: Waves },
       { id: "atencion_medica", label: "Atención médica", Icon: HeartPulse },
-      { id: "otra_emergencia", label: "Otra emergencia", Icon: CircleHelp, ...OPCION_OTRO },
       { id: "fauna_peligrosa", label: "Fauna peligrosa", Icon: Bug },
+      { id: "otra_emergencia", label: "Otra emergencia", Icon: CircleHelp, ...OPCION_OTRO },
     ],
   },
   {
@@ -92,9 +91,9 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
       { id: "derrumbe_via", label: "Derrumbe en la vía", Icon: Mountain },
       { id: "puente", label: "Puente o paso dañado", Icon: Construction },
       { id: "paso_restringido", label: "Paso restringido", Icon: Ban },
-      { id: "otro_problema_vial", label: "Otro problema vial", Icon: CircleHelp, ...OPCION_OTRO },
       { id: "animales_sueltos_via", label: "Animales sueltos en la vía", Icon: PawPrint },
       { id: "animales_muertos_via", label: "Animales muertos en la vía", Icon: Skull },
+      { id: "otro_problema_vial", label: "Otro problema vial", Icon: CircleHelp, ...OPCION_OTRO },
     ],
   },
   {
@@ -152,8 +151,8 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
         label: "Señal o comunicación",
         Icon: Radio,
         children: [
-          { id: "no_hay_senal", label: "No hay señal", Icon: SignalZero },
-          { id: "senal_debil", label: "Señal débil", Icon: SignalLow },
+          { id: "no_hay_senal", label: "No hay señal", Icon: SignalNoCoverageIcon },
+          { id: "senal_debil", label: "Señal débil", Icon: SignalWeakIcon },
           { id: "internet_no_funciona", label: "Internet no funciona", Icon: WifiOff },
           {
             id: "no_se_pueden_hacer_llamadas",

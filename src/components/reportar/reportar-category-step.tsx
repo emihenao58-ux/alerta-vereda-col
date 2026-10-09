@@ -14,17 +14,21 @@ export function ReportarCategoryStep({
   categoria,
   subcategoria,
   subcategoriaPadre,
+  descripcion,
   error,
   onCategoria,
   onSubcategoria,
+  onDescripcion,
   onNext,
 }: {
   categoria: ReporteCategoria | null;
   subcategoria: string | null;
   subcategoriaPadre: string | null;
+  descripcion: string;
   error: string | null;
   onCategoria: (categoria: ReporteCategoria) => void;
   onSubcategoria: (selection: ReporteSubcategoriaSeleccion) => void;
+  onDescripcion: (descripcion: string) => void;
   onNext: () => void;
 }) {
   const config = categoriaConfig(categoria);
@@ -132,13 +136,42 @@ export function ReportarCategoryStep({
                   aria-checked={seleccionado}
                 >
                   <span className="reportar-subcategory-icon" aria-hidden="true">
-                    <opcion.Icon size={27} strokeWidth={1.9} />
+                    <opcion.Icon
+                      size={27}
+                      strokeWidth={1.9}
+                      className={
+                        opcion.id === "no_hay_senal"
+                          ? "reportar-signal-no-coverage-icon"
+                          : opcion.id === "senal_debil"
+                            ? "reportar-signal-weak-icon"
+                            : undefined
+                      }
+                    />
                   </span>
                   <span>{opcion.label}</span>
                   {tieneHijos && <ArrowRight size={18} aria-hidden="true" />}
                 </button>
               );
             })}
+          </div>
+
+          <div
+            className={`reportar-description-reveal ${opcionSeleccionada?.requiresDescription ? "is-visible" : ""}`}
+            aria-hidden={!opcionSeleccionada?.requiresDescription}
+          >
+            <label className="reportar-field" htmlFor="reportar-other-description">
+              <span>Cuéntanos qué sucede</span>
+              <textarea
+                id="reportar-other-description"
+                className="reportar-input reportar-textarea"
+                rows={3}
+                value={descripcion}
+                onChange={(event) => onDescripcion(event.target.value)}
+                placeholder="Escribe aquí lo que está pasando…"
+                aria-required={opcionSeleccionada?.requiresDescription === true}
+                tabIndex={opcionSeleccionada?.requiresDescription ? 0 : -1}
+              />
+            </label>
           </div>
 
           {opcionSeleccionada?.notice && (

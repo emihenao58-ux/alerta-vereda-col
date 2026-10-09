@@ -92,9 +92,11 @@ export function ReportarFlow() {
           categoria={flow.draft.categoria}
           subcategoria={flow.draft.subcategoria}
           subcategoriaPadre={flow.draft.subcategoriaPadre}
+          descripcion={flow.draft.descripcion}
           error={flow.ui.error}
           onCategoria={flow.elegirCategoria}
           onSubcategoria={flow.elegirSubcategoria}
+          onDescripcion={(descripcion) => flow.updateDraft({ descripcion })}
           onNext={flow.siguientePaso}
         />
       )}

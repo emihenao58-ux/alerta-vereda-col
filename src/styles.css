@@ -5368,6 +5368,98 @@ html.theme-transition-no-blur .mi-vereda-board {
   color: var(--reportar-accent);
 }
 
+.reportar-description-reveal {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.35rem);
+  transition:
+    max-height 180ms ease,
+    opacity 160ms ease,
+    transform 180ms ease;
+}
+
+.reportar-description-reveal.is-visible {
+  max-height: 12rem;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.reportar-signal-no-coverage-icon .signal-bar,
+.reportar-signal-weak-icon .signal-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.reportar-signal-no-coverage-icon .signal-slash {
+  opacity: 0.7;
+}
+
+.reportar-signal-weak-icon .signal-weak-muted {
+  opacity: 0.25;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reportar-subcategory-option.is-selected .reportar-signal-no-coverage-icon .signal-bar-1 {
+    animation: reportar-signal-no-coverage 900ms 40ms ease-out both;
+  }
+
+  .reportar-subcategory-option.is-selected .reportar-signal-no-coverage-icon .signal-bar-2 {
+    animation: reportar-signal-no-coverage 900ms 130ms ease-out both;
+  }
+
+  .reportar-subcategory-option.is-selected .reportar-signal-no-coverage-icon .signal-bar-3 {
+    animation: reportar-signal-no-coverage 900ms 220ms ease-out both;
+  }
+
+  .reportar-subcategory-option.is-selected .reportar-signal-no-coverage-icon .signal-bar-4 {
+    animation: reportar-signal-no-coverage 900ms 310ms ease-out both;
+  }
+
+  .reportar-subcategory-option.is-selected .reportar-signal-weak-icon .signal-weak-active {
+    animation: reportar-signal-weak 1200ms ease-in-out both;
+  }
+
+  @keyframes reportar-signal-no-coverage {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+
+    78% {
+      opacity: 0.12;
+      transform: scaleY(0.3);
+    }
+  }
+
+  @keyframes reportar-signal-weak {
+    0%,
+    100% {
+      opacity: 0.85;
+      transform: translateY(0);
+    }
+
+    50% {
+      opacity: 0.48;
+      transform: translateY(0.7px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reportar-description-reveal {
+    transition: none;
+  }
+
+  .reportar-signal-no-coverage-icon .signal-bar,
+  .reportar-signal-weak-icon .signal-weak-active {
+    animation: none !important;
+  }
+}
+
 .reportar-option-notice {
   display: flex;
   align-items: flex-start;

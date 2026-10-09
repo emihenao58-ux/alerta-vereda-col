@@ -357,19 +357,20 @@ export function ReportarDetailsStep({
       </div>
 
       <div className="reportar-form-grid">
-        <label className="reportar-field">
-          <span>
-            {descripcionObligatoria ? "Cuéntanos qué sucede" : "¿Qué está pasando?"}
-            {!descripcionObligatoria && <em>(opcional)</em>}
-          </span>
-          <textarea
-            className="reportar-input reportar-textarea"
-            rows={5}
-            value={descripcion}
-            onChange={(event) => onChange({ descripcion: event.target.value })}
-            placeholder={descripcionObligatoria ? "Cuéntanos qué sucede" : "Cuéntanos qué ocurrió…"}
-          />
-        </label>
+        {!descripcionObligatoria && (
+          <label className="reportar-field">
+            <span>
+              ¿Qué está pasando? <em>(opcional)</em>
+            </span>
+            <textarea
+              className="reportar-input reportar-textarea"
+              rows={5}
+              value={descripcion}
+              onChange={(event) => onChange({ descripcion: event.target.value })}
+              placeholder="Cuéntanos qué ocurrió…"
+            />
+          </label>
+        )}
 
         <label className="reportar-field">
           <span>¿Dónde ocurrió exactamente?</span>

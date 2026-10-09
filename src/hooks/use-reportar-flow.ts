@@ -41,6 +41,7 @@ export function useReportarFlow() {
       categoria,
       subcategoria: null,
       subcategoriaPadre: null,
+      descripcion: "",
       sinEvidencia: null,
     }));
     setUi((actual) => ({ ...actual, error: null }));
@@ -51,6 +52,7 @@ export function useReportarFlow() {
       ...actual,
       subcategoria: selection.id,
       subcategoriaPadre: selection.parentId,
+      descripcion: "",
     }));
     setUi((actual) => ({ ...actual, error: null }));
   }, []);
@@ -132,7 +134,9 @@ export function useReportarFlow() {
   const validarPaso = useCallback(
     (step: ReporteStep) => {
       if (step === "categoria") {
-        return Boolean(draft.categoria && draft.subcategoria);
+        const opcion = subcategoriaPorId(draft.categoria, draft.subcategoria);
+        const descripcionValida = !opcion?.requiresDescription || Boolean(draft.descripcion.trim());
+        return Boolean(draft.categoria && draft.subcategoria && descripcionValida);
       }
       if (step === "detalle") {
         const opcion = subcategoriaPorId(draft.categoria, draft.subcategoria);
@@ -159,7 +163,10 @@ export function useReportarFlow() {
         ...actual,
         error:
           actual.step === "categoria"
-            ? "Selecciona una categoría y una subcategoría para continuar."
+            ? subcategoriaPorId(draft.categoria, draft.subcategoria)?.requiresDescription &&
+              !draft.descripcion.trim()
+              ? "Cuéntanos qué sucede antes de continuar."
+              : "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
               ? "Completa el tipo de lugar, la zona y dónde ocurrió; si elegiste Otro, cuéntanos qué sucede."
               : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
@@ -171,7 +178,7 @@ export function useReportarFlow() {
     const next = STEPS[index + 1];
     if (next) setStep(next);
     return true;
-  }, [setStep, ui.step, validarPaso]);
+  }, [draft.categoria, draft.descripcion, draft.subcategoria, setStep, ui.step, validarPaso]);
 
   const pasoAnterior = useCallback(() => {
     const index = STEPS.indexOf(ui.step);
