@@ -139,11 +139,7 @@ export function useReportarFlow() {
         return Boolean(draft.categoria && draft.subcategoria && descripcionValida);
       }
       if (step === "detalle") {
-        const opcion = subcategoriaPorId(draft.categoria, draft.subcategoria);
-        const descripcionValida = !opcion?.requiresDescription || Boolean(draft.descripcion.trim());
-        return Boolean(
-          draft.tipoLugar && draft.territorioId && descripcionValida && draft.lugar.trim(),
-        );
+        return Boolean(draft.tipoLugar && draft.territorioId && draft.lugar.trim());
       }
       if (step === "evidencias") {
         return (
@@ -168,7 +164,7 @@ export function useReportarFlow() {
               ? "Cuéntanos qué sucede antes de continuar."
               : "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
-              ? "Completa el tipo de lugar, la zona y dónde ocurrió; si elegiste Otro, cuéntanos qué sucede."
+              ? "Completa el tipo de lugar, la zona y dónde ocurrió."
               : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
       }));
       return false;

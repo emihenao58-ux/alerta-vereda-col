@@ -10,7 +10,6 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { subcategoriaPorId } from "@/lib/reportar/catalogo";
 import {
   buscarVeredas,
   colorDeTerritorio,
@@ -60,9 +59,6 @@ export function ReportarDetailsStep({
   tipoLugar,
   territorioId,
   territorioPadreId,
-  categoria,
-  subcategoria,
-  descripcion,
   lugar,
   nombre,
   error,
@@ -73,9 +69,6 @@ export function ReportarDetailsStep({
   tipoLugar: TipoLugar | null;
   territorioId: string | null;
   territorioPadreId: string | null;
-  categoria: ReporteDraft["categoria"];
-  subcategoria: string | null;
-  descripcion: string;
   lugar: string;
   nombre: string;
   error: string | null;
@@ -86,8 +79,6 @@ export function ReportarDetailsStep({
   const [veredaQuery, setVeredaQuery] = useState("");
   const [veredasExpandidas, setVeredasExpandidas] = useState(false);
   const territorioSeleccionado = territorioPorId(territorioId);
-  const opcionSeleccionada = subcategoriaPorId(categoria, subcategoria);
-  const descripcionObligatoria = Boolean(opcionSeleccionada?.requiresDescription);
   const corregimientos = territoriosDeTipo("corregimiento");
   const barrios = hijosDe("cabecera-municipal");
   const resultadosVereda = useMemo(
@@ -357,21 +348,6 @@ export function ReportarDetailsStep({
       </div>
 
       <div className="reportar-form-grid">
-        {!descripcionObligatoria && (
-          <label className="reportar-field">
-            <span>
-              ¿Qué está pasando? <em>(opcional)</em>
-            </span>
-            <textarea
-              className="reportar-input reportar-textarea"
-              rows={5}
-              value={descripcion}
-              onChange={(event) => onChange({ descripcion: event.target.value })}
-              placeholder="Cuéntanos qué ocurrió…"
-            />
-          </label>
-        )}
-
         <label className="reportar-field">
           <span>¿Dónde ocurrió exactamente?</span>
           <input

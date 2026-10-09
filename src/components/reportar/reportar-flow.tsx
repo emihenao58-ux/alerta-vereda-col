@@ -105,9 +105,6 @@ export function ReportarFlow() {
           tipoLugar={flow.draft.tipoLugar}
           territorioId={flow.draft.territorioId}
           territorioPadreId={flow.draft.territorioPadreId}
-          categoria={flow.draft.categoria}
-          subcategoria={flow.draft.subcategoria}
-          descripcion={flow.draft.descripcion}
           lugar={flow.draft.lugar}
           nombre={flow.draft.nombre}
           error={flow.ui.error}
