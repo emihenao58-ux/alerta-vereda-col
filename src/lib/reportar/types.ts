@@ -33,9 +33,17 @@ export type ReporteEvidencia = {
   recortada?: boolean;
 };
 
+export type ReporteSubcategoriaSeleccion = {
+  id: string | null;
+  parentId: string | null;
+};
+
 export type ReporteDraft = {
   categoria: ReporteCategoria | null;
+  // Se conserva el ID de la opción final; PR #15 definirá el contrato persistido.
   subcategoria: string | null;
+  // Identifica el grupo visual cuando la opción tiene dos niveles.
+  subcategoriaPadre: string | null;
   // Compatibilidad temporal con el backend actual. Sólo se llena cuando la
   // selección final es una vereda; PR #15 definirá el contrato definitivo.
   veredaId: string | null;
@@ -61,6 +69,7 @@ export function createEmptyDraft(): ReporteDraft {
   return {
     categoria: null,
     subcategoria: null,
+    subcategoriaPadre: null,
     veredaId: null,
     tipoLugar: null,
     territorioId: null,

@@ -5092,6 +5092,35 @@ html.theme-transition-no-blur .mi-vereda-board {
   color: var(--bosque);
 }
 
+.reportar-security-review-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--atencion) 65%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--atencion) 10%, var(--card));
+  color: var(--tinta);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.reportar-security-review-notice > svg {
+  color: var(--atencion);
+}
+
+.reportar-security-review-notice strong,
+.reportar-security-review-notice small {
+  display: block;
+}
+
+.reportar-security-review-notice small {
+  margin-top: 0.2rem;
+  color: var(--tinta-suave);
+  font-size: inherit;
+}
+
 .reportar-local-id {
   margin: 0;
   color: var(--tinta-suave);
@@ -5260,6 +5289,35 @@ html.theme-transition-no-blur .mi-vereda-board {
   font-size: 0.75rem;
 }
 
+.reportar-subcategory-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--reportar-accent, var(--bosque)) 10%, var(--card));
+}
+
+.reportar-subcategory-breadcrumb span {
+  color: var(--tinta-suave);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.reportar-subcategory-breadcrumb strong {
+  color: var(--tinta);
+}
+
+.reportar-subcategory-breadcrumb .reportar-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
 .reportar-subcategory-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5268,7 +5326,7 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-subcategory-option {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.65rem;
   min-height: 4.2rem;
@@ -5308,6 +5366,24 @@ html.theme-transition-no-blur .mi-vereda-board {
   border-radius: 0.7rem;
   background: color-mix(in srgb, var(--reportar-accent) 16%, transparent);
   color: var(--reportar-accent);
+}
+
+.reportar-option-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--urgente) 55%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--urgente) 9%, var(--card));
+  color: var(--tinta);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.reportar-option-notice svg {
+  flex: 0 0 auto;
+  color: var(--urgente);
 }
 
 .reportar-location-type-grid {

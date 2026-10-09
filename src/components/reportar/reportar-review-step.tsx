@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   categoriaConfig,
   etiquetaMotivoSinEvidencia,
-  subcategoriasDe,
+  subcategoriaPorId,
 } from "@/lib/reportar/catalogo";
 import { contextoVereda, etiquetaTipoLugar, territorioPorId } from "@/lib/reportar/mock-data";
 import type { ReporteDraft } from "@/lib/reportar/types";
@@ -18,9 +18,13 @@ export function ReportarReviewStep({
   onConfirm: () => void;
 }) {
   const categoria = categoriaConfig(draft.categoria);
-  const subcategoria = subcategoriasDe(draft.categoria).find(
-    (item) => item.id === draft.subcategoria,
-  )?.label;
+  const subcategoria = subcategoriaPorId(draft.categoria, draft.subcategoria);
+  const subcategoriaPadre = subcategoriaPorId(draft.categoria, draft.subcategoriaPadre);
+  const subcategoriaResumen = subcategoria
+    ? subcategoriaPadre
+      ? `${subcategoriaPadre.label} · ${subcategoria.label}`
+      : subcategoria.label
+    : null;
   const territorio = territorioPorId(draft.territorioId);
   const territorioPadre = territorioPorId(draft.territorioPadreId);
   const territorioResumen = territorio
@@ -42,7 +46,7 @@ export function ReportarReviewStep({
           <div>
             <span className="reportar-review-label">Tipo</span>
             <strong>{categoria?.label ?? "Sin seleccionar"}</strong>
-            <span>{subcategoria ?? "Sin subcategoría"}</span>
+            <span>{subcategoriaResumen ?? "Sin subcategoría"}</span>
           </div>
           <button
             type="button"
@@ -60,7 +64,11 @@ export function ReportarReviewStep({
               <span>Dentro de {territorioPadre.nombre}</span>
             )}
             <span>{draft.lugar}</span>
-            <p>{draft.descripcion}</p>
+            {draft.descripcion ? (
+              <p>{draft.descripcion}</p>
+            ) : (
+              <span>Sin descripción adicional</span>
+            )}
             {draft.nombre && <span>Reporta: {draft.nombre}</span>}
           </div>
           <button type="button" className="reportar-text-button" onClick={() => onEdit("detalle")}>

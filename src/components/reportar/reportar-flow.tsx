@@ -91,9 +91,10 @@ export function ReportarFlow() {
         <ReportarCategoryStep
           categoria={flow.draft.categoria}
           subcategoria={flow.draft.subcategoria}
+          subcategoriaPadre={flow.draft.subcategoriaPadre}
           error={flow.ui.error}
           onCategoria={flow.elegirCategoria}
-          onSubcategoria={(subcategoria) => flow.updateDraft({ subcategoria })}
+          onSubcategoria={flow.elegirSubcategoria}
           onNext={flow.siguientePaso}
         />
       )}
@@ -102,6 +103,8 @@ export function ReportarFlow() {
           tipoLugar={flow.draft.tipoLugar}
           territorioId={flow.draft.territorioId}
           territorioPadreId={flow.draft.territorioPadreId}
+          categoria={flow.draft.categoria}
+          subcategoria={flow.draft.subcategoria}
           descripcion={flow.draft.descripcion}
           lugar={flow.draft.lugar}
           nombre={flow.draft.nombre}
@@ -146,6 +149,7 @@ export function ReportarFlow() {
       {step === "confirmacion" && submission && (
         <ReportarConfirmation
           result={submission}
+          pendienteRevision={flow.draft.subcategoriaPadre === "alerta_seguridad"}
           onReset={() => {
             setSubmission(null);
             flow.reiniciar();

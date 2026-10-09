@@ -1,4 +1,4 @@
-import { CheckCircle2, Home, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Home, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import type { MockSubmissionResult } from "@/lib/reportar/mock-submit";
@@ -6,9 +6,11 @@ import { ReportarStepShell } from "@/components/reportar/reportar-step-shell";
 
 export function ReportarConfirmation({
   result,
+  pendienteRevision,
   onReset,
 }: {
   result: MockSubmissionResult;
+  pendienteRevision: boolean;
   onReset: () => void;
 }) {
   return (
@@ -28,6 +30,18 @@ export function ReportarConfirmation({
           La información y las evidencias permanecieron en este dispositivo durante el recorrido.
         </span>
       </div>
+      {pendienteRevision && (
+        <div className="reportar-security-review-notice" role="status">
+          <ShieldAlert size={19} aria-hidden="true" />
+          <span>
+            <strong>Alerta de seguridad pendiente de revisión</strong>
+            <small>
+              En esta versión local no se publica automáticamente ni se muestran datos sensibles a
+              la comunidad.
+            </small>
+          </span>
+        </div>
+      )}
       <div className="reportar-step-actions">
         <Button type="button" variant="outline" onClick={onReset}>
           Crear otro reporte

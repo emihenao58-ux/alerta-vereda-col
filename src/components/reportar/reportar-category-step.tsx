@@ -1,13 +1,19 @@
 import type { CSSProperties } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CATEGORIAS, categoriaConfig, subcategoriasDe } from "@/lib/reportar/catalogo";
-import type { ReporteCategoria } from "@/lib/reportar/types";
+import {
+  CATEGORIAS,
+  categoriaConfig,
+  subcategoriaPorId,
+  subcategoriasDe,
+} from "@/lib/reportar/catalogo";
+import type { ReporteCategoria, ReporteSubcategoriaSeleccion } from "@/lib/reportar/types";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
 
 export function ReportarCategoryStep({
   categoria,
   subcategoria,
+  subcategoriaPadre,
   error,
   onCategoria,
   onSubcategoria,
@@ -15,13 +21,25 @@ export function ReportarCategoryStep({
 }: {
   categoria: ReporteCategoria | null;
   subcategoria: string | null;
+  subcategoriaPadre: string | null;
   error: string | null;
   onCategoria: (categoria: ReporteCategoria) => void;
-  onSubcategoria: (subcategoria: string) => void;
+  onSubcategoria: (selection: ReporteSubcategoriaSeleccion) => void;
   onNext: () => void;
 }) {
   const config = categoriaConfig(categoria);
-  const subcategorias = subcategoriasDe(categoria);
+  const opcionesRaiz = subcategoriasDe(categoria);
+  const opcionPadre = subcategoriaPorId(categoria, subcategoriaPadre);
+  const opcionesVisibles = opcionPadre?.children ?? opcionesRaiz;
+  const opcionSeleccionada = subcategoriaPorId(categoria, subcategoria);
+
+  const seleccionarOpcion = (id: string, tieneHijos: boolean) => {
+    onSubcategoria({ id: tieneHijos ? null : id, parentId: tieneHijos ? id : subcategoriaPadre });
+  };
+
+  const volverAOpcionesPrincipales = () => {
+    onSubcategoria({ id: null, parentId: null });
+  };
 
   return (
     <ReportarStepShell
@@ -69,33 +87,67 @@ export function ReportarCategoryStep({
         <div className="reportar-subcategory-block" aria-labelledby="reportar-subcategory-title">
           <div className="reportar-subcategory-heading">
             <div>
-              <span className="reportar-field-kicker">Ahora elige una opción</span>
-              <h3 id="reportar-subcategory-title">¿Qué pasó exactamente?</h3>
+              <span className="reportar-field-kicker">
+                {opcionPadre ? "Ahora elige el problema" : "Ahora elige una opción"}
+              </span>
+              <h3 id="reportar-subcategory-title">
+                {opcionPadre ? `¿Qué ocurre con ${opcionPadre.label}?` : "¿Qué pasó exactamente?"}
+              </h3>
             </div>
-            <span className="reportar-subcategory-count">{subcategorias.length} opciones</span>
+            <span className="reportar-subcategory-count">{opcionesVisibles.length} opciones</span>
           </div>
+
+          {opcionPadre && (
+            <div className="reportar-subcategory-breadcrumb">
+              <span>Dentro de</span>
+              <strong>{opcionPadre.label}</strong>
+              <button
+                type="button"
+                className="reportar-text-button"
+                onClick={volverAOpcionesPrincipales}
+              >
+                <ArrowLeft size={14} /> Cambiar opción principal
+              </button>
+            </div>
+          )}
+
           <div
             className="reportar-subcategory-grid"
             role="radiogroup"
-            aria-label={`Subcategoría de ${config.label}`}
+            aria-label={`Opciones de ${opcionPadre?.label ?? config.label}`}
           >
-            {subcategorias.map(({ id, label, Icon }) => (
-              <button
-                key={id}
-                type="button"
-                className={`reportar-subcategory-option ${subcategoria === id ? "is-selected" : ""}`}
-                style={{ "--reportar-accent": config.color } as CSSProperties}
-                onClick={() => onSubcategoria(id)}
-                role="radio"
-                aria-checked={subcategoria === id}
-              >
-                <span className="reportar-subcategory-icon" aria-hidden="true">
-                  <Icon size={27} strokeWidth={1.9} />
-                </span>
-                <span>{label}</span>
-              </button>
-            ))}
+            {opcionesVisibles.map((opcion) => {
+              const tieneHijos = Boolean(opcion.children?.length);
+              const seleccionado = tieneHijos
+                ? subcategoriaPadre === opcion.id
+                : subcategoria === opcion.id;
+              return (
+                <button
+                  key={opcion.id}
+                  type="button"
+                  className={`reportar-subcategory-option ${seleccionado ? "is-selected" : ""}`}
+                  style={{ "--reportar-accent": config.color } as CSSProperties}
+                  onClick={() => seleccionarOpcion(opcion.id, tieneHijos)}
+                  role="radio"
+                  aria-checked={seleccionado}
+                >
+                  <span className="reportar-subcategory-icon" aria-hidden="true">
+                    <opcion.Icon size={27} strokeWidth={1.9} />
+                  </span>
+                  <span>{opcion.label}</span>
+                  {tieneHijos && <ArrowRight size={18} aria-hidden="true" />}
+                </button>
+              );
+            })}
           </div>
+
+          {opcionSeleccionada?.notice && (
+            <div className="reportar-option-notice" role="alert">
+              <ShieldAlert size={19} aria-hidden="true" />
+              <span>{opcionSeleccionada.notice}</span>
+            </div>
+          )}
+
           <small className="reportar-help">
             Catálogo visual local del frontend; se revisará en PR #15.
           </small>

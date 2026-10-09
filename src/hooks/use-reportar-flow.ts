@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRef } from "react";
-import { evidenciaObligatoriaPara } from "@/lib/reportar/catalogo";
+import { evidenciaObligatoriaPara, subcategoriaPorId } from "@/lib/reportar/catalogo";
 import {
   createEmptyDraft,
   createInitialUiState,
@@ -8,6 +8,7 @@ import {
   type ReporteEvidencia,
   type ReporteStep,
   type ReportarUiState,
+  type ReporteSubcategoriaSeleccion,
   type SinEvidencia,
 } from "@/lib/reportar/types";
 
@@ -39,7 +40,17 @@ export function useReportarFlow() {
       ...actual,
       categoria,
       subcategoria: null,
+      subcategoriaPadre: null,
       sinEvidencia: null,
+    }));
+    setUi((actual) => ({ ...actual, error: null }));
+  }, []);
+
+  const elegirSubcategoria = useCallback((selection: ReporteSubcategoriaSeleccion) => {
+    setDraft((actual) => ({
+      ...actual,
+      subcategoria: selection.id,
+      subcategoriaPadre: selection.parentId,
     }));
     setUi((actual) => ({ ...actual, error: null }));
   }, []);
@@ -124,8 +135,10 @@ export function useReportarFlow() {
         return Boolean(draft.categoria && draft.subcategoria);
       }
       if (step === "detalle") {
+        const opcion = subcategoriaPorId(draft.categoria, draft.subcategoria);
+        const descripcionValida = !opcion?.requiresDescription || Boolean(draft.descripcion.trim());
         return Boolean(
-          draft.tipoLugar && draft.territorioId && draft.descripcion.trim() && draft.lugar.trim(),
+          draft.tipoLugar && draft.territorioId && descripcionValida && draft.lugar.trim(),
         );
       }
       if (step === "evidencias") {
@@ -148,7 +161,7 @@ export function useReportarFlow() {
           actual.step === "categoria"
             ? "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
-              ? "Completa el tipo de lugar, la zona, qué pasó y dónde ocurrió."
+              ? "Completa el tipo de lugar, la zona y dónde ocurrió; si elegiste Otro, cuéntanos qué sucede."
               : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
       }));
       return false;
@@ -201,6 +214,7 @@ export function useReportarFlow() {
     evidenciaObligatoria,
     updateDraft,
     elegirCategoria,
+    elegirSubcategoria,
     agregarEvidencias,
     quitarEvidencia,
     reemplazarEvidencia,
