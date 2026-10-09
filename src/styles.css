@@ -5377,7 +5377,7 @@ html.theme-transition-no-blur .mi-vereda-board {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.65rem;
-  min-height: 4.2rem;
+  min-height: 5.2rem;
   padding: 0.7rem;
   border: 2px solid color-mix(in srgb, var(--reportar-accent) 32%, var(--border));
   border-radius: 0.78rem;
@@ -5408,12 +5408,21 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-subcategory-icon {
   display: grid;
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 4.25rem;
+  height: 4.25rem;
+  overflow: hidden;
   place-items: center;
   border-radius: 0.7rem;
   background: color-mix(in srgb, var(--reportar-accent) 16%, transparent);
   color: var(--reportar-accent);
+}
+
+.reportar-subcategory-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: contain;
 }
 
 .reportar-description-reveal {
@@ -5764,6 +5773,11 @@ html.theme-transition-no-blur .mi-vereda-board {
 
   .reportar-category-copy small {
     font-size: 0.68rem;
+  }
+
+  .reportar-subcategory-icon {
+    width: 3.7rem;
+    height: 3.7rem;
   }
 }
 

@@ -7,6 +7,7 @@ import {
   subcategoriaPorId,
   subcategoriasDe,
 } from "@/lib/reportar/catalogo";
+import { ilustracionDe } from "@/lib/reportar/illustrations";
 import type { ReporteCategoria, ReporteSubcategoriaSeleccion } from "@/lib/reportar/types";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
 
@@ -125,6 +126,7 @@ export function ReportarCategoryStep({
               const seleccionado = tieneHijos
                 ? subcategoriaPadre === opcion.id
                 : subcategoria === opcion.id;
+              const ilustracion = ilustracionDe(opcion.id);
               return (
                 <button
                   key={opcion.id}
@@ -136,17 +138,27 @@ export function ReportarCategoryStep({
                   aria-checked={seleccionado}
                 >
                   <span className="reportar-subcategory-icon" aria-hidden="true">
-                    <opcion.Icon
-                      size={27}
-                      strokeWidth={1.9}
-                      className={
-                        opcion.id === "no_hay_senal"
-                          ? "reportar-signal-no-coverage-icon"
-                          : opcion.id === "senal_debil"
-                            ? "reportar-signal-weak-icon"
-                            : undefined
-                      }
-                    />
+                    {ilustracion ? (
+                      <img
+                        src={ilustracion}
+                        alt=""
+                        className="reportar-subcategory-image"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <opcion.Icon
+                        size={27}
+                        strokeWidth={1.9}
+                        className={
+                          opcion.id === "no_hay_senal"
+                            ? "reportar-signal-no-coverage-icon"
+                            : opcion.id === "senal_debil"
+                              ? "reportar-signal-weak-icon"
+                              : undefined
+                        }
+                      />
+                    )}
                   </span>
                   <span>{opcion.label}</span>
                   {tieneHijos && <ArrowRight size={18} aria-hidden="true" />}
