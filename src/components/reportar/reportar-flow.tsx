@@ -105,7 +105,6 @@ export function ReportarFlow() {
           tipoLugar={flow.draft.tipoLugar}
           territorioId={flow.draft.territorioId}
           territorioPadreId={flow.draft.territorioPadreId}
-          lugar={flow.draft.lugar}
           nombre={flow.draft.nombre}
           error={flow.ui.error}
           onChange={flow.updateDraft}
@@ -115,8 +114,13 @@ export function ReportarFlow() {
       )}
       {step === "ubicacion" && (
         <ReportarLocationStep
+          categoria={flow.draft.categoria}
           ubicacion={flow.draft.ubicacion}
+          ubicacionEstado={flow.draft.ubicacionEstado}
+          lugar={flow.draft.lugar}
           onUbicacion={(ubicacion) => flow.updateDraft({ ubicacion })}
+          onUbicacionEstado={(ubicacionEstado) => flow.updateDraft({ ubicacionEstado })}
+          onLugar={(lugar) => flow.updateDraft({ lugar })}
           onBack={flow.pasoAnterior}
           onNext={flow.siguientePaso}
         />

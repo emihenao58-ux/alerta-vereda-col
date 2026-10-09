@@ -42,6 +42,9 @@ export function useReportarFlow() {
       subcategoria: null,
       subcategoriaPadre: null,
       descripcion: "",
+      lugar: "",
+      ubicacion: null,
+      ubicacionEstado: "pendiente",
       sinEvidencia: null,
     }));
     setUi((actual) => ({ ...actual, error: null }));
@@ -53,6 +56,9 @@ export function useReportarFlow() {
       subcategoria: selection.id,
       subcategoriaPadre: selection.parentId,
       descripcion: "",
+      lugar: "",
+      ubicacion: null,
+      ubicacionEstado: "pendiente",
     }));
     setUi((actual) => ({ ...actual, error: null }));
   }, []);
@@ -139,7 +145,14 @@ export function useReportarFlow() {
         return Boolean(draft.categoria && draft.subcategoria && descripcionValida);
       }
       if (step === "detalle") {
-        return Boolean(draft.tipoLugar && draft.territorioId && draft.lugar.trim());
+        return Boolean(draft.tipoLugar && draft.territorioId);
+      }
+      if (step === "ubicacion") {
+        return (
+          draft.categoria !== "emergencia" ||
+          draft.ubicacionEstado === "confirmada" ||
+          Boolean(draft.lugar.trim())
+        );
       }
       if (step === "evidencias") {
         return (
@@ -164,8 +177,10 @@ export function useReportarFlow() {
               ? "Cuéntanos qué sucede antes de continuar."
               : "Selecciona una categoría y una subcategoría para continuar."
             : actual.step === "detalle"
-              ? "Completa el tipo de lugar, la zona y dónde ocurrió."
-              : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
+              ? "Completa el tipo de lugar y la zona."
+              : actual.step === "ubicacion"
+                ? "Confirma la ubicación GPS o indica dónde ocurrió el incidente."
+                : "Adjunta al menos una evidencia visual o registra por qué no puedes aportarla.",
       }));
       return false;
     }

@@ -59,7 +59,6 @@ export function ReportarDetailsStep({
   tipoLugar,
   territorioId,
   territorioPadreId,
-  lugar,
   nombre,
   error,
   onChange,
@@ -69,7 +68,6 @@ export function ReportarDetailsStep({
   tipoLugar: TipoLugar | null;
   territorioId: string | null;
   territorioPadreId: string | null;
-  lugar: string;
   nombre: string;
   error: string | null;
   onChange: (patch: Partial<ReporteDraft>) => void;
@@ -348,16 +346,6 @@ export function ReportarDetailsStep({
       </div>
 
       <div className="reportar-form-grid">
-        <label className="reportar-field">
-          <span>¿Dónde ocurrió exactamente?</span>
-          <input
-            className="reportar-input"
-            value={lugar}
-            onChange={(event) => onChange({ lugar: event.target.value })}
-            placeholder="Ej.: cerca de la escuela"
-          />
-        </label>
-
         <label className="reportar-field">
           <span>
             Tu nombre <em>(opcional)</em>

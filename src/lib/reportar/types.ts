@@ -14,6 +14,8 @@ export type ReporteUbicacion = {
   precision: number;
 };
 
+export type ReporteUbicacionEstado = "pendiente" | "confirmada" | "no-confirmada" | "no-disponible";
+
 export type SinEvidenciaMotivo =
   "dispositivo_sin_camara" | "camara_no_disponible" | "acceso_bloqueado" | "otro_problema_tecnico";
 
@@ -52,6 +54,7 @@ export type ReporteDraft = {
   territorioPadreId: string | null;
   descripcion: string;
   lugar: string;
+  ubicacionEstado: ReporteUbicacionEstado;
   nombre: string;
   ubicacion: ReporteUbicacion | null;
   evidencias: ReporteEvidencia[];
@@ -76,6 +79,7 @@ export function createEmptyDraft(): ReporteDraft {
     territorioPadreId: null,
     descripcion: "",
     lugar: "",
+    ubicacionEstado: "pendiente",
     nombre: "",
     ubicacion: null,
     evidencias: [],

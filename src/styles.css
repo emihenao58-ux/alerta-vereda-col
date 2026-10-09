@@ -4787,6 +4787,54 @@ html.theme-transition-no-blur .mi-vereda-board {
   line-height: 1.45;
 }
 
+.reportar-location-confirmation {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--bosque) 34%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bosque) 7%, var(--card));
+}
+
+.reportar-location-confirmation > strong {
+  color: var(--tinta);
+}
+
+.reportar-location-confirmation > p,
+.reportar-location-reference > small,
+.reportar-location-status {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.reportar-location-confirmation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+}
+
+.reportar-location-status {
+  padding: 0.55rem 0.7rem;
+  border-inline-start: 3px solid var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 7%, transparent);
+}
+
+.reportar-location-reference {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+}
+
+.reportar-location-reference-trigger {
+  justify-self: start;
+}
+
 .reportar-text-button {
   min-height: 2.2rem;
   border: 0;

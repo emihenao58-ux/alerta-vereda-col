@@ -63,7 +63,11 @@ export function ReportarReviewStep({
             {territorioPadre && draft.tipoLugar !== "vereda" && (
               <span>Dentro de {territorioPadre.nombre}</span>
             )}
-            <span>{draft.lugar}</span>
+            {draft.lugar ? (
+              <span>{draft.lugar}</span>
+            ) : (
+              <span>Sin referencia textual adicional</span>
+            )}
             {draft.descripcion ? (
               <p>{draft.descripcion}</p>
             ) : (
