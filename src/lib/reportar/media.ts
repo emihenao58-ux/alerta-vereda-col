@@ -28,8 +28,49 @@ export async function solicitarStream(modo: "foto" | "video") {
   });
 }
 
+export function videoListoParaCaptura(video: HTMLVideoElement) {
+  return video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0;
+}
+
+export function esperarVideoListo(video: HTMLVideoElement, signal?: AbortSignal) {
+  if (videoListoParaCaptura(video)) return Promise.resolve();
+
+  return new Promise<void>((resolve, reject) => {
+    const cleanup = () => {
+      video.removeEventListener("loadedmetadata", onReady);
+      video.removeEventListener("canplay", onReady);
+      video.removeEventListener("error", onError);
+      signal?.removeEventListener("abort", onAbort);
+    };
+    const onReady = () => {
+      if (videoListoParaCaptura(video)) {
+        cleanup();
+        resolve();
+      }
+    };
+    const onError = () => {
+      cleanup();
+      reject(new Error("No se pudo iniciar la vista previa de la cámara."));
+    };
+    const onAbort = () => {
+      cleanup();
+      reject(new DOMException("La vista previa fue cancelada.", "AbortError"));
+    };
+
+    if (signal?.aborted) {
+      onAbort();
+      return;
+    }
+    video.addEventListener("loadedmetadata", onReady);
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("error", onError);
+    signal?.addEventListener("abort", onAbort, { once: true });
+    onReady();
+  });
+}
+
 export async function capturarFotoDesdeVideo(video: HTMLVideoElement) {
-  if (!video.videoWidth || !video.videoHeight) {
+  if (!video.srcObject || !videoListoParaCaptura(video)) {
     throw new Error("La cámara aún se está preparando. Inténtalo de nuevo.");
   }
 

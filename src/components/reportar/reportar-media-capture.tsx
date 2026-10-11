@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Circle, Square, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +12,13 @@ import {
   capturarFotoDesdeVideo,
   detenerStream,
   extensionDeMime,
+  esperarVideoListo,
   mensajeDeErrorMedia,
   MAX_VIDEO_BYTES,
   MAX_VIDEO_DURATION_SECONDS,
   recorderMimeType,
   solicitarStream,
+  videoListoParaCaptura,
   videoDisponible,
 } from "@/lib/reportar/media";
 
@@ -42,10 +44,16 @@ export function ReportarMediaCapture({
   const startedAtRef = useRef<number | null>(null);
   const discardRecordingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [ready, setReady] = useState(false);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  const setVideoNode = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    setVideoElement(node);
+  }, []);
 
   const stopTimer = () => {
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
@@ -67,9 +75,9 @@ export function ReportarMediaCapture({
   };
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !videoElement) return;
     let cancelled = false;
-    const videoElement = videoRef.current;
+    const abortController = new AbortController();
     setError(null);
     setReady(false);
     setRecording(false);
@@ -84,28 +92,36 @@ export function ReportarMediaCapture({
       return () => undefined;
     }
 
+    let streamAcquired = false;
     void solicitarStream(mode)
-      .then((stream) => {
+      .then(async (stream) => {
         if (cancelled) {
           detenerStream(stream);
           return;
         }
         streamRef.current = stream;
-        if (videoElement) {
-          videoElement.srcObject = stream;
-          void videoElement.play().catch(() => undefined);
-        }
-        setReady(true);
+        streamAcquired = true;
         onPermissionState("concedido");
+        videoElement.srcObject = stream;
+        const readyPromise = esperarVideoListo(videoElement, abortController.signal);
+        await Promise.all([videoElement.play(), readyPromise]);
+        if (cancelled || !videoListoParaCaptura(videoElement)) return;
+        setReady(true);
       })
       .catch((cause: unknown) => {
         if (cancelled) return;
-        onPermissionState("denegado");
+        if (!streamAcquired) onPermissionState("denegado");
+        abortController.abort();
+        detenerStream(streamRef.current);
+        streamRef.current = null;
+        videoElement.srcObject = null;
+        setReady(false);
         setError(mensajeDeErrorMedia(cause));
       });
 
     return () => {
       cancelled = true;
+      abortController.abort();
       discardRecordingRef.current = true;
       if (recorderRef.current?.state === "recording") recorderRef.current.stop();
       recorderRef.current = null;
@@ -114,10 +130,10 @@ export function ReportarMediaCapture({
       streamRef.current = null;
       if (videoElement) videoElement.srcObject = null;
     };
-  }, [mode, onPermissionState, open]);
+  }, [mode, onPermissionState, open, videoElement]);
 
   const takePhoto = async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !ready) return;
     try {
       onPhoto(await capturarFotoDesdeVideo(videoRef.current));
       closeMedia();
@@ -206,7 +222,13 @@ export function ReportarMediaCapture({
         </DialogHeader>
 
         <div className="reportar-media-viewfinder">
-          <video ref={videoRef} autoPlay playsInline muted aria-label="Vista previa de la cámara" />
+          <video
+            ref={setVideoNode}
+            autoPlay
+            playsInline
+            muted
+            aria-label="Vista previa de la cámara"
+          />
           {!ready && !error && <span className="reportar-media-status">Preparando la cámara…</span>}
           {recording && (
             <span className="reportar-recording-badge">
