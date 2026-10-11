@@ -5011,40 +5011,176 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-review-list {
   display: grid;
-  gap: 0.65rem;
+  gap: 0.8rem;
 }
 
-.reportar-review-list article {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+.reportar-review-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 1rem;
-  padding: 0.85rem;
+  padding: 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--card) 94%, transparent);
 }
 
-.reportar-review-list article > div {
+.reportar-review-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.reportar-review-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bosque) 18%, transparent);
+  color: var(--bosque);
+}
+
+.reportar-review-card-content {
   display: grid;
   gap: 0.18rem;
   min-width: 0;
 }
 
-.reportar-review-list article strong {
+.reportar-review-card-content strong {
   color: var(--tinta);
 }
 
-.reportar-review-list article span:not(.reportar-review-label),
-.reportar-review-list article p {
+.reportar-review-card-content > span:not(.reportar-review-label),
+.reportar-review-card-content > p {
   margin: 0;
   color: var(--tinta-suave);
   font-size: 0.8rem;
   line-height: 1.45;
 }
 
-.reportar-review-label {
-  font-size: 0.65rem;
+.reportar-review-inline-detail b {
+  color: var(--tinta);
+  font-weight: 700;
+}
+
+.reportar-review-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.4rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--tinta);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.reportar-review-edit:hover,
+.reportar-review-edit:focus-visible {
+  border-color: var(--bosque);
+  color: var(--bosque);
+}
+
+.reportar-review-card-extra {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-left: 4.05rem;
+}
+
+.reportar-review-map-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 6.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px dashed color-mix(in srgb, var(--bosque) 60%, var(--border));
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  color: var(--bosque);
+}
+
+.reportar-review-map-placeholder div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.reportar-review-map-placeholder strong {
+  color: var(--tinta);
+}
+
+.reportar-review-map-placeholder span {
+  color: var(--tinta-suave);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.reportar-review-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reportar-review-evidence {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.reportar-review-evidence img,
+.reportar-review-evidence video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--card) 80%, #000);
+  object-fit: contain;
+}
+
+.reportar-review-evidence span,
+.reportar-review-empty {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.reportar-review-quote {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--bosque) 7%, var(--card));
+  font-size: 0.88rem !important;
+}
+
+@media (max-width: 720px) {
+  .reportar-review-card {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .reportar-review-edit {
+    justify-self: start;
+  }
+
+  .reportar-review-card-extra {
+    padding-left: 0;
+  }
+
+  .reportar-review-evidence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .reportar-crop-dialog {
