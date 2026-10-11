@@ -4504,14 +4504,12 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-progress {
   display: grid;
-  gap: 0.55rem;
-  padding: 0.85rem 1rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--card) 88%, transparent);
 }
 
-.reportar-progress-topline,
 .reportar-evidence-limit,
 .reportar-review-label {
   color: var(--tinta-suave);
@@ -4521,65 +4519,18 @@ html.theme-transition-no-blur .mi-vereda-board {
   text-transform: uppercase;
 }
 
-.reportar-progress-topline {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
 .reportar-progress-track {
-  height: 0.42rem;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--bosque) 18%, transparent);
+  background: color-mix(in srgb, var(--tinta) 14%, transparent);
 }
 
 .reportar-progress-track span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 82%, #b7f3d5);
   transition: width 180ms ease;
-}
-
-.reportar-progress-labels {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.reportar-progress-labels li {
-  display: grid;
-  min-width: 0;
-  justify-items: center;
-  gap: 0.18rem;
-  color: var(--tinta-suave);
-  text-align: center;
-}
-
-.reportar-progress-labels li span {
-  display: grid;
-  width: 1.45rem;
-  height: 1.45rem;
-  place-items: center;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  font-size: 0.7rem;
-}
-
-.reportar-progress-labels li.is-active span {
-  border-color: var(--bosque);
-  background: var(--bosque);
-  color: var(--primary-foreground);
-}
-
-.reportar-progress-labels small {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-size: 0.65rem;
 }
 
 .reportar-step {
@@ -4590,19 +4541,35 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-step-eyebrow {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.reportar-step-title {
   margin: 0;
+  color: var(--tinta);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  line-height: 1.08;
+}
+
+.reportar-step-eyebrow + .reportar-step-title {
+  margin-top: 0;
+}
+
+/* El encabezado visual del paso queda en el título; el rótulo anterior permanece para lectores de pantalla. */
+.reportar-step-eyebrow {
   color: var(--terracota);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-
-.reportar-step-title {
-  margin: -0.55rem 0 0;
-  color: var(--tinta);
-  font-size: clamp(1.45rem, 4vw, 2rem);
-  line-height: 1.08;
 }
 
 .reportar-step-description,
@@ -5453,13 +5420,17 @@ html.theme-transition-no-blur .mi-vereda-board {
     padding-inline: 0.75rem;
   }
 
-  .reportar-progress-labels small {
-    font-size: 0.58rem;
+  .reportar-review-confirm-button {
+    flex-basis: 100%;
   }
 
   .reportar-step-actions > button,
   .reportar-step-actions > a {
     flex: 1 1 8rem;
+  }
+
+  .reportar-step-actions > .reportar-review-confirm-button {
+    flex: 1 1 100%;
   }
 
   .reportar-media-dialog,

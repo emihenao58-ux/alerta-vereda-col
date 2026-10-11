@@ -267,9 +267,9 @@ export function ReportarReviewStep({
           <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
-        <Button type="button" onClick={onConfirm}>
+        <Button type="button" className="reportar-review-confirm-button" onClick={onConfirm}>
           <Send size={16} aria-hidden="true" />
-          Preparar reporte
+          Confirmar y enviar reporte
         </Button>
       </ReportarStepActions>
     </ReportarStepShell>
