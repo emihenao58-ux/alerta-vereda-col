@@ -39,9 +39,9 @@ export function ReportarEvidenceList({
                 <button
                   type="button"
                   onClick={() => onEdit(evidencia.id)}
-                  aria-label={`Recortar evidencia ${index + 1}`}
+                  aria-label={`Editar evidencia fotográfica ${index + 1}`}
                 >
-                  <Scissors size={15} /> Recortar
+                  <Scissors size={15} /> Editar
                 </button>
               )}
               <button

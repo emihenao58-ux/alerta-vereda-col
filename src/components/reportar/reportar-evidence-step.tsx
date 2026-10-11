@@ -178,7 +178,7 @@ export function ReportarEvidenceStep({
         </Button>
         <Button type="button" onClick={onNext}>
           <ArrowRight size={16} aria-hidden="true" />
-          Revisar reporte
+          Conservar y continuar
         </Button>
       </ReportarStepActions>
     </ReportarStepShell>

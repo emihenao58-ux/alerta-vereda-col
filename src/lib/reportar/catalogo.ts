@@ -237,7 +237,11 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
           { id: "robo", label: "Robo", Icon: LockOpen },
           { id: "intento_robo", label: "Intento de robo", Icon: DoorOpen },
           { id: "mascota_perdida", label: "Mascota perdida", Icon: PawPrint },
-          { id: "disturbios_orden", label: "Disturbios o alteración del orden", Icon: AlertTriangle },
+          {
+            id: "disturbios_orden",
+            label: "Disturbios o alteración del orden",
+            Icon: AlertTriangle,
+          },
           {
             id: "embriaguez_via",
             label: "Persona en estado de embriaguez en la vía pública",

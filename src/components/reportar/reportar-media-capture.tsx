@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Circle, Square, Video } from "lucide-react";
+import { Camera, Circle, Square, SwitchCamera, Video, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,14 +10,16 @@ import {
 } from "@/components/ui/dialog";
 import {
   capturarFotoDesdeVideo,
+  detectarCapacidadesCamara,
   detenerStream,
-  extensionDeMime,
   esperarVideoListo,
+  extensionDeMime,
   mensajeDeErrorMedia,
   MAX_VIDEO_BYTES,
   MAX_VIDEO_DURATION_SECONDS,
   recorderMimeType,
   solicitarStream,
+  type CameraFacingMode,
   videoListoParaCaptura,
   videoDisponible,
 } from "@/lib/reportar/media";
@@ -44,9 +46,17 @@ export function ReportarMediaCapture({
   const startedAtRef = useRef<number | null>(null);
   const discardRecordingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
+  const sessionRef = useRef(0);
+  const recordingStartAbortRef = useRef<AbortController | null>(null);
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+  const [facingMode, setFacingMode] = useState<CameraFacingMode>("environment");
+  const [canSwitchCamera, setCanSwitchCamera] = useState(false);
+  const [torchSupported, setTorchSupported] = useState(false);
+  const [torchEnabled, setTorchEnabled] = useState(false);
+  const [audioAvailable, setAudioAvailable] = useState(false);
   const [ready, setReady] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordingStarting, setRecordingStarting] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,16 +70,24 @@ export function ReportarMediaCapture({
     timerRef.current = null;
   };
 
+  const releaseStream = () => {
+    detenerStream(streamRef.current);
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  };
+
   const closeMedia = (discardRecording = false) => {
+    sessionRef.current += 1;
+    recordingStartAbortRef.current?.abort();
+    recordingStartAbortRef.current = null;
     discardRecordingRef.current = discardRecording;
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
     recorderRef.current = null;
     stopTimer();
-    detenerStream(streamRef.current);
-    streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
+    releaseStream();
     setReady(false);
     setRecording(false);
+    setRecordingStarting(false);
     setSeconds(0);
     onOpenChange(false);
   };
@@ -81,7 +99,12 @@ export function ReportarMediaCapture({
     setError(null);
     setReady(false);
     setRecording(false);
+    setRecordingStarting(false);
     setSeconds(0);
+    setAudioAvailable(false);
+    setTorchSupported(false);
+    setTorchEnabled(false);
+    setCanSwitchCamera(false);
     discardRecordingRef.current = false;
 
     if (mode === "video" && !videoDisponible()) {
@@ -93,7 +116,7 @@ export function ReportarMediaCapture({
     }
 
     let streamAcquired = false;
-    void solicitarStream(mode)
+    void solicitarStream(mode, facingMode, false)
       .then(async (stream) => {
         if (cancelled) {
           detenerStream(stream);
@@ -106,15 +129,23 @@ export function ReportarMediaCapture({
         const readyPromise = esperarVideoListo(videoElement, abortController.signal);
         await Promise.all([videoElement.play(), readyPromise]);
         if (cancelled || !videoListoParaCaptura(videoElement)) return;
+
+        let capabilities = { canSwitchCamera: false, torch: false };
+        try {
+          capabilities = await detectarCapacidadesCamara(stream);
+        } catch {
+          // La cámara sigue siendo usable si el navegador no expone sus capacidades.
+        }
+        if (cancelled) return;
+        setCanSwitchCamera(capabilities.canSwitchCamera);
+        setTorchSupported(capabilities.torch);
         setReady(true);
       })
       .catch((cause: unknown) => {
         if (cancelled) return;
         if (!streamAcquired) onPermissionState("denegado");
         abortController.abort();
-        detenerStream(streamRef.current);
-        streamRef.current = null;
-        videoElement.srcObject = null;
+        releaseStream();
         setReady(false);
         setError(mensajeDeErrorMedia(cause));
       });
@@ -122,15 +153,23 @@ export function ReportarMediaCapture({
     return () => {
       cancelled = true;
       abortController.abort();
+      recordingStartAbortRef.current?.abort();
       discardRecordingRef.current = true;
       if (recorderRef.current?.state === "recording") recorderRef.current.stop();
       recorderRef.current = null;
       stopTimer();
-      detenerStream(streamRef.current);
-      streamRef.current = null;
-      if (videoElement) videoElement.srcObject = null;
+      releaseStream();
     };
-  }, [mode, onPermissionState, open, videoElement]);
+  }, [facingMode, mode, onPermissionState, open, videoElement]);
+
+  useEffect(() => {
+    if (open) return;
+    setFacingMode("environment");
+    setCanSwitchCamera(false);
+    setTorchSupported(false);
+    setTorchEnabled(false);
+    setAudioAvailable(false);
+  }, [open]);
 
   const takePhoto = async () => {
     if (!videoRef.current || !ready) return;
@@ -142,69 +181,132 @@ export function ReportarMediaCapture({
     }
   };
 
+  const flipCamera = () => {
+    if (!canSwitchCamera || recording || recordingStarting) return;
+    setFacingMode((actual) => (actual === "environment" ? "user" : "environment"));
+  };
+
+  const toggleTorch = async () => {
+    const track = streamRef.current?.getVideoTracks()[0];
+    if (!track || !torchSupported) return;
+    const nextValue = !torchEnabled;
+    try {
+      const constraints = { advanced: [{ torch: nextValue }] } as unknown as MediaTrackConstraints;
+      await track.applyConstraints(constraints);
+      setTorchEnabled(nextValue);
+    } catch {
+      setError("La iluminación no está disponible en este momento.");
+    }
+  };
+
   const stopRecording = () => {
     if (!recorderRef.current || recorderRef.current.state !== "recording") return;
     recorderRef.current.stop();
   };
 
-  const startRecording = () => {
-    if (!streamRef.current || !ready || recording) return;
+  const startRecording = async () => {
+    if (!streamRef.current || !ready || recording || recordingStarting) return;
     const mimeType = recorderMimeType();
     if (!mimeType) {
       setError("No encontramos un formato de video compatible en este navegador.");
       return;
     }
 
-    chunksRef.current = [];
-    const recorder = new MediaRecorder(streamRef.current, { mimeType });
-    recorderRef.current = recorder;
-    startedAtRef.current = Date.now();
-    setSeconds(0);
-    setRecording(true);
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) chunksRef.current.push(event.data);
-    };
-    recorder.onerror = () => {
-      setError("No se pudo grabar el video. Inténtalo de nuevo.");
-      setRecording(false);
-      stopTimer();
-    };
-    recorder.onstop = () => {
-      if (discardRecordingRef.current) {
-        discardRecordingRef.current = false;
-        chunksRef.current = [];
+    const session = ++sessionRef.current;
+    const abortController = new AbortController();
+    recordingStartAbortRef.current = abortController;
+    const videoElement = videoRef.current;
+    releaseStream();
+    setReady(false);
+    setRecordingStarting(true);
+    setError(null);
+
+    try {
+      // El stream de previsualización no tiene audio. El micrófono se solicita
+      // únicamente después de que la persona pulsa «Iniciar video».
+      const stream = await solicitarStream("video", facingMode, true);
+      if (session !== sessionRef.current || !open || abortController.signal.aborted) {
+        detenerStream(stream);
         return;
       }
-      const duration = Math.min(
-        MAX_VIDEO_DURATION_SECONDS,
-        Math.max(1, Math.round((Date.now() - (startedAtRef.current ?? Date.now())) / 1000)),
-      );
-      const blob = new Blob(chunksRef.current, { type: mimeType });
-      if (blob.size > MAX_VIDEO_BYTES) {
-        recorderRef.current = null;
-        chunksRef.current = [];
-        stopTimer();
+      if (!videoElement) throw new Error("No se encontró el visor de video.");
+
+      streamRef.current = stream;
+      setAudioAvailable(stream.getAudioTracks().length > 0);
+      videoElement.srcObject = stream;
+      const readyPromise = esperarVideoListo(videoElement, abortController.signal);
+      await Promise.all([videoElement.play(), readyPromise]);
+      if (
+        session !== sessionRef.current ||
+        !videoListoParaCaptura(videoElement) ||
+        abortController.signal.aborted
+      ) {
+        detenerStream(stream);
+        return;
+      }
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      recorderRef.current = recorder;
+      chunksRef.current = [];
+      startedAtRef.current = Date.now();
+      setSeconds(0);
+      setRecording(true);
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorder.onerror = () => {
+        setError("No se pudo grabar el video. Inténtalo de nuevo.");
         setRecording(false);
-        setError("El video supera el límite de 15 MB. Inténtalo de nuevo.");
-        return;
+        stopTimer();
+      };
+      recorder.onstop = () => {
+        if (discardRecordingRef.current) {
+          discardRecordingRef.current = false;
+          chunksRef.current = [];
+          return;
+        }
+        const duration = Math.min(
+          MAX_VIDEO_DURATION_SECONDS,
+          Math.max(1, Math.round((Date.now() - (startedAtRef.current ?? Date.now())) / 1000)),
+        );
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        if (blob.size > MAX_VIDEO_BYTES) {
+          recorderRef.current = null;
+          chunksRef.current = [];
+          stopTimer();
+          setRecording(false);
+          setError("El video supera el límite de 15 MB. Inténtalo de nuevo.");
+          return;
+        }
+        const file = new File(
+          [blob],
+          `evidencia-alertavereda-${Date.now()}.${extensionDeMime(mimeType)}`,
+          {
+            type: mimeType,
+            lastModified: Date.now(),
+          },
+        );
+        onVideo(file, duration);
+        closeMedia();
+      };
+      recorder.start();
+      timerRef.current = window.setInterval(() => {
+        const elapsed = Math.floor((Date.now() - (startedAtRef.current ?? Date.now())) / 1000);
+        setSeconds(Math.min(MAX_VIDEO_DURATION_SECONDS, elapsed));
+        if (elapsed >= MAX_VIDEO_DURATION_SECONDS) stopRecording();
+      }, 250);
+    } catch (cause) {
+      if (session === sessionRef.current && !abortController.signal.aborted) {
+        releaseStream();
+        setReady(false);
+        setError(mensajeDeErrorMedia(cause));
       }
-      const file = new File(
-        [blob],
-        `evidencia-alertavereda-${Date.now()}.${extensionDeMime(mimeType)}`,
-        {
-          type: mimeType,
-          lastModified: Date.now(),
-        },
-      );
-      onVideo(file, duration);
-      closeMedia();
-    };
-    recorder.start();
-    timerRef.current = window.setInterval(() => {
-      const elapsed = Math.floor((Date.now() - (startedAtRef.current ?? Date.now())) / 1000);
-      setSeconds(Math.min(MAX_VIDEO_DURATION_SECONDS, elapsed));
-      if (elapsed >= MAX_VIDEO_DURATION_SECONDS) stopRecording();
-    }, 250);
+    } finally {
+      if (recordingStartAbortRef.current === abortController) {
+        recordingStartAbortRef.current = null;
+      }
+      setRecordingStarting(false);
+    }
   };
 
   return (
@@ -235,31 +337,72 @@ export function ReportarMediaCapture({
               <Circle size={12} fill="currentColor" /> {seconds}s / {MAX_VIDEO_DURATION_SECONDS}s
             </span>
           )}
+          {recording && !audioAvailable && (
+            <span className="reportar-audio-status">Grabando video sin audio</span>
+          )}
+          <div className="reportar-media-tools" aria-label="Controles de cámara">
+            {canSwitchCamera && (
+              <button
+                type="button"
+                className="reportar-media-tool"
+                onClick={flipCamera}
+                disabled={recording || recordingStarting}
+                aria-label="Voltear cámara"
+                title="Voltear cámara"
+              >
+                <SwitchCamera size={22} aria-hidden="true" />
+              </button>
+            )}
+            {torchSupported && (
+              <button
+                type="button"
+                className={`reportar-media-tool${torchEnabled ? " is-active" : ""}`}
+                onClick={() => void toggleTorch()}
+                aria-pressed={torchEnabled}
+                aria-label={torchEnabled ? "Apagar iluminación" : "Encender iluminación"}
+                title={torchEnabled ? "Apagar iluminación" : "Encender iluminación"}
+              >
+                <Zap size={22} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
 
         {error && (
-          <p className="reportar-error" role="alert">
+          <p className="reportar-error reportar-media-error" role="alert">
             {error}
           </p>
         )}
 
         <div className="reportar-media-actions">
           {mode === "foto" ? (
-            <Button type="button" onClick={() => void takePhoto()} disabled={!ready}>
-              <Camera size={17} /> Capturar foto
+            <Button
+              type="button"
+              className="reportar-media-primary"
+              onClick={() => void takePhoto()}
+              disabled={!ready}
+            >
+              <Camera size={20} /> Capturar foto
             </Button>
           ) : recording ? (
-            <Button type="button" variant="destructive" onClick={stopRecording}>
-              <Square size={16} fill="currentColor" /> Detener video
+            <Button
+              type="button"
+              className="reportar-media-primary"
+              variant="destructive"
+              onClick={stopRecording}
+            >
+              <Square size={20} fill="currentColor" /> Detener video
             </Button>
           ) : (
-            <Button type="button" onClick={startRecording} disabled={!ready}>
-              <Video size={17} /> Iniciar video
+            <Button
+              type="button"
+              className="reportar-media-primary"
+              onClick={() => void startRecording()}
+              disabled={!ready || recordingStarting}
+            >
+              <Video size={20} /> {recordingStarting ? "Preparando grabación…" : "Iniciar video"}
             </Button>
           )}
-          <Button type="button" variant="outline" onClick={() => closeMedia(true)}>
-            Cancelar
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,13 @@
 export const MAX_VIDEO_DURATION_SECONDS = 15;
 export const MAX_VIDEO_BYTES = 15 * 1024 * 1024;
 
+export type CameraFacingMode = "environment" | "user";
+
+type CameraCapabilities = {
+  canSwitchCamera: boolean;
+  torch: boolean;
+};
+
 export function detenerStream(stream: MediaStream | null) {
   stream?.getTracks().forEach((track) => track.stop());
 }
@@ -17,15 +24,52 @@ export function videoDisponible() {
   );
 }
 
-export async function solicitarStream(modo: "foto" | "video") {
+function constraintsDeVideo(facingMode: CameraFacingMode): MediaTrackConstraints {
+  return { facingMode: { ideal: facingMode } };
+}
+
+export async function solicitarStream(
+  modo: "foto" | "video",
+  facingMode: CameraFacingMode = "environment",
+  solicitarAudio = false,
+) {
   if (!camaraDisponible()) {
     throw new Error("Este dispositivo no permite acceder a la cámara.");
   }
 
-  return navigator.mediaDevices.getUserMedia({
-    video: { facingMode: "environment" },
-    audio: false,
-  });
+  const video = constraintsDeVideo(facingMode);
+  if (modo !== "video" || !solicitarAudio) {
+    return navigator.mediaDevices.getUserMedia({ video, audio: false });
+  }
+
+  try {
+    return await navigator.mediaDevices.getUserMedia({ video, audio: true });
+  } catch (cause) {
+    // Algunos navegadores rechazan toda la solicitud cuando el micrófono está bloqueado.
+    // Reintentamos solo con video para conservar la captura sin dejar el flujo inutilizable.
+    if (cause instanceof DOMException) {
+      return navigator.mediaDevices.getUserMedia({ video, audio: false });
+    }
+    throw cause;
+  }
+}
+
+export async function detectarCapacidadesCamara(stream: MediaStream): Promise<CameraCapabilities> {
+  const track = stream.getVideoTracks()[0];
+  const capabilities = track?.getCapabilities?.() as
+    (MediaTrackCapabilities & { facingMode?: string[]; torch?: boolean }) | undefined;
+  const facingModes = capabilities?.facingMode ?? [];
+  let canSwitchCamera = facingModes.includes("environment") && facingModes.includes("user");
+
+  if (!canSwitchCamera && navigator.mediaDevices?.enumerateDevices) {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    canSwitchCamera = devices.filter((device) => device.kind === "videoinput").length > 1;
+  }
+
+  return {
+    canSwitchCamera,
+    torch: capabilities?.torch === true,
+  };
 }
 
 export function videoListoParaCaptura(video: HTMLVideoElement) {
