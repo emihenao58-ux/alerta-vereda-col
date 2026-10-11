@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Camera, Film, FolderOpen } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Film, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MOTIVOS_SIN_EVIDENCIA } from "@/lib/reportar/catalogo";
 import type { ReporteEvidencia, SinEvidencia, SinEvidenciaMotivo } from "@/lib/reportar/types";
@@ -173,9 +173,11 @@ export function ReportarEvidenceStep({
 
       <ReportarStepActions>
         <Button type="button" variant="outline" onClick={onBack}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
         <Button type="button" onClick={onNext}>
+          <ArrowRight size={16} aria-hidden="true" />
           Revisar reporte
         </Button>
       </ReportarStepActions>

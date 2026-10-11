@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import {
+  ArrowLeft,
+  ArrowRight,
   Building2,
   ChevronDown,
   ChevronRight,
@@ -367,9 +369,11 @@ export function ReportarDetailsStep({
 
       <ReportarStepActions>
         <Button type="button" variant="outline" onClick={onBack}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
         <Button type="button" onClick={onNext}>
+          <ArrowRight size={16} aria-hidden="true" />
           Continuar
         </Button>
       </ReportarStepActions>

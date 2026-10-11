@@ -1,3 +1,4 @@
+import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   categoriaConfig,
@@ -122,9 +123,11 @@ export function ReportarReviewStep({
 
       <ReportarStepActions>
         <Button type="button" variant="outline" onClick={() => onEdit("evidencias")}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
         <Button type="button" onClick={onConfirm}>
+          <Send size={16} aria-hidden="true" />
           Preparar reporte
         </Button>
       </ReportarStepActions>

@@ -248,6 +248,7 @@ export function ReportarCategoryStep({
 
       <ReportarStepActions>
         <Button type="button" onClick={onNext} disabled={!categoria || !subcategoria}>
+          <ArrowRight size={16} aria-hidden="true" />
           Continuar
         </Button>
       </ReportarStepActions>

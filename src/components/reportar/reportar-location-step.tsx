@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { obtenerUbicacion } from "@/lib/reportar/location";
 import type { ReporteDraft, ReporteUbicacion, ReporteUbicacionEstado } from "@/lib/reportar/types";
@@ -230,9 +230,11 @@ export function ReportarLocationStep({
 
       <ReportarStepActions>
         <Button type="button" variant="outline" onClick={onBack}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
         <Button type="button" onClick={continuar}>
+          <ArrowRight size={16} aria-hidden="true" />
           Continuar
         </Button>
       </ReportarStepActions>
