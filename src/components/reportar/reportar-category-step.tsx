@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { ArrowLeft, ArrowRight, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronUp, Plus, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   CATEGORIAS,
@@ -32,11 +33,16 @@ export function ReportarCategoryStep({
   onDescripcion: (descripcion: string) => void;
   onNext: () => void;
 }) {
+  const [detallesAbiertos, setDetallesAbiertos] = useState(false);
   const config = categoriaConfig(categoria);
   const opcionesRaiz = subcategoriasDe(categoria);
   const opcionPadre = subcategoriaPorId(categoria, subcategoriaPadre);
   const opcionesVisibles = opcionPadre?.children ?? opcionesRaiz;
   const opcionSeleccionada = subcategoriaPorId(categoria, subcategoria);
+
+  useEffect(() => {
+    setDetallesAbiertos(false);
+  }, [opcionSeleccionada?.id]);
 
   const seleccionarOpcion = (id: string, tieneHijos: boolean) => {
     onSubcategoria({ id: tieneHijos ? null : id, parentId: tieneHijos ? id : subcategoriaPadre });
@@ -170,24 +176,56 @@ export function ReportarCategoryStep({
             })}
           </div>
 
-          <div
-            className={`reportar-description-reveal ${opcionSeleccionada?.requiresDescription ? "is-visible" : ""}`}
-            aria-hidden={!opcionSeleccionada?.requiresDescription}
-          >
-            <label className="reportar-field" htmlFor="reportar-other-description">
-              <span>Cuéntanos qué sucede</span>
-              <textarea
-                id="reportar-other-description"
-                className="reportar-input reportar-textarea"
-                rows={3}
-                value={descripcion}
-                onChange={(event) => onDescripcion(event.target.value)}
-                placeholder="Escribe aquí lo que está pasando…"
-                aria-required={opcionSeleccionada?.requiresDescription === true}
-                tabIndex={opcionSeleccionada?.requiresDescription ? 0 : -1}
-              />
-            </label>
-          </div>
+          {opcionSeleccionada ? (
+            opcionSeleccionada.requiresDescription ? (
+              <div className="reportar-description-reveal is-visible">
+                <label className="reportar-field" htmlFor="reportar-other-description">
+                  <span>Cuéntanos qué sucede</span>
+                  <textarea
+                    id="reportar-other-description"
+                    className="reportar-input reportar-textarea"
+                    rows={3}
+                    value={descripcion}
+                    onChange={(event) => onDescripcion(event.target.value)}
+                    placeholder="Escribe aquí lo que está pasando…"
+                    aria-required="true"
+                  />
+                </label>
+              </div>
+            ) : (
+              <div className="reportar-optional-details">
+                <button
+                  type="button"
+                  className="reportar-text-button"
+                  aria-expanded={detallesAbiertos}
+                  aria-controls="reportar-optional-description"
+                  onClick={() => setDetallesAbiertos((abierto) => !abierto)}
+                >
+                  {detallesAbiertos ? <ChevronUp size={16} /> : <Plus size={16} />}
+                  {detallesAbiertos ? "Ocultar detalles" : "Agregar detalles (opcional)"}
+                </button>
+                <div
+                  id="reportar-optional-description"
+                  className={`reportar-description-reveal ${detallesAbiertos ? "is-visible" : ""}`}
+                  aria-hidden={!detallesAbiertos}
+                >
+                  <label className="reportar-field" htmlFor="reportar-optional-description-input">
+                    <span>¿Quieres agregar más detalles?</span>
+                    <textarea
+                      id="reportar-optional-description-input"
+                      className="reportar-input reportar-textarea"
+                      rows={3}
+                      value={descripcion}
+                      onChange={(event) => onDescripcion(event.target.value)}
+                      placeholder="Escribe aquí algo más, si lo deseas…"
+                      aria-required="false"
+                      tabIndex={detallesAbiertos ? 0 : -1}
+                    />
+                  </label>
+                </div>
+              </div>
+            )
+          ) : null}
 
           {opcionSeleccionada?.notice && (
             <div className="reportar-option-notice" role="alert">

@@ -68,11 +68,7 @@ export function ReportarReviewStep({
             ) : (
               <span>Sin referencia textual adicional</span>
             )}
-            {draft.descripcion ? (
-              <p>{draft.descripcion}</p>
-            ) : (
-              <span>Sin descripción adicional</span>
-            )}
+            {draft.descripcion && <p>{draft.descripcion}</p>}
             {draft.nombre && <span>Reporta: {draft.nombre}</span>}
           </div>
           <button type="button" className="reportar-text-button" onClick={() => onEdit("detalle")}>
