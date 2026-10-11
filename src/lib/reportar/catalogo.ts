@@ -236,6 +236,13 @@ export const CATEGORIAS: readonly ReporteCategoriaConfig[] = [
           { id: "persona_desaparecida", label: "Persona desaparecida", Icon: UserSearch },
           { id: "robo", label: "Robo", Icon: LockOpen },
           { id: "intento_robo", label: "Intento de robo", Icon: DoorOpen },
+          { id: "mascota_perdida", label: "Mascota perdida", Icon: PawPrint },
+          { id: "disturbios_orden", label: "Disturbios o alteración del orden", Icon: AlertTriangle },
+          {
+            id: "embriaguez_via",
+            label: "Persona en estado de embriaguez en la vía pública",
+            Icon: Activity,
+          },
           { id: "otro_seguridad", label: "Otro", Icon: CircleHelp, ...OPCION_OTRO },
         ],
       },

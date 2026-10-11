@@ -65,6 +65,9 @@ export const REPORTAR_ILLUSTRATIONS: Readonly<Record<string, string>> = {
   persona_desaparecida: `${ROOT}/avisos/desaparecida.webp`,
   robo: `${ROOT}/avisos/robo.webp`,
   intento_robo: `${ROOT}/avisos/intento-robo.webp`,
+  mascota_perdida: `${ROOT}/avisos/mascota-perdida.webp`,
+  disturbios_orden: `${ROOT}/avisos/disturbios-orden.webp`,
+  embriaguez_via: `${ROOT}/avisos/embriaguez-via.webp`,
   otro_seguridad: `${ROOT}/avisos/otro-seguridad.webp`,
 };
 
