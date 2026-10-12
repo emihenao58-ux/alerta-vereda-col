@@ -5542,6 +5542,7 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 /* PR #14 · ronda visual territorial: continuidad con las tarjetas de Inicio. */
 .reportar-category-option {
+  position: relative;
   min-height: 5.35rem;
   padding: 0;
   border: 1px solid color-mix(in srgb, white 42%, transparent);
@@ -5564,6 +5565,12 @@ html.theme-transition-no-blur .mi-vereda-board {
   filter: saturate(1.06) brightness(1.03);
   transform: translateY(-1px);
   box-shadow: 0 5px 14px rgba(25, 47, 64, 0.24);
+}
+
+.reportar-category-option.is-selected {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--reportar-card-text) 58%, transparent),
+    0 5px 14px rgba(25, 47, 64, 0.24);
 }
 
 .reportar-category-option:active {
@@ -5622,6 +5629,27 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-category-arrow {
   color: inherit;
+}
+
+.reportar-selection-indicator {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.45rem;
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border: 1px solid var(--reportar-accent, var(--bosque));
+  border-radius: 50%;
+  background: var(--reportar-accent, var(--bosque));
+  color: var(--primary-foreground);
+  pointer-events: none;
+}
+
+.reportar-category-option .reportar-selection-indicator {
+  border-color: var(--reportar-card-text);
+  background: var(--reportar-card-text);
+  color: var(--reportar-accent);
 }
 
 .reportar-subcategory-block,
@@ -5698,6 +5726,7 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-subcategory-option {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;

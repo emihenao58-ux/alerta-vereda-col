@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { ArrowLeft, ArrowRight, ChevronUp, Plus, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronUp, Plus, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   CATEGORIAS,
@@ -90,6 +90,11 @@ export function ReportarCategoryStep({
               </span>
               <ArrowRight className="reportar-category-arrow" size={24} aria-hidden="true" />
             </span>
+            {categoria === value && (
+              <span className="reportar-selection-indicator" aria-hidden="true">
+                <Check size={14} strokeWidth={3} />
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -171,6 +176,11 @@ export function ReportarCategoryStep({
                   </span>
                   <span>{opcion.label}</span>
                   {tieneHijos && <ArrowRight size={18} aria-hidden="true" />}
+                  {seleccionado && (
+                    <span className="reportar-selection-indicator" aria-hidden="true">
+                      <Check size={14} strokeWidth={3} />
+                    </span>
+                  )}
                 </button>
               );
             })}
