@@ -4980,6 +4980,14 @@ html.theme-transition-no-blur .mi-vereda-board {
   font-weight: 700;
 }
 
+.reportar-evidence-timestamp {
+  display: block;
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
 .reportar-evidence-actions {
   display: flex;
   flex-wrap: wrap;
@@ -5192,6 +5200,7 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-review-evidence span,
+.reportar-review-evidence small,
 .reportar-review-empty {
   margin: 0;
   color: var(--tinta-suave);
@@ -6546,6 +6555,15 @@ html.theme-transition-no-blur .mi-vereda-board {
   color: white;
   font-size: 0.62rem;
   line-height: 1;
+}
+
+.reportar-confirmation-media-grid li > small {
+  display: block;
+  padding: 0.25rem 0.3rem 0.35rem;
+  color: color-mix(in srgb, white 78%, var(--tinta-suave));
+  font-size: 0.57rem;
+  line-height: 1.25;
+  text-align: center;
 }
 
 .reportar-confirmation-description-row p {

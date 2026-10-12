@@ -17,6 +17,7 @@ import {
   etiquetaMotivoSinEvidencia,
   subcategoriaPorId,
 } from "@/lib/reportar/catalogo";
+import { etiquetaFechaEvidencia } from "@/lib/reportar/media";
 import { contextoVereda, territorioPorId } from "@/lib/reportar/mock-data";
 import type { ReporteDraft, TipoLugar } from "@/lib/reportar/types";
 import type { MockSubmissionResult } from "@/lib/reportar/mock-submit";
@@ -183,6 +184,9 @@ export function ReportarConfirmation({
                           {evidencia.tipo === "foto" ? <Camera size={12} /> : <Video size={12} />}
                           {evidencia.tipo === "foto" ? "Foto" : "Video"}
                         </span>
+                        <small className="reportar-evidence-timestamp">
+                          {etiquetaFechaEvidencia(evidencia.fuente, evidencia.capturadaEn)}
+                        </small>
                       </li>
                     ))}
                   </ul>

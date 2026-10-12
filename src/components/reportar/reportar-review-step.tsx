@@ -17,6 +17,7 @@ import {
   subcategoriaPorId,
 } from "@/lib/reportar/catalogo";
 import { contextoVereda, territorioPorId } from "@/lib/reportar/mock-data";
+import { etiquetaFechaEvidencia } from "@/lib/reportar/media";
 import type { ReporteDraft, ReporteStep } from "@/lib/reportar/types";
 import { colorTipoReporte } from "@/lib/reportar/visuals";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
@@ -233,6 +234,9 @@ export function ReportarReviewStep({
                       {evidencia.tipo === "foto" ? "Fotografía" : "Video"}
                       {evidencia.recortada ? " · recortada" : ""}
                     </span>
+                    <small className="reportar-evidence-timestamp">
+                      {etiquetaFechaEvidencia(evidencia.fuente, evidencia.capturadaEn)}
+                    </small>
                   </li>
                 ))}
               </ul>

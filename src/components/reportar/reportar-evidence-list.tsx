@@ -1,5 +1,6 @@
 import { Image as ImageIcon, Scissors, Trash2, Video } from "lucide-react";
 import type { ReporteEvidencia } from "@/lib/reportar/types";
+import { etiquetaFechaEvidencia } from "@/lib/reportar/media";
 
 export function ReportarEvidenceList({
   evidencias,
@@ -33,6 +34,9 @@ export function ReportarEvidenceList({
               {evidencia.tipo === "foto" ? <ImageIcon size={14} /> : <Video size={14} />}
               {evidencia.tipo === "foto" ? "Foto" : "Video"}
               {evidencia.recortada ? " · recortada" : ""}
+            </span>
+            <span className="reportar-evidence-timestamp">
+              {etiquetaFechaEvidencia(evidencia.fuente, evidencia.capturadaEn)}
             </span>
             <div className="reportar-evidence-actions">
               {evidencia.tipo === "foto" && (

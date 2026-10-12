@@ -157,6 +157,25 @@ export function extensionDeMime(mime: string) {
   return mime.includes("mp4") ? "mp4" : "webm";
 }
 
+export function etiquetaFechaEvidencia(fuente: "camara" | "galeria", capturadaEn: string) {
+  const fecha = new Date(capturadaEn);
+  if (Number.isNaN(fecha.getTime())) {
+    return fuente === "camara" ? "Capturada: fecha no disponible" : "Añadida desde galería";
+  }
+
+  const fechaTexto = new Intl.DateTimeFormat("es-CO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(fecha);
+  const horaTexto = new Intl.DateTimeFormat("es-CO", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(fecha);
+
+  return `${fuente === "camara" ? "Capturada" : "Añadida desde galería"}: ${fechaTexto}, ${horaTexto}`;
+}
+
 export function leerDuracionVideo(file: File) {
   return new Promise<number>((resolve, reject) => {
     const previewUrl = URL.createObjectURL(file);
