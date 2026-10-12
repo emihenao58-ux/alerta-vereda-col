@@ -5080,8 +5080,9 @@ html.theme-transition-no-blur .mi-vereda-board {
   height: 3.25rem;
   place-items: center;
   border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--bosque) 18%, transparent);
-  color: var(--bosque);
+  border: 1px solid color-mix(in srgb, var(--review-accent, var(--bosque)) 36%, var(--border));
+  background: color-mix(in srgb, var(--review-accent, var(--bosque)) 18%, transparent);
+  color: var(--review-accent, var(--bosque));
 }
 
 .reportar-review-card-content {
@@ -5142,10 +5143,10 @@ html.theme-transition-no-blur .mi-vereda-board {
   gap: 0.75rem;
   min-height: 6.5rem;
   padding: 0.9rem 1rem;
-  border: 1px dashed color-mix(in srgb, var(--bosque) 60%, var(--border));
+  border: 1px dashed color-mix(in srgb, var(--review-accent, var(--bosque)) 60%, var(--border));
   border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
-  color: var(--bosque);
+  background: color-mix(in srgb, var(--review-accent, var(--bosque)) 8%, var(--card));
+  color: var(--review-accent, var(--bosque));
 }
 
 .reportar-review-map-placeholder div {

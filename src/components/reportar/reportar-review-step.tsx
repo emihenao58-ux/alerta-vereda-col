@@ -9,6 +9,7 @@ import {
   Send,
   UserRound,
 } from "lucide-react";
+import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import {
   categoriaConfig,
@@ -17,7 +18,12 @@ import {
 } from "@/lib/reportar/catalogo";
 import { contextoVereda, territorioPorId } from "@/lib/reportar/mock-data";
 import type { ReporteDraft, ReporteStep } from "@/lib/reportar/types";
+import { colorTipoReporte } from "@/lib/reportar/visuals";
 import { ReportarStepActions, ReportarStepShell } from "@/components/reportar/reportar-step-shell";
+
+function accentStyle(color: string): CSSProperties {
+  return { "--review-accent": color } as CSSProperties;
+}
 
 export function ReportarReviewStep({
   draft,
@@ -31,9 +37,18 @@ export function ReportarReviewStep({
   onConfirm: () => void;
 }) {
   const categoria = categoriaConfig(draft.categoria);
-  const CategoriaIcon = categoria?.Icon ?? Info;
   const subcategoria = subcategoriaPorId(draft.categoria, draft.subcategoria);
   const subcategoriaPadre = subcategoriaPorId(draft.categoria, draft.subcategoriaPadre);
+  const TipoIcon =
+    draft.categoria === "servicio"
+      ? (subcategoriaPadre?.Icon ?? subcategoria?.Icon ?? categoria?.Icon ?? Info)
+      : (categoria?.Icon ?? subcategoria?.Icon ?? Info);
+  const tipoColor = colorTipoReporte(
+    draft.categoria,
+    subcategoria?.id ?? null,
+    subcategoriaPadre?.id ?? null,
+    categoria?.color,
+  );
   const subcategoriaResumen = subcategoria
     ? subcategoriaPadre
       ? `${subcategoriaPadre.label} · ${subcategoria.label}`
@@ -70,8 +85,12 @@ export function ReportarReviewStep({
       <div className="reportar-review-list">
         <article className="reportar-review-card">
           <div className="reportar-review-card-main">
-            <span className="reportar-review-icon" aria-hidden="true">
-              <CategoriaIcon size={25} />
+            <span
+              className="reportar-review-icon"
+              style={accentStyle(tipoColor)}
+              aria-hidden="true"
+            >
+              <TipoIcon size={25} />
             </span>
             <div className="reportar-review-card-content">
               <span className="reportar-review-label">Tipo de reporte</span>
@@ -92,7 +111,11 @@ export function ReportarReviewStep({
 
         <article className="reportar-review-card">
           <div className="reportar-review-card-main">
-            <span className="reportar-review-icon" aria-hidden="true">
+            <span
+              className="reportar-review-icon"
+              style={accentStyle("#E7A836")}
+              aria-hidden="true"
+            >
               <MapPin size={25} />
             </span>
             <div className="reportar-review-card-content">
@@ -119,7 +142,11 @@ export function ReportarReviewStep({
 
         <article className="reportar-review-card">
           <div className="reportar-review-card-main">
-            <span className="reportar-review-icon" aria-hidden="true">
+            <span
+              className="reportar-review-icon"
+              style={accentStyle("#3D83C4")}
+              aria-hidden="true"
+            >
               <MapIcon size={25} />
             </span>
             <div className="reportar-review-card-content">
@@ -140,7 +167,11 @@ export function ReportarReviewStep({
             Editar
           </button>
           <div className="reportar-review-card-extra">
-            <div className="reportar-review-map-placeholder" aria-label="Vista previa del mapa">
+            <div
+              className="reportar-review-map-placeholder"
+              style={accentStyle("#3D83C4")}
+              aria-label="Vista previa del mapa"
+            >
               <MapIcon size={26} aria-hidden="true" />
               <div>
                 <strong>Vista previa del mapa</strong>
@@ -152,7 +183,11 @@ export function ReportarReviewStep({
 
         <article className="reportar-review-card">
           <div className="reportar-review-card-main">
-            <span className="reportar-review-icon" aria-hidden="true">
+            <span
+              className="reportar-review-icon"
+              style={accentStyle("#208666")}
+              aria-hidden="true"
+            >
               <Images size={25} />
             </span>
             <div className="reportar-review-card-content">
@@ -210,7 +245,11 @@ export function ReportarReviewStep({
         {descripcion && (
           <article className="reportar-review-card">
             <div className="reportar-review-card-main">
-              <span className="reportar-review-icon" aria-hidden="true">
+              <span
+                className="reportar-review-icon"
+                style={accentStyle("#B86B42")}
+                aria-hidden="true"
+              >
                 <MessageSquare size={25} />
               </span>
               <div className="reportar-review-card-content">
@@ -233,7 +272,11 @@ export function ReportarReviewStep({
         {nombre && (
           <article className="reportar-review-card">
             <div className="reportar-review-card-main">
-              <span className="reportar-review-icon" aria-hidden="true">
+              <span
+                className="reportar-review-icon"
+                style={accentStyle("#8D6AAE")}
+                aria-hidden="true"
+              >
                 <UserRound size={25} />
               </span>
               <div className="reportar-review-card-content">
