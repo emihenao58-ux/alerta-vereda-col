@@ -4596,7 +4596,8 @@ html.theme-transition-no-blur .mi-vereda-board {
   box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--bosque) 22%, transparent);
 }
 
-.reportar-progress-labels li.is-pending span {
+.reportar-progress-labels li.is-discovered span {
+  border-color: color-mix(in srgb, var(--border) 82%, var(--bosque));
   background: color-mix(in srgb, var(--card) 78%, transparent);
 }
 

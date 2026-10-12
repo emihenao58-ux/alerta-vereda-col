@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { ReporteStep } from "@/lib/reportar/types";
 
 const STEPS: readonly { step: ReporteStep; label: string }[] = [
@@ -16,7 +17,12 @@ export function ReportarProgress({ step }: { step: ReporteStep }) {
           0,
           STEPS.findIndex((item) => item.step === step),
         );
+  const maxDiscoveredIndex = useRef(currentIndex);
+
+  maxDiscoveredIndex.current = Math.max(maxDiscoveredIndex.current, currentIndex);
+
   const currentLabel = STEPS[currentIndex]?.label ?? STEPS[0]?.label ?? "Tipo";
+  const visibleSteps = STEPS.slice(0, maxDiscoveredIndex.current + 1);
   const percentage = ((currentIndex + 1) / STEPS.length) * 100;
 
   return (
@@ -35,14 +41,14 @@ export function ReportarProgress({ step }: { step: ReporteStep }) {
       >
         <span style={{ width: `${percentage}%` }} />
       </div>
-      <ol className="reportar-progress-labels" aria-label="Etapas del reporte">
-        {STEPS.map((item, index) => {
+      <ol className="reportar-progress-labels" aria-label="Etapas descubiertas del reporte">
+        {visibleSteps.map((item, index) => {
           const state =
             index < currentIndex
               ? "is-complete"
               : index === currentIndex
                 ? "is-current"
-                : "is-pending";
+                : "is-discovered";
 
           return (
             <li
