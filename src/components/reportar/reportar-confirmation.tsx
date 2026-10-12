@@ -1,11 +1,11 @@
 import {
   Camera,
   CheckCircle2,
-  Clock3,
   Home,
   Images,
   Map as MapIcon,
   MapPin,
+  MessageSquare,
   ShieldAlert,
   ShieldCheck,
   Video,
@@ -18,28 +18,14 @@ import {
   subcategoriaPorId,
 } from "@/lib/reportar/catalogo";
 import { contextoVereda, territorioPorId } from "@/lib/reportar/mock-data";
-import type { ReporteDraft, ReporteEvidencia, TipoLugar } from "@/lib/reportar/types";
+import type { ReporteDraft, TipoLugar } from "@/lib/reportar/types";
 import type { MockSubmissionResult } from "@/lib/reportar/mock-submit";
-import { ReportarStepShell } from "@/components/reportar/reportar-step-shell";
-
-function formatearFecha(valor: string) {
-  const fecha = new Date(valor);
-  if (Number.isNaN(fecha.getTime())) return "Fecha no disponible";
-  return new Intl.DateTimeFormat("es-CO", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(fecha);
-}
 
 function etiquetaTipoLugar(tipo: TipoLugar | null) {
   if (tipo === "corregimiento") return "Corregimiento";
   if (tipo === "vereda") return "Vereda";
   if (tipo === "casco_urbano") return "Cabecera municipal";
   return "Lugar";
-}
-
-function etiquetaFuente(evidencia: ReporteEvidencia) {
-  return evidencia.fuente === "camara" ? "Capturada desde la cámara" : "Seleccionada de galería";
 }
 
 export function ReportarConfirmation({
@@ -72,148 +58,138 @@ export function ReportarConfirmation({
     ? `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
     : "Lugar no seleccionado";
   const contextoTexto = territorioPadre?.nombre ?? contexto;
+  const cantidadEvidencias = draft.evidencias.length;
 
   return (
-    <ReportarStepShell
-      eyebrow="Reporte preparado"
-      title="Tu reporte está listo"
-      description="Revisa la información que quedó preparada en este dispositivo. Todavía no se ha enviado ni publicado."
+    <section
+      className="reportar-confirmation-screen carta"
+      aria-labelledby="reportar-confirmation-title"
     >
-      <div className="reportar-confirmation-card">
-        <CheckCircle2 size={42} aria-hidden="true" />
-        <strong>Reporte preparado localmente</strong>
+      <div className="reportar-confirmation-hero">
+        <span className="reportar-confirmation-mark" aria-hidden="true">
+          <CheckCircle2 size={48} strokeWidth={1.8} />
+        </span>
+        <p className="reportar-confirmation-kicker">Confirmación local</p>
+        <h2 id="reportar-confirmation-title">Tu reporte está listo</h2>
         <p>
-          No se creó un registro en Supabase ni se subieron archivos. La marca de agua de
-          publicación se aplicará únicamente cuando exista un envío real.
+          La información quedó preparada en este dispositivo. Todavía no se ha enviado ni publicado.
         </p>
       </div>
 
-      <div className="reportar-confirmation-summary" aria-label="Resumen del reporte preparado">
-        <article className="reportar-confirmation-summary-card">
-          <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-            <CategoriaIcon size={22} />
-          </span>
-          <div>
-            <span className="reportar-confirmation-summary-label">Tipo de reporte</span>
-            <strong>{categoria?.label ?? "Categoría no disponible"}</strong>
-            <small>{subcategoriaTexto}</small>
-          </div>
-        </article>
-
-        <article className="reportar-confirmation-summary-card">
-          <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-            <MapPin size={22} />
-          </span>
-          <div>
-            <span className="reportar-confirmation-summary-label">Lugar del reporte</span>
-            <strong>{territorioTexto}</strong>
-            {contextoTexto && <small>Zona: {contextoTexto}</small>}
-            {referencia && <small>Referencia: {referencia}</small>}
-          </div>
-        </article>
-
-        {descripcion && (
-          <article className="reportar-confirmation-summary-card reportar-confirmation-summary-card-wide">
+      <div className="reportar-confirmation-panel">
+        <h3>Resumen de tu reporte</h3>
+        <div className="reportar-confirmation-summary-list">
+          <article className="reportar-confirmation-summary-row">
             <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-              <Images size={22} />
+              <CategoriaIcon size={21} />
             </span>
             <div>
-              <span className="reportar-confirmation-summary-label">Descripción</span>
-              <p className="reportar-confirmation-summary-quote">“{descripcion}”</p>
+              <span className="reportar-confirmation-summary-label">Tipo de reporte</span>
+              <strong>{categoria?.label ?? "Categoría no disponible"}</strong>
+              <small>{subcategoriaTexto}</small>
             </div>
           </article>
-        )}
 
-        <article className="reportar-confirmation-summary-card reportar-confirmation-summary-card-wide">
-          <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-            <Clock3 size={22} />
-          </span>
-          <div>
-            <span className="reportar-confirmation-summary-label">Preparación local</span>
-            <strong>Reporte preparado el {formatearFecha(result.submittedAt)}</strong>
-            <small>Esta fecha no representa la fecha del incidente.</small>
-          </div>
-        </article>
-
-        <article className="reportar-confirmation-summary-card reportar-confirmation-summary-card-wide">
-          <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-            <Images size={22} />
-          </span>
-          <div className="reportar-confirmation-evidence-content">
-            <span className="reportar-confirmation-summary-label">Evidencias</span>
-            {draft.evidencias.length > 0 ? (
-              <ul
-                className="reportar-confirmation-evidence-grid"
-                aria-label="Evidencias del reporte"
-              >
-                {draft.evidencias.map((evidencia, index) => (
-                  <li key={evidencia.id} className="reportar-confirmation-evidence">
-                    {evidencia.tipo === "foto" ? (
-                      <img
-                        src={evidencia.previewUrl}
-                        alt={`Vista previa de la fotografía ${index + 1}`}
-                      />
-                    ) : (
-                      <video
-                        src={evidencia.previewUrl}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        aria-label={`Vista previa del video ${index + 1}`}
-                      />
-                    )}
-                    <span>
-                      {evidencia.tipo === "foto" ? <Camera size={14} /> : <Video size={14} />}
-                      {evidencia.tipo === "foto" ? "Fotografía" : "Video"}
-                      {evidencia.duracionSegundos ? ` · ${evidencia.duracionSegundos}s` : ""}
-                    </span>
-                    <small>{etiquetaFuente(evidencia)}</small>
-                    {evidencia.fuente === "camara" && (
-                      <small>Capturada el {formatearFecha(evidencia.capturadaEn)}</small>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : draft.sinEvidencia ? (
-              <div className="reportar-confirmation-empty-evidence">
-                <strong>Sin evidencia fotográfica</strong>
-                <span>{etiquetaMotivoSinEvidencia(draft.sinEvidencia.motivo)}</span>
-                {draft.sinEvidencia.detalle.trim() && <small>{draft.sinEvidencia.detalle}</small>}
-              </div>
-            ) : (
-              <div className="reportar-confirmation-empty-evidence">
-                <strong>No se adjuntaron evidencias</strong>
-                <span>La evidencia es opcional para este tipo de reporte.</span>
-              </div>
-            )}
-          </div>
-        </article>
-
-        {gpsConfirmado && draft.ubicacion && (
-          <article className="reportar-confirmation-summary-card reportar-confirmation-summary-card-wide">
+          <article className="reportar-confirmation-summary-row">
             <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-              <MapIcon size={22} />
+              <MapPin size={21} />
             </span>
             <div>
-              <span className="reportar-confirmation-summary-label">Ubicación GPS</span>
-              <strong>Ubicación GPS confirmada</strong>
-              {draft.ubicacion.precision > 0 && (
-                <small>Precisión aproximada: {Math.round(draft.ubicacion.precision)} m</small>
+              <span className="reportar-confirmation-summary-label">Lugar</span>
+              <strong>{territorioTexto}</strong>
+              {contextoTexto && <small>Zona: {contextoTexto}</small>}
+              {referencia && <small>Referencia: {referencia}</small>}
+            </div>
+          </article>
+
+          {gpsConfirmado && draft.ubicacion && (
+            <article className="reportar-confirmation-summary-row">
+              <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+                <MapIcon size={21} />
+              </span>
+              <div>
+                <span className="reportar-confirmation-summary-label">Ubicación GPS</span>
+                <strong>Ubicación GPS confirmada</strong>
+                {draft.ubicacion.precision > 0 && (
+                  <small>Precisión aproximada: {Math.round(draft.ubicacion.precision)} m</small>
+                )}
+              </div>
+            </article>
+          )}
+
+          <article className="reportar-confirmation-summary-row reportar-confirmation-evidence-row">
+            <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+              <Images size={21} />
+            </span>
+            <div>
+              <span className="reportar-confirmation-summary-label">Evidencias</span>
+              {cantidadEvidencias > 0 ? (
+                <>
+                  <strong>
+                    {cantidadEvidencias} evidencia{cantidadEvidencias === 1 ? "" : "s"} adjunta
+                    {cantidadEvidencias === 1 ? "" : "s"}
+                  </strong>
+                  <ul
+                    className="reportar-confirmation-media-grid"
+                    aria-label="Miniaturas de las evidencias del reporte"
+                  >
+                    {draft.evidencias.map((evidencia, index) => (
+                      <li key={evidencia.id}>
+                        {evidencia.tipo === "foto" ? (
+                          <img
+                            src={evidencia.previewUrl}
+                            alt={`Vista previa de la fotografía ${index + 1}`}
+                          />
+                        ) : (
+                          <video
+                            src={evidencia.previewUrl}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            aria-label={`Vista previa del video ${index + 1}`}
+                          />
+                        )}
+                        <span>
+                          {evidencia.tipo === "foto" ? <Camera size={12} /> : <Video size={12} />}
+                          {evidencia.tipo === "foto" ? "Foto" : "Video"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : draft.sinEvidencia ? (
+                <>
+                  <strong>Reporte sin evidencia fotográfica</strong>
+                  <small>{etiquetaMotivoSinEvidencia(draft.sinEvidencia.motivo)}</small>
+                  {draft.sinEvidencia.detalle.trim() && <small>{draft.sinEvidencia.detalle}</small>}
+                </>
+              ) : (
+                <>
+                  <strong>Sin evidencias adjuntas</strong>
+                  <small>La evidencia es opcional para este tipo de reporte.</small>
+                </>
               )}
-              <small className="reportar-confirmation-map-note">
-                <MapPin size={14} /> Mapa pendiente de integración
-              </small>
             </div>
           </article>
-        )}
+
+          {descripcion && (
+            <article className="reportar-confirmation-summary-row reportar-confirmation-description-row">
+              <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+                <MessageSquare size={21} />
+              </span>
+              <div>
+                <span className="reportar-confirmation-summary-label">Descripción</span>
+                <p>“{descripcion}”</p>
+              </div>
+            </article>
+          )}
+        </div>
       </div>
 
-      <div className="reportar-confirmation-note">
-        <ShieldCheck size={18} aria-hidden="true" />
-        <span>
-          La información y las evidencias permanecieron en este dispositivo durante el recorrido.
-        </span>
-      </div>
+      <p className="reportar-confirmation-local-note">
+        <ShieldCheck size={16} aria-hidden="true" />
+        La información y las evidencias permanecieron en este dispositivo durante el recorrido.
+      </p>
 
       {pendienteRevision && (
         <div className="reportar-security-review-notice" role="status">
@@ -228,7 +204,7 @@ export function ReportarConfirmation({
         </div>
       )}
 
-      <div className="reportar-step-actions">
+      <div className="reportar-confirmation-actions">
         <Button type="button" variant="outline" onClick={onReset}>
           Crear otro reporte
         </Button>
@@ -244,6 +220,6 @@ export function ReportarConfirmation({
       <span className="sr-only">
         Modo: {result.mode}. Preparado: {result.submittedAt}. Identificador definitivo pendiente.
       </span>
-    </ReportarStepShell>
+    </section>
   );
 }

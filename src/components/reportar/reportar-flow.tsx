@@ -111,16 +111,19 @@ export function ReportarFlow() {
   };
 
   const step = flow.ui.step;
+  const isConfirmation = step === "confirmacion";
   const evidenciaEditando =
     flow.draft.evidencias.find((item) => item.id === flow.ui.evidenciaEditando) ?? null;
 
   return (
-    <div className="reportar-page">
-      <TituloModulo
-        titulo="Reportar"
-        bajada="Cuéntale a la comunidad lo que está pasando. Tu reporte será revisado antes de publicarse."
-      />
-      <ReportarProgress step={step} />
+    <div className={`reportar-page${isConfirmation ? " reportar-page-confirmation" : ""}`}>
+      {!isConfirmation && (
+        <TituloModulo
+          titulo="Reportar"
+          bajada="Cuéntale a la comunidad lo que está pasando. Tu reporte será revisado antes de publicarse."
+        />
+      )}
+      {!isConfirmation && <ReportarProgress step={step} />}
 
       {step === "categoria" && (
         <ReportarCategoryStep
