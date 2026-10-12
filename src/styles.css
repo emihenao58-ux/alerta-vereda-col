@@ -6401,15 +6401,15 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-confirmation-mark {
-  display: grid;
-  width: 5rem;
-  height: 5rem;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--normal) 64%, var(--border));
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--normal) 22%, var(--card));
-  color: var(--normal);
-  box-shadow: 0 0 0 0.45rem color-mix(in srgb, var(--normal) 10%, transparent);
+  display: block;
+  width: clamp(8rem, 26vw, 11rem);
+  margin-inline: auto;
+}
+
+.reportar-confirmation-mark img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .reportar-confirmation-kicker {
@@ -6478,8 +6478,9 @@ html.theme-transition-no-blur .mi-vereda-board {
 .reportar-confirmation-screen .reportar-confirmation-summary-icon {
   width: 2.25rem;
   height: 2.25rem;
-  background: color-mix(in srgb, var(--bosque) 18%, var(--card));
-  color: var(--bosque-oscuro);
+  border: 1px solid color-mix(in srgb, var(--confirmation-accent, var(--bosque)) 36%, var(--border));
+  background: color-mix(in srgb, var(--confirmation-accent, var(--bosque)) 18%, var(--card));
+  color: var(--confirmation-accent, var(--bosque-oscuro));
 }
 
 .reportar-confirmation-summary-label {
@@ -6601,11 +6602,6 @@ html.theme-transition-no-blur .mi-vereda-board {
 @media (max-width: 640px) {
   .reportar-confirmation-screen {
     padding: 1rem 0.85rem;
-  }
-
-  .reportar-confirmation-mark {
-    width: 4.5rem;
-    height: 4.5rem;
   }
 
   .reportar-confirmation-actions > button,

@@ -1,6 +1,5 @@
 import {
   Camera,
-  CheckCircle2,
   Home,
   Images,
   Map as MapIcon,
@@ -10,6 +9,7 @@ import {
   ShieldCheck,
   Video,
 } from "lucide-react";
+import type { CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,31 @@ function etiquetaTipoLugar(tipo: TipoLugar | null) {
   return "Lugar";
 }
 
+function colorTipoReporte(
+  categoria: ReporteDraft["categoria"],
+  subcategoriaId: string | null,
+  subcategoriaPadreId: string | null,
+  colorBase: string | undefined,
+) {
+  if (categoria === "emergencia") return "#D83644";
+  if (categoria === "via") return "#E58129";
+  if (categoria === "otro") {
+    return subcategoriaPadreId === "alerta_seguridad" ? "#D83644" : "#E7A836";
+  }
+
+  const serviceId = subcategoriaPadreId ?? subcategoriaId;
+  if (serviceId === "agua") return "#2A91C9";
+  if (serviceId === "energia") return "#D49A1C";
+  if (serviceId === "gas") return "#E4772C";
+  if (serviceId === "recoleccion_basura") return "#6D8E42";
+  if (serviceId === "senal") return "#3D83C4";
+  return colorBase ?? "#208666";
+}
+
+function accentStyle(color: string): CSSProperties {
+  return { "--confirmation-accent": color } as CSSProperties;
+}
+
 export function ReportarConfirmation({
   draft,
   result,
@@ -40,9 +65,18 @@ export function ReportarConfirmation({
   onReset: () => void;
 }) {
   const categoria = categoriaConfig(draft.categoria);
-  const CategoriaIcon = categoria?.Icon ?? Images;
   const subcategoria = subcategoriaPorId(draft.categoria, draft.subcategoria);
   const subcategoriaPadre = subcategoriaPorId(draft.categoria, draft.subcategoriaPadre);
+  const TipoIcon =
+    draft.categoria === "servicio"
+      ? (subcategoriaPadre?.Icon ?? subcategoria?.Icon ?? categoria?.Icon ?? Images)
+      : (categoria?.Icon ?? subcategoria?.Icon ?? Images);
+  const tipoColor = colorTipoReporte(
+    draft.categoria,
+    subcategoria?.id ?? null,
+    subcategoriaPadre?.id ?? null,
+    categoria?.color,
+  );
   const territorio = territorioPorId(draft.territorioId);
   const territorioPadre = territorioPorId(draft.territorioPadreId);
   const contexto = territorio && draft.tipoLugar === "vereda" ? contextoVereda(territorio) : null;
@@ -67,7 +101,7 @@ export function ReportarConfirmation({
     >
       <div className="reportar-confirmation-hero">
         <span className="reportar-confirmation-mark" aria-hidden="true">
-          <CheckCircle2 size={48} strokeWidth={1.8} />
+          <img src="/images/reportar/confirmation-check.webp" alt="" />
         </span>
         <p className="reportar-confirmation-kicker">Confirmación local</p>
         <h2 id="reportar-confirmation-title">Tu reporte está listo</h2>
@@ -80,8 +114,12 @@ export function ReportarConfirmation({
         <h3>Resumen de tu reporte</h3>
         <div className="reportar-confirmation-summary-list">
           <article className="reportar-confirmation-summary-row">
-            <span className="reportar-confirmation-summary-icon" aria-hidden="true">
-              <CategoriaIcon size={21} />
+            <span
+              className="reportar-confirmation-summary-icon"
+              style={accentStyle(tipoColor)}
+              aria-hidden="true"
+            >
+              <TipoIcon size={21} />
             </span>
             <div>
               <span className="reportar-confirmation-summary-label">Tipo de reporte</span>
@@ -91,7 +129,11 @@ export function ReportarConfirmation({
           </article>
 
           <article className="reportar-confirmation-summary-row">
-            <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+            <span
+              className="reportar-confirmation-summary-icon"
+              style={accentStyle("#E7A836")}
+              aria-hidden="true"
+            >
               <MapPin size={21} />
             </span>
             <div>
@@ -104,7 +146,11 @@ export function ReportarConfirmation({
 
           {gpsConfirmado && draft.ubicacion && (
             <article className="reportar-confirmation-summary-row">
-              <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+              <span
+                className="reportar-confirmation-summary-icon"
+                style={accentStyle("#3D83C4")}
+                aria-hidden="true"
+              >
                 <MapIcon size={21} />
               </span>
               <div>
@@ -118,7 +164,11 @@ export function ReportarConfirmation({
           )}
 
           <article className="reportar-confirmation-summary-row reportar-confirmation-evidence-row">
-            <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+            <span
+              className="reportar-confirmation-summary-icon"
+              style={accentStyle("#208666")}
+              aria-hidden="true"
+            >
               <Images size={21} />
             </span>
             <div>
@@ -174,7 +224,11 @@ export function ReportarConfirmation({
 
           {descripcion && (
             <article className="reportar-confirmation-summary-row reportar-confirmation-description-row">
-              <span className="reportar-confirmation-summary-icon" aria-hidden="true">
+              <span
+                className="reportar-confirmation-summary-icon"
+                style={accentStyle("#B86B42")}
+                aria-hidden="true"
+              >
                 <MessageSquare size={21} />
               </span>
               <div>
