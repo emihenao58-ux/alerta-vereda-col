@@ -5,6 +5,7 @@ import type { LucideProps } from "lucide-react";
 import { AlertTriangle, ArrowRight, Droplet, Megaphone, Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { CartaCompacta, ChipSeveridad, Vacio } from "@/components/carta";
+import { RoadIcon } from "@/components/road-icon";
 import { URL_FOTO, severidadDeNivel } from "@/lib/alerta";
 import { consultarCartelera, type MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
 
@@ -36,15 +37,6 @@ const ATAJOS = [
 
 type Atajo = (typeof ATAJOS)[number];
 type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
-
-function RoadIcon({ size = 48, color = "currentColor", ...props }: LucideProps) {
-  return (
-    <svg {...props} width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <path d="M16 4h16l11 40H5L16 4Z" fill={color} />
-      <path d="M22 9h4v7h-4V9Zm0 12h4v7h-4v-7Zm0 12h4v7h-4v-7Z" fill="var(--icon-cutout)" />
-    </svg>
-  );
-}
 
 const ICONOS_ATAJO: Record<Atajo["to"], ComponentType<LucideProps>> = {
   "/emergencias": AlertTriangle,
