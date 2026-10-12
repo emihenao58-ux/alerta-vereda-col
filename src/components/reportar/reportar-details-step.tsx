@@ -3,13 +3,14 @@ import type { CSSProperties } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  Building2,
+  Check,
   ChevronDown,
   ChevronRight,
   Leaf,
   MapPin,
   RotateCcw,
   Search,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,25 +29,25 @@ const TIPO_LUGAR_OPTIONS: readonly {
   tipo: TipoLugar;
   label: string;
   description: string;
-  Icon: typeof Building2;
+  illustration: string;
 }[] = [
   {
     tipo: "corregimiento",
     label: "Corregimiento",
     description: "Selecciona un corregimiento.",
-    Icon: Building2,
+    illustration: "/images/reportar/territory/corregimiento.webp",
   },
   {
     tipo: "vereda",
     label: "Vereda",
     description: "Busca tu vereda.",
-    Icon: Leaf,
+    illustration: "/images/reportar/territory/vereda.webp",
   },
   {
     tipo: "casco_urbano",
     label: "Cabecera municipal",
     description: "Puedes indicar el barrio o sector.",
-    Icon: MapPin,
+    illustration: "/images/reportar/territory/cabecera-municipal.webp",
   },
 ];
 
@@ -170,27 +171,35 @@ export function ReportarDetailsStep({
           )}
         </div>
 
-        {!tipoLugar && (
+        {!finalSeleccionado && (
           <div className="reportar-location-type-grid" role="radiogroup" aria-label="Tipo de lugar">
-            {TIPO_LUGAR_OPTIONS.map(({ tipo, label, description, Icon }) => (
-              <button
-                key={tipo}
-                type="button"
-                className="reportar-location-type-option"
-                onClick={() => elegirTipo(tipo)}
-                role="radio"
-                aria-checked={false}
-              >
-                <span className="reportar-location-type-icon" aria-hidden="true">
-                  <Icon size={28} strokeWidth={1.8} />
-                </span>
-                <span>
-                  <strong>{label}</strong>
-                  <small>{description}</small>
-                </span>
-                <ChevronRight size={20} aria-hidden="true" />
-              </button>
-            ))}
+            {TIPO_LUGAR_OPTIONS.map(({ tipo, label, description, illustration }) => {
+              const seleccionado = tipoLugar === tipo;
+              return (
+                <button
+                  key={tipo}
+                  type="button"
+                  className={`reportar-location-type-option ${seleccionado ? "is-selected" : ""}`}
+                  onClick={() => elegirTipo(tipo)}
+                  role="radio"
+                  aria-checked={seleccionado}
+                >
+                  <span className="reportar-location-type-icon has-illustration" aria-hidden="true">
+                    <img src={illustration} alt="" className="reportar-location-type-image" />
+                  </span>
+                  <span className="reportar-location-type-copy">
+                    <strong>{label}</strong>
+                    <small>{description}</small>
+                  </span>
+                  <ChevronRight size={20} aria-hidden="true" />
+                  {seleccionado && (
+                    <span className="reportar-location-selection-indicator" aria-hidden="true">
+                      <Check size={14} strokeWidth={3} />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -349,14 +358,17 @@ export function ReportarDetailsStep({
 
       <div className="reportar-form-grid">
         <label className="reportar-field">
-          <span>
-            Tu nombre <em>(opcional)</em>
+          <span className="reportar-name-label">
+            <User size={18} strokeWidth={1.9} aria-hidden="true" />
+            <span>
+              Tu nombre <em>(opcional)</em>
+            </span>
           </span>
           <input
             className="reportar-input"
             value={nombre}
             onChange={(event) => onChange({ nombre: event.target.value })}
-            placeholder="Ej.: María"
+            placeholder="Escribe tu nombre"
           />
         </label>
       </div>

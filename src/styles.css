@@ -5918,9 +5918,11 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-location-type-option {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  min-height: 7rem;
-  padding: 0.85rem;
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 10rem;
+  padding: 0.7rem;
 }
 
 .reportar-location-type-option:hover,
@@ -5930,6 +5932,12 @@ html.theme-transition-no-blur .mi-vereda-board {
   border-color: var(--bosque);
   background: color-mix(in srgb, var(--bosque) 11%, var(--card));
   transform: translateY(-1px);
+}
+
+.reportar-location-type-option.is-selected {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bosque) 58%, transparent);
 }
 
 .reportar-location-type-option strong,
@@ -5954,14 +5962,44 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .reportar-location-type-icon {
+  grid-column: 1 / -1;
   display: grid;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 100%;
+  height: 5.1rem;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--bosque) 13%, transparent);
+  overflow: hidden;
+  border-radius: 0.62rem;
+  background: color-mix(in srgb, var(--bosque) 10%, transparent);
   color: var(--bosque-oscuro);
+}
+
+.reportar-location-type-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.reportar-location-type-copy {
+  min-width: 0;
+  align-self: end;
+}
+
+.reportar-location-selection-indicator {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  border: 1px solid var(--bosque);
+  border-radius: 50%;
+  background: var(--bosque);
+  color: #fff;
+  pointer-events: none;
 }
 
 .reportar-territory-options {
@@ -6094,6 +6132,17 @@ html.theme-transition-no-blur .mi-vereda-board {
 .reportar-territory-selected strong {
   color: var(--tinta);
   font-size: 1rem;
+}
+
+.reportar-name-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.reportar-name-label > svg {
+  flex: 0 0 auto;
+  color: var(--bosque);
 }
 
 .reportar-text-button {
