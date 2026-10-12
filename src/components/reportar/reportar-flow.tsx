@@ -3,6 +3,11 @@ import { TituloModulo } from "@/components/carta";
 import { confirmarReporteLocal, type MockSubmissionResult } from "@/lib/reportar/mock-submit";
 import { useReportarFlow } from "@/hooks/use-reportar-flow";
 import type { ReporteEvidencia } from "@/lib/reportar/types";
+import {
+  leerDuracionVideo,
+  MAX_VIDEO_BYTES,
+  MAX_VIDEO_DURATION_SECONDS,
+} from "@/lib/reportar/media";
 import { ReportarProgress } from "@/components/reportar/reportar-progress";
 import { ReportarCategoryStep } from "@/components/reportar/reportar-category-step";
 import { ReportarDetailsStep } from "@/components/reportar/reportar-details-step";
@@ -18,6 +23,7 @@ function evidenciaDesdeArchivo(
   fuente: "camara" | "galeria",
   tipo: "foto" | "video",
   duracionSegundos?: number,
+  capturadaEn = new Date().toISOString(),
 ): ReporteEvidencia {
   return {
     id: `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -25,7 +31,7 @@ function evidenciaDesdeArchivo(
     archivo: file,
     previewUrl: URL.createObjectURL(file),
     fuente,
-    capturadaEn: new Date().toISOString(),
+    capturadaEn,
     ...(duracionSegundos === undefined ? {} : { duracionSegundos }),
   };
 }
@@ -44,29 +50,58 @@ export function ReportarFlow() {
   );
 
   const onPhoto = useCallback(
-    (file: File) => {
-      agregarEvidencias([evidenciaDesdeArchivo(file, "camara", "foto")]);
+    (file: File, capturedAt: string) => {
+      agregarEvidencias([evidenciaDesdeArchivo(file, "camara", "foto", undefined, capturedAt)]);
       setCaptureMode(null);
     },
     [agregarEvidencias],
   );
 
   const onVideo = useCallback(
-    (file: File, durationSeconds: number) => {
-      agregarEvidencias([evidenciaDesdeArchivo(file, "camara", "video", durationSeconds)]);
+    (file: File, durationSeconds: number, capturedAt: string) => {
+      agregarEvidencias([
+        evidenciaDesdeArchivo(file, "camara", "video", durationSeconds, capturedAt),
+      ]);
       setCaptureMode(null);
     },
     [agregarEvidencias],
   );
 
   const onFiles = useCallback(
-    (files: readonly File[]) => {
-      const evidencias = files
-        .filter((file) => file.type.startsWith("image/"))
-        .map((file) => evidenciaDesdeArchivo(file, "galeria", "foto"));
-      agregarEvidencias(evidencias);
+    async (files: readonly File[]) => {
+      const evidencias: ReporteEvidencia[] = [];
+      const errores: string[] = [];
+
+      for (const file of files) {
+        if (file.type.startsWith("image/")) {
+          evidencias.push(evidenciaDesdeArchivo(file, "galeria", "foto"));
+          continue;
+        }
+        if (!file.type.startsWith("video/")) continue;
+        if (file.size > MAX_VIDEO_BYTES) {
+          errores.push("Un video supera el límite de 15 MB.");
+          continue;
+        }
+        try {
+          const duration = await leerDuracionVideo(file);
+          if (duration > MAX_VIDEO_DURATION_SECONDS) {
+            errores.push("Un video supera el límite de 15 segundos.");
+            continue;
+          }
+          evidencias.push(
+            evidenciaDesdeArchivo(file, "galeria", "video", Math.max(1, Math.ceil(duration))),
+          );
+        } catch {
+          errores.push("No se pudo leer la duración de uno de los videos.");
+        }
+      }
+
+      if (evidencias.length > 0) agregarEvidencias(evidencias);
+      if (errores.length > 0) {
+        setUi((actual) => ({ ...actual, error: errores[0] ?? null }));
+      }
     },
-    [agregarEvidencias],
+    [agregarEvidencias, setUi],
   );
 
   const prepararReporte = async () => {
@@ -151,6 +186,7 @@ export function ReportarFlow() {
       )}
       {step === "confirmacion" && submission && (
         <ReportarConfirmation
+          draft={flow.draft}
           result={submission}
           pendienteRevision={flow.draft.subcategoriaPadre === "alerta_seguridad"}
           onReset={() => {

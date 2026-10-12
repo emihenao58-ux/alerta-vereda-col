@@ -157,6 +157,35 @@ export function extensionDeMime(mime: string) {
   return mime.includes("mp4") ? "mp4" : "webm";
 }
 
+export function leerDuracionVideo(file: File) {
+  return new Promise<number>((resolve, reject) => {
+    const previewUrl = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    const cleanup = () => {
+      URL.revokeObjectURL(previewUrl);
+      video.removeAttribute("src");
+      video.load();
+    };
+
+    video.onloadedmetadata = () => {
+      const duration = video.duration;
+      cleanup();
+      if (Number.isFinite(duration) && duration > 0) {
+        resolve(duration);
+      } else {
+        reject(new Error("No se pudo leer la duración del video."));
+      }
+    };
+    video.onerror = () => {
+      cleanup();
+      reject(new Error("No se pudo leer la duración del video."));
+    };
+    video.src = previewUrl;
+  });
+}
+
 export function mensajeDeErrorMedia(error: unknown) {
   if (error instanceof DOMException) {
     if (error.name === "NotAllowedError" || error.name === "SecurityError") {

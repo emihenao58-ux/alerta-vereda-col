@@ -40,6 +40,7 @@ export function ReportarEvidenceStep({
     sinEvidencia?.motivo ?? "camara_no_disponible",
   );
   const [detalle, setDetalle] = useState(sinEvidencia?.detalle ?? "");
+  const galeriaLlena = fotoCount >= 3 && videoCount >= 1;
 
   const guardarExcepcion = () => {
     onSinEvidencia({ motivo, detalle: detalle.trim() });
@@ -67,14 +68,14 @@ export function ReportarEvidenceStep({
         <Button type="button" onClick={() => onOpenCapture("foto")} disabled={fotoCount >= 3}>
           <Camera size={17} /> Tomar foto
         </Button>
-        <label className={`reportar-file-button ${fotoCount >= 3 ? "is-disabled" : ""}`}>
+        <label className={`reportar-file-button ${galeriaLlena ? "is-disabled" : ""}`}>
           <FolderOpen size={17} /> Elegir de galería
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             multiple
             onChange={elegirArchivos}
-            disabled={fotoCount >= 3}
+            disabled={galeriaLlena}
           />
         </label>
         <Button

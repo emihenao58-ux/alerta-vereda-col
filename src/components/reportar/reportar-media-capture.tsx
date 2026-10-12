@@ -35,8 +35,8 @@ export function ReportarMediaCapture({
   open: boolean;
   mode: "foto" | "video";
   onOpenChange: (open: boolean) => void;
-  onPhoto: (file: File) => void;
-  onVideo: (file: File, durationSeconds: number) => void;
+  onPhoto: (file: File, capturedAt: string) => void;
+  onVideo: (file: File, durationSeconds: number, capturedAt: string) => void;
   onPermissionState: (state: "concedido" | "denegado" | "no-disponible") => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -174,7 +174,8 @@ export function ReportarMediaCapture({
   const takePhoto = async () => {
     if (!videoRef.current || !ready) return;
     try {
-      onPhoto(await capturarFotoDesdeVideo(videoRef.current));
+      const capturedAt = new Date().toISOString();
+      onPhoto(await capturarFotoDesdeVideo(videoRef.current), capturedAt);
       closeMedia();
     } catch (cause) {
       setError(mensajeDeErrorMedia(cause));
@@ -286,7 +287,8 @@ export function ReportarMediaCapture({
             lastModified: Date.now(),
           },
         );
-        onVideo(file, duration);
+        const capturedAt = new Date(startedAtRef.current ?? Date.now()).toISOString();
+        onVideo(file, duration, capturedAt);
         closeMedia();
       };
       recorder.start();
