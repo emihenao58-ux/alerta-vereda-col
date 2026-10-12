@@ -4504,10 +4504,19 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 .reportar-progress {
   display: grid;
+  gap: 0.55rem;
   padding: 0.55rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--card) 88%, transparent);
+}
+
+.reportar-progress-topline {
+  color: var(--tinta-suave);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .reportar-evidence-limit,
@@ -4532,6 +4541,69 @@ html.theme-transition-no-blur .mi-vereda-board {
   border-radius: inherit;
   background: color-mix(in srgb, var(--bosque) 82%, #b7f3d5);
   transition: width 180ms ease;
+}
+
+.reportar-progress-labels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reportar-progress-labels li {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 0.18rem;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.reportar-progress-labels li span {
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tinta-suave);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.reportar-progress-labels li.is-complete {
+  color: var(--bosque);
+}
+
+.reportar-progress-labels li.is-complete span {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 24%, var(--card));
+  color: var(--bosque-oscuro);
+}
+
+.reportar-progress-labels li.is-current {
+  color: var(--tinta);
+  font-weight: 800;
+}
+
+.reportar-progress-labels li.is-current span {
+  border-color: var(--bosque);
+  background: var(--bosque);
+  color: var(--primary-foreground);
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--bosque) 22%, transparent);
+}
+
+.reportar-progress-labels li.is-pending span {
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+}
+
+.reportar-progress-labels small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 0.65rem;
 }
 
 .reportar-step {
@@ -5419,6 +5491,20 @@ html.theme-transition-no-blur .mi-vereda-board {
 
   .reportar-progress {
     padding-inline: 0.75rem;
+  }
+
+  .reportar-progress-labels {
+    gap: 0.1rem;
+  }
+
+  .reportar-progress-labels li span {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.64rem;
+  }
+
+  .reportar-progress-labels small {
+    font-size: clamp(0.56rem, 2.3vw, 0.62rem);
   }
 
   .reportar-review-confirm-button {
