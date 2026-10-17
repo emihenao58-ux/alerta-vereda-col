@@ -16,7 +16,7 @@ import {
   etiquetaMotivoSinEvidencia,
   subcategoriaPorId,
 } from "@/lib/reportar/catalogo";
-import { contextoVereda, territorioPorId } from "@/lib/reportar/mock-data";
+import { contextoVereda, etiquetaTipoLugar, territorioPorId } from "@/lib/reportar/mock-data";
 import { etiquetaFechaEvidencia } from "@/lib/reportar/media";
 import type { ReporteDraft, ReporteStep } from "@/lib/reportar/types";
 import { colorTipoReporte } from "@/lib/reportar/visuals";
@@ -60,8 +60,8 @@ export function ReportarReviewStep({
   const contexto = territorio && !territorioPadre ? contextoVereda(territorio) : null;
   const referenciaTerritorial = territorioPadre?.nombre ?? contexto;
   const comunidadResumen = territorio
-    ? `Comunidad · ${territorio.nombre}`
-    : "Sin comunidad seleccionada";
+    ? `${etiquetaTipoLugar(draft.tipoLugar)} · ${territorio.nombre}`
+    : "Sin lugar seleccionado";
   const ubicacionResumen = draft.ubicacion
     ? "Ubicación GPS compartida"
     : draft.ubicacionEstado === "no-confirmada"
@@ -176,7 +176,13 @@ export function ReportarReviewStep({
               <MapIcon size={26} aria-hidden="true" />
               <div>
                 <strong>Vista previa del mapa</strong>
-                <span>Aquí se mostrará la ubicación del reporte.</span>
+                <span>
+                  {draft.ubicacion
+                    ? "Ubicación GPS registrada para el mapa comunitario (en preparación)."
+                    : referencia
+                      ? "Referencia escrita registrada para el mapa comunitario (en preparación)."
+                      : "El mapa comunitario de Ebéjico está en preparación."}
+                </span>
               </div>
             </div>
           </div>
@@ -316,7 +322,7 @@ export function ReportarReviewStep({
         </Button>
         <Button type="button" className="reportar-review-confirm-button" onClick={onConfirm}>
           <Send size={16} aria-hidden="true" />
-          Confirmar y enviar reporte
+          Confirmar reporte
         </Button>
       </ReportarStepActions>
     </ReportarStepShell>

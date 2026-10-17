@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -57,7 +58,7 @@ export function ReportarPhotoCropper({
 }: {
   evidencia: ReporteEvidencia | null;
   onClose: () => void;
-  onSave: (archivo: File) => void;
+  onSave: (archivo: File) => void | Promise<void>;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const interaccionRef = useRef<Interaccion | null>(null);
@@ -100,43 +101,107 @@ export function ReportarPhotoCropper({
     const contexto = canvas.getContext("2d");
     if (!contexto) return;
 
-    canvas.width = imagen.naturalWidth;
-    canvas.height = imagen.naturalHeight;
-    contexto.clearRect(0, 0, canvas.width, canvas.height);
-    contexto.drawImage(imagen, 0, 0);
+    const dibujar = () => {
+      canvas.width = imagen.naturalWidth;
+      canvas.height = imagen.naturalHeight;
+      contexto.clearRect(0, 0, canvas.width, canvas.height);
+      contexto.drawImage(imagen, 0, 0);
 
-    contexto.fillStyle = "rgba(0, 0, 0, 0.56)";
-    contexto.fillRect(0, 0, canvas.width, recorte.y);
-    contexto.fillRect(0, recorte.y, recorte.x, recorte.height);
-    contexto.fillRect(
-      recorte.x + recorte.width,
-      recorte.y,
-      canvas.width - recorte.x - recorte.width,
-      recorte.height,
-    );
-    contexto.fillRect(
-      0,
-      recorte.y + recorte.height,
-      canvas.width,
-      canvas.height - recorte.y - recorte.height,
-    );
+      const estilosTema = getComputedStyle(document.documentElement);
+      const colorControl = estilosTema.getPropertyValue("--bosque-oscuro").trim() || "#1f4433";
+      const colorHalo = estilosTema.getPropertyValue("--card").trim() || "#f7f3e8";
 
-    contexto.strokeStyle = "#ffffff";
-    contexto.lineWidth = Math.max(4, Math.round(Math.min(canvas.width, canvas.height) * 0.004));
-    contexto.strokeRect(recorte.x, recorte.y, recorte.width, recorte.height);
+      contexto.fillStyle = "rgba(0, 0, 0, 0.56)";
+      contexto.fillRect(0, 0, canvas.width, recorte.y);
+      contexto.fillRect(0, recorte.y, recorte.x, recorte.height);
+      contexto.fillRect(
+        recorte.x + recorte.width,
+        recorte.y,
+        canvas.width - recorte.x - recorte.width,
+        recorte.height,
+      );
+      contexto.fillRect(
+        0,
+        recorte.y + recorte.height,
+        canvas.width,
+        canvas.height - recorte.y - recorte.height,
+      );
 
-    const handleSize = Math.max(28, Math.round(Math.min(canvas.width, canvas.height) * 0.025));
-    const half = handleSize / 2;
-    contexto.fillStyle = "#ffffff";
-    const handles: readonly [number, number][] = [
-      [recorte.x, recorte.y],
-      [recorte.x + recorte.width, recorte.y],
-      [recorte.x, recorte.y + recorte.height],
-      [recorte.x + recorte.width, recorte.y + recorte.height],
-    ];
-    for (const [x, y] of handles) {
-      contexto.fillRect(x - half, y - half, handleSize, handleSize);
-    }
+      const lineWidth = Math.max(4, Math.round(Math.min(canvas.width, canvas.height) * 0.004));
+      contexto.strokeStyle = colorHalo;
+      contexto.lineWidth = lineWidth + Math.max(6, Math.round(lineWidth * 1.5));
+      contexto.strokeRect(recorte.x, recorte.y, recorte.width, recorte.height);
+      contexto.strokeStyle = colorControl;
+      contexto.lineWidth = lineWidth;
+      contexto.strokeRect(recorte.x, recorte.y, recorte.width, recorte.height);
+
+      const handleSize = Math.max(44, Math.round(Math.min(canvas.width, canvas.height) * 0.035));
+      const half = handleSize / 2;
+      const pintarControl = (x: number, y: number, width: number, height: number) => {
+        const halo = Math.max(4, Math.round(Math.min(width, height) * 0.22));
+        contexto.fillStyle = colorHalo;
+        contexto.fillRect(x - halo / 2, y - halo / 2, width + halo, height + halo);
+        contexto.fillStyle = colorControl;
+        contexto.fillRect(x, y, width, height);
+      };
+      const handles: readonly [number, number][] = [
+        [recorte.x, recorte.y],
+        [recorte.x + recorte.width, recorte.y],
+        [recorte.x, recorte.y + recorte.height],
+        [recorte.x + recorte.width, recorte.y + recorte.height],
+      ];
+      for (const [x, y] of handles) {
+        const visibleX = limitar(x, half, canvas.width - half);
+        const visibleY = limitar(y, half, canvas.height - half);
+        pintarControl(visibleX - half, visibleY - half, handleSize, handleSize);
+      }
+
+      const edgeHandleWidth = Math.max(
+        52,
+        Math.round(Math.min(canvas.width, canvas.height) * 0.04),
+      );
+      const edgeHandleHeight = Math.max(10, Math.round(edgeHandleWidth * 0.22));
+      const centerX = recorte.x + recorte.width / 2;
+      const centerY = recorte.y + recorte.height / 2;
+      const topHandleY = limitar(
+        recorte.y - edgeHandleHeight / 2,
+        0,
+        canvas.height - edgeHandleHeight,
+      );
+      const bottomHandleY = limitar(
+        recorte.y + recorte.height - edgeHandleHeight / 2,
+        0,
+        canvas.height - edgeHandleHeight,
+      );
+      const leftHandleX = limitar(
+        recorte.x - edgeHandleHeight / 2,
+        0,
+        canvas.width - edgeHandleHeight,
+      );
+      const rightHandleX = limitar(
+        recorte.x + recorte.width - edgeHandleHeight / 2,
+        0,
+        canvas.width - edgeHandleHeight,
+      );
+      pintarControl(centerX - edgeHandleWidth / 2, topHandleY, edgeHandleWidth, edgeHandleHeight);
+      pintarControl(
+        centerX - edgeHandleWidth / 2,
+        bottomHandleY,
+        edgeHandleWidth,
+        edgeHandleHeight,
+      );
+      pintarControl(leftHandleX, centerY - edgeHandleWidth / 2, edgeHandleHeight, edgeHandleWidth);
+      pintarControl(rightHandleX, centerY - edgeHandleWidth / 2, edgeHandleHeight, edgeHandleWidth);
+    };
+
+    dibujar();
+    const observadorTema = new MutationObserver(dibujar);
+    observadorTema.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observadorTema.disconnect();
   }, [imagen, recorte]);
 
   const puntoDesdeEvento = (event: React.PointerEvent<HTMLCanvasElement>): Punto | null => {
@@ -153,7 +218,7 @@ export function ReportarPhotoCropper({
     if (!recorte || !canvasRef.current) return;
     const point = puntoDesdeEvento(event);
     if (!point) return;
-    const radio = Math.max(36, Math.min(canvasRef.current.width, canvasRef.current.height) * 0.035);
+    const radio = Math.max(56, Math.min(canvasRef.current.width, canvasRef.current.height) * 0.055);
     const control = controlEnPunto(point, recorte, radio);
     if (!control) return;
     interaccionRef.current = { control, inicio: point, recorte };
@@ -208,7 +273,7 @@ export function ReportarPhotoCropper({
     setGuardando(true);
     setError(null);
     try {
-      onSave(await recortarFoto(evidencia.archivo, recorte));
+      await onSave(await recortarFoto(evidencia.archivo, recorte));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "No se pudo recortar la fotografía.");
     } finally {
@@ -219,12 +284,9 @@ export function ReportarPhotoCropper({
   return (
     <Dialog open={Boolean(evidencia)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="reportar-crop-dialog">
-        <DialogHeader>
-          <DialogTitle>Editar fotografía</DialogTitle>
-          <DialogDescription>
-            Arrastra las esquinas o los bordes para elegir libremente qué conservar. También puedes
-            mover el marco completo.
-          </DialogDescription>
+        <DialogHeader className="reportar-crop-header">
+          <DialogTitle>Recortar fotografía</DialogTitle>
+          <DialogDescription>Ajusta el marco y confirma.</DialogDescription>
         </DialogHeader>
         {imagen && recorte ? (
           <div className="reportar-free-crop-stage">
@@ -246,12 +308,25 @@ export function ReportarPhotoCropper({
             {error}
           </p>
         )}
-        <div className="reportar-step-actions">
-          <Button type="button" variant="outline" onClick={onClose} disabled={guardando}>
+        <div className="reportar-crop-actions">
+          <Button
+            type="button"
+            variant="outline"
+            className="reportar-crop-action"
+            onClick={onClose}
+            disabled={guardando}
+          >
+            <X size={20} aria-hidden="true" />
             Cancelar
           </Button>
-          <Button type="button" onClick={() => void guardar()} disabled={guardando || !recorte}>
-            {guardando ? "Guardando…" : "Guardar recorte"}
+          <Button
+            type="button"
+            className="reportar-crop-action"
+            onClick={() => void guardar()}
+            disabled={guardando || !recorte}
+          >
+            <Check size={20} aria-hidden="true" />
+            {guardando ? "Guardando…" : "Aceptar"}
           </Button>
         </div>
       </DialogContent>

@@ -8,8 +8,7 @@ export const Route = createFileRoute("/reportar")({
       { title: "Reportar una novedad · AlertaVereda Ebéjico" },
       {
         name: "description",
-        content:
-          "Envía un reporte de tu comunidad. Un administrador lo verifica antes de publicarlo.",
+        content: "Prepara un reporte sobre una novedad en tu comunidad de Ebéjico.",
       },
       {
         property: "og:title",
@@ -17,8 +16,7 @@ export const Route = createFileRoute("/reportar")({
       },
       {
         property: "og:description",
-        content:
-          "Todo reporte queda pendiente de revisión hasta que un administrador lo verifique.",
+        content: "Prepara un reporte sobre una novedad en tu comunidad de Ebéjico.",
       },
     ],
   }),

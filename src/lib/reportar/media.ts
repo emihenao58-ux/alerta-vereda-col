@@ -157,10 +157,19 @@ export function extensionDeMime(mime: string) {
   return mime.includes("mp4") ? "mp4" : "webm";
 }
 
-export function etiquetaFechaEvidencia(fuente: "camara" | "galeria", capturadaEn: string) {
+/**
+ * Muestra la información temporal veraz de cada evidencia:
+ * - Si fue tomada con la cámara: muestra la fecha y hora exacta de captura.
+ * - Si proviene de galería: muestra "Desde galería", sin fingir fecha de captura.
+ */
+export function etiquetaFechaEvidencia(fuente: "camara" | "galeria", capturadaEn: string | null) {
+  if (fuente === "galeria" || !capturadaEn) {
+    return "Desde galería";
+  }
+
   const fecha = new Date(capturadaEn);
   if (Number.isNaN(fecha.getTime())) {
-    return fuente === "camara" ? "Capturada: fecha no disponible" : "Añadida desde galería";
+    return "Capturada en la app";
   }
 
   const fechaTexto = new Intl.DateTimeFormat("es-CO", {
@@ -173,7 +182,7 @@ export function etiquetaFechaEvidencia(fuente: "camara" | "galeria", capturadaEn
     minute: "2-digit",
   }).format(fecha);
 
-  return `${fuente === "camara" ? "Capturada" : "Añadida desde galería"}: ${fechaTexto}, ${horaTexto}`;
+  return `Capturada: ${fechaTexto}, ${horaTexto}`;
 }
 
 export function leerDuracionVideo(file: File) {
