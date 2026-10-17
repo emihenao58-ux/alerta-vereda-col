@@ -8,6 +8,7 @@ import {
   MAX_VIDEO_BYTES,
   MAX_VIDEO_DURATION_SECONDS,
 } from "@/lib/reportar/media";
+import { procesarFotografiaEvidencia } from "@/lib/reportar/photo-processor";
 import { ReportarProgress } from "@/components/reportar/reportar-progress";
 import { ReportarCategoryStep } from "@/components/reportar/reportar-category-step";
 import { ReportarDetailsStep } from "@/components/reportar/reportar-details-step";
@@ -18,13 +19,21 @@ import { ReportarConfirmation } from "@/components/reportar/reportar-confirmatio
 import { ReportarMediaCapture } from "@/components/reportar/reportar-media-capture";
 import { ReportarPhotoCropper } from "@/components/reportar/reportar-photo-cropper";
 
-function evidenciaDesdeArchivo(
-  file: File,
-  fuente: "camara" | "galeria",
-  tipo: "foto" | "video",
-  duracionSegundos?: number,
-  capturadaEn = new Date().toISOString(),
-): ReporteEvidencia {
+function crearEvidencia({
+  file,
+  fuente,
+  tipo,
+  duracionSegundos,
+  capturadaEn,
+  archivoOriginal,
+}: {
+  file: File;
+  fuente: "camara" | "galeria";
+  tipo: "foto" | "video";
+  duracionSegundos?: number;
+  capturadaEn: string | null;
+  archivoOriginal?: File;
+}): ReporteEvidencia {
   return {
     id: `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     tipo,
@@ -32,6 +41,8 @@ function evidenciaDesdeArchivo(
     previewUrl: URL.createObjectURL(file),
     fuente,
     capturadaEn,
+    incorporadaEn: new Date().toISOString(),
+    archivoOriginal: archivoOriginal ?? file,
     ...(duracionSegundos === undefined ? {} : { duracionSegundos }),
   };
 }
@@ -50,8 +61,19 @@ export function ReportarFlow() {
   );
 
   const onPhoto = useCallback(
-    (file: File, capturedAt: string) => {
-      agregarEvidencias([evidenciaDesdeArchivo(file, "camara", "foto", undefined, capturedAt)]);
+    async (file: File, capturedAt: string) => {
+      // Optimizamos la fotografía capturada para que no exceda 1600px ni ~600KB,
+      // preservando el archivo original de la captura en archivoOriginal.
+      const procesada = await procesarFotografiaEvidencia(file);
+      agregarEvidencias([
+        crearEvidencia({
+          file: procesada,
+          fuente: "camara",
+          tipo: "foto",
+          capturadaEn: capturedAt,
+          archivoOriginal: file,
+        }),
+      ]);
       setCaptureMode(null);
     },
     [agregarEvidencias],
@@ -60,7 +82,13 @@ export function ReportarFlow() {
   const onVideo = useCallback(
     (file: File, durationSeconds: number, capturedAt: string) => {
       agregarEvidencias([
-        evidenciaDesdeArchivo(file, "camara", "video", durationSeconds, capturedAt),
+        crearEvidencia({
+          file,
+          fuente: "camara",
+          tipo: "video",
+          duracionSegundos: durationSeconds,
+          capturadaEn: capturedAt,
+        }),
       ]);
       setCaptureMode(null);
     },
@@ -74,14 +102,30 @@ export function ReportarFlow() {
 
       for (const file of files) {
         if (file.type.startsWith("image/")) {
-          evidencias.push(evidenciaDesdeArchivo(file, "galeria", "foto"));
+          try {
+            const procesada = await procesarFotografiaEvidencia(file);
+            evidencias.push(
+              crearEvidencia({
+                file: procesada,
+                fuente: "galeria",
+                tipo: "foto",
+                capturadaEn: null, // De galería: no se inventa fecha de captura
+                archivoOriginal: file,
+              }),
+            );
+          } catch {
+            errores.push("No se pudo procesar una de las fotografías.");
+          }
           continue;
         }
+
         if (!file.type.startsWith("video/")) continue;
+
         if (file.size > MAX_VIDEO_BYTES) {
           errores.push("Un video supera el límite de 15 MB.");
           continue;
         }
+
         try {
           const duration = await leerDuracionVideo(file);
           if (duration > MAX_VIDEO_DURATION_SECONDS) {
@@ -89,7 +133,13 @@ export function ReportarFlow() {
             continue;
           }
           evidencias.push(
-            evidenciaDesdeArchivo(file, "galeria", "video", Math.max(1, Math.ceil(duration))),
+            crearEvidencia({
+              file,
+              fuente: "galeria",
+              tipo: "video",
+              duracionSegundos: Math.max(1, Math.ceil(duration)),
+              capturadaEn: null, // De galería: fecha de captura no verificable
+            }),
           );
         } catch {
           errores.push("No se pudo leer la duración de uno de los videos.");
@@ -120,7 +170,7 @@ export function ReportarFlow() {
       {!isConfirmation && (
         <TituloModulo
           titulo="Reportar"
-          bajada="Cuéntale a la comunidad lo que está pasando. Tu reporte será revisado antes de publicarse."
+          bajada="Prepara el reporte de una novedad en tu comunidad. Toda la información se mantendrá de forma local en tu dispositivo."
         />
       )}
       {!isConfirmation && <ReportarProgress step={step} />}

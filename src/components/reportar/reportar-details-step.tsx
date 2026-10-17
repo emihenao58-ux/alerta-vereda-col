@@ -185,7 +185,13 @@ export function ReportarDetailsStep({
                   aria-checked={seleccionado}
                 >
                   <span className="reportar-location-type-icon has-illustration" aria-hidden="true">
-                    <img src={illustration} alt="" className="reportar-location-type-image" />
+                    <img
+                      src={illustration}
+                      alt=""
+                      className="reportar-location-type-image"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </span>
                   <span className="reportar-location-type-copy">
                     <strong>{label}</strong>
@@ -349,11 +355,6 @@ export function ReportarDetailsStep({
             </div>
           </div>
         )}
-
-        <small className="reportar-help">
-          Catálogo local del frontend para PR #14; la clasificación definitiva de backend se
-          revisará en PR #15.
-        </small>
       </div>
 
       <div className="reportar-form-grid">

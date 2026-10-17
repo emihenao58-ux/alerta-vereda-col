@@ -30,9 +30,15 @@ export type ReporteEvidencia = {
   archivo: File;
   previewUrl: string;
   fuente: EvidenciaFuente;
-  capturadaEn: string;
+  // Solo se define cuando se capturó directamente en la cámara o app.
+  // En galería permanece null para no inventar fecha ni usar lastModified erróneo.
+  capturadaEn: string | null;
+  // Fecha exacta en que se incorporó al borrador local.
+  incorporadaEn: string;
   duracionSegundos?: number;
   recortada?: boolean;
+  // Archivo original preservado si se genera una versión procesada o recortada
+  archivoOriginal?: File;
 };
 
 export type ReporteSubcategoriaSeleccion = {
