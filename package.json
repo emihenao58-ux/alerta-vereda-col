@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test:photo-processor": "node --experimental-strip-types --test scripts/test-photo-processor.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

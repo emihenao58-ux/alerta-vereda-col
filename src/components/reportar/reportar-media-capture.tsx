@@ -35,7 +35,7 @@ export function ReportarMediaCapture({
   open: boolean;
   mode: "foto" | "video";
   onOpenChange: (open: boolean) => void;
-  onPhoto: (file: File, capturedAt: string) => void;
+  onPhoto: (file: File, capturedAt: string) => void | Promise<void>;
   onVideo: (file: File, durationSeconds: number, capturedAt: string) => void;
   onPermissionState: (state: "concedido" | "denegado" | "no-disponible") => void;
 }) {
@@ -59,6 +59,8 @@ export function ReportarMediaCapture({
   const [recordingStarting, setRecordingStarting] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [cameraRetry, setCameraRetry] = useState(0);
+  const [canRetryCamera, setCanRetryCamera] = useState(false);
 
   const setVideoNode = useCallback((node: HTMLVideoElement | null) => {
     videoRef.current = node;
@@ -101,6 +103,7 @@ export function ReportarMediaCapture({
     setRecording(false);
     setRecordingStarting(false);
     setSeconds(0);
+    setCanRetryCamera(false);
     setAudioAvailable(false);
     setTorchSupported(false);
     setTorchEnabled(false);
@@ -147,6 +150,7 @@ export function ReportarMediaCapture({
         abortController.abort();
         releaseStream();
         setReady(false);
+        setCanRetryCamera(true);
         setError(mensajeDeErrorMedia(cause));
       });
 
@@ -160,7 +164,7 @@ export function ReportarMediaCapture({
       stopTimer();
       releaseStream();
     };
-  }, [facingMode, mode, onPermissionState, open, videoElement]);
+  }, [cameraRetry, facingMode, mode, onPermissionState, open, videoElement]);
 
   useEffect(() => {
     if (open) return;
@@ -169,17 +173,38 @@ export function ReportarMediaCapture({
     setTorchSupported(false);
     setTorchEnabled(false);
     setAudioAvailable(false);
+    setCameraRetry(0);
+    setCanRetryCamera(false);
   }, [open]);
 
   const takePhoto = async () => {
     if (!videoRef.current || !ready) return;
     try {
       const capturedAt = new Date().toISOString();
-      onPhoto(await capturarFotoDesdeVideo(videoRef.current), capturedAt);
+      const file = await capturarFotoDesdeVideo(videoRef.current);
+      await onPhoto(file, capturedAt);
       closeMedia();
     } catch (cause) {
+      releaseStream();
+      setReady(false);
+      setCanRetryCamera(true);
       setError(mensajeDeErrorMedia(cause));
     }
+  };
+
+  const retryCamera = () => {
+    if (recording || recordingStarting) return;
+    discardRecordingRef.current = true;
+    recordingStartAbortRef.current?.abort();
+    recordingStartAbortRef.current = null;
+    recorderRef.current = null;
+    chunksRef.current = [];
+    stopTimer();
+    releaseStream();
+    setReady(false);
+    setError(null);
+    setCanRetryCamera(false);
+    setCameraRetry((attempt) => attempt + 1);
   };
 
   const flipCamera = () => {
@@ -256,7 +281,13 @@ export function ReportarMediaCapture({
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
       recorder.onerror = () => {
+        discardRecordingRef.current = true;
+        chunksRef.current = [];
+        recorderRef.current = null;
+        releaseStream();
+        setReady(false);
         setError("No se pudo grabar el video. Inténtalo de nuevo.");
+        setCanRetryCamera(true);
         setRecording(false);
         stopTimer();
       };
@@ -275,6 +306,9 @@ export function ReportarMediaCapture({
           recorderRef.current = null;
           chunksRef.current = [];
           stopTimer();
+          releaseStream();
+          setReady(false);
+          setCanRetryCamera(true);
           setRecording(false);
           setError("El video supera el límite de 15 MB. Inténtalo de nuevo.");
           return;
@@ -301,6 +335,7 @@ export function ReportarMediaCapture({
       if (session === sessionRef.current && !abortController.signal.aborted) {
         releaseStream();
         setReady(false);
+        setCanRetryCamera(true);
         setError(mensajeDeErrorMedia(cause));
       }
     } finally {
@@ -377,6 +412,11 @@ export function ReportarMediaCapture({
         )}
 
         <div className="reportar-media-actions">
+          {canRetryCamera && !recording && !recordingStarting && (
+            <Button type="button" variant="secondary" onClick={retryCamera}>
+              <Camera size={20} /> Reintentar cámara
+            </Button>
+          )}
           {mode === "foto" ? (
             <Button
               type="button"

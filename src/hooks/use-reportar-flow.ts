@@ -1,6 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { evidenciaObligatoriaPara, subcategoriaPorId } from "@/lib/reportar/catalogo";
+import {
+  actualizarMetadatosEvidencia,
+  type ResultadoProcesamientoFotografia,
+} from "@/lib/reportar/photo-processor";
 import {
   createEmptyDraft,
   createInitialUiState,
@@ -28,7 +31,28 @@ function contar(draft: ReporteDraft, tipo: ReporteEvidencia["tipo"]) {
 export function useReportarFlow() {
   const [draft, setDraft] = useState<ReporteDraft>(createEmptyDraft);
   const [ui, setUi] = useState<ReportarUiState>(createInitialUiState);
-  const evidenciasRef = useRef<ReporteEvidencia[]>([]);
+  const mountedRef = useRef(false);
+  const previewUrlsRef = useRef<Set<string>>(new Set());
+
+  const revocarPreviewUrl = useCallback((previewUrl: string) => {
+    if (previewUrlsRef.current.delete(previewUrl)) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  }, []);
+
+  const revocarTodasLasPreview = useCallback(() => {
+    previewUrlsRef.current.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
+    previewUrlsRef.current.clear();
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      revocarTodasLasPreview();
+    };
+  }, [revocarTodasLasPreview]);
 
   const updateDraft = useCallback((patch: Partial<ReporteDraft>) => {
     setDraft((actual) => ({ ...actual, ...patch }));
@@ -63,70 +87,96 @@ export function useReportarFlow() {
     setUi((actual) => ({ ...actual, error: null }));
   }, []);
 
-  const agregarEvidencias = useCallback((nuevas: readonly ReporteEvidencia[]) => {
-    let agregadas = 0;
-    setDraft((actual) => {
-      const fotosDisponibles = Math.max(0, 3 - contar(actual, "foto"));
-      const videoDisponible = contar(actual, "video") === 0;
-      const aceptadas: ReporteEvidencia[] = [];
-
-      for (const evidencia of nuevas) {
-        if (
-          evidencia.tipo === "foto" &&
-          aceptadas.filter((item) => item.tipo === "foto").length < fotosDisponibles
-        ) {
-          aceptadas.push(evidencia);
-        }
-        if (
-          evidencia.tipo === "video" &&
-          videoDisponible &&
-          !aceptadas.some((item) => item.tipo === "video")
-        ) {
-          aceptadas.push(evidencia);
-        }
+  const agregarEvidencias = useCallback(
+    (nuevas: readonly ReporteEvidencia[]) => {
+      if (!mountedRef.current) {
+        nuevas.forEach((evidencia) => URL.revokeObjectURL(evidencia.previewUrl));
+        return 0;
       }
 
-      agregadas = aceptadas.length;
-      nuevas
-        .filter((evidencia) => !aceptadas.includes(evidencia))
-        .forEach((evidencia) => URL.revokeObjectURL(evidencia.previewUrl));
-      return { ...actual, evidencias: [...actual.evidencias, ...aceptadas], sinEvidencia: null };
-    });
-    setUi((actual) => ({ ...actual, error: null }));
-    return agregadas;
-  }, []);
+      nuevas.forEach((evidencia) => previewUrlsRef.current.add(evidencia.previewUrl));
 
-  const quitarEvidencia = useCallback((id: string) => {
-    setDraft((actual) => {
-      const evidencia = actual.evidencias.find((item) => item.id === id);
-      if (evidencia) URL.revokeObjectURL(evidencia.previewUrl);
-      return { ...actual, evidencias: actual.evidencias.filter((item) => item.id !== id) };
-    });
-    setUi((actual) => ({
-      ...actual,
-      evidenciaEditando: actual.evidenciaEditando === id ? null : actual.evidenciaEditando,
-      error: null,
-    }));
-  }, []);
+      let agregadas = 0;
+      setDraft((actual) => {
+        const fotosDisponibles = Math.max(0, 3 - contar(actual, "foto"));
+        const videoDisponible = contar(actual, "video") === 0;
+        const aceptadas: ReporteEvidencia[] = [];
 
-  const reemplazarEvidencia = useCallback((id: string, archivo: File, recortada = false) => {
-    const previewUrl = URL.createObjectURL(archivo);
-    setDraft((actual) => {
-      const evidencia = actual.evidencias.find((item) => item.id === id);
-      if (!evidencia) {
-        URL.revokeObjectURL(previewUrl);
-        return actual;
-      }
-      URL.revokeObjectURL(evidencia.previewUrl);
-      return {
+        for (const evidencia of nuevas) {
+          if (
+            evidencia.tipo === "foto" &&
+            aceptadas.filter((item) => item.tipo === "foto").length < fotosDisponibles
+          ) {
+            aceptadas.push(evidencia);
+          }
+          if (
+            evidencia.tipo === "video" &&
+            videoDisponible &&
+            !aceptadas.some((item) => item.tipo === "video")
+          ) {
+            aceptadas.push(evidencia);
+          }
+        }
+
+        agregadas = aceptadas.length;
+        nuevas
+          .filter((evidencia) => !aceptadas.includes(evidencia))
+          .forEach((evidencia) => revocarPreviewUrl(evidencia.previewUrl));
+        return { ...actual, evidencias: [...actual.evidencias, ...aceptadas], sinEvidencia: null };
+      });
+      setUi((actual) => ({ ...actual, error: null }));
+      return agregadas;
+    },
+    [revocarPreviewUrl],
+  );
+
+  const quitarEvidencia = useCallback(
+    (id: string) => {
+      if (!mountedRef.current) return;
+
+      setDraft((actual) => {
+        const evidencia = actual.evidencias.find((item) => item.id === id);
+        if (evidencia) revocarPreviewUrl(evidencia.previewUrl);
+        return { ...actual, evidencias: actual.evidencias.filter((item) => item.id !== id) };
+      });
+      setUi((actual) => ({
         ...actual,
-        evidencias: actual.evidencias.map((item) =>
-          item.id === id ? { ...item, archivo, previewUrl, recortada } : item,
-        ),
-      };
-    });
-    setUi((actual) => ({ ...actual, evidenciaEditando: null, error: null }));
-  }, []);
+        evidenciaEditando: actual.evidenciaEditando === id ? null : actual.evidenciaEditando,
+        error: null,
+      }));
+    },
+    [revocarPreviewUrl],
+  );
+
+  const reemplazarEvidencia = useCallback(
+    (
+      id: string,
+      resultado: Pick<ResultadoProcesamientoFotografia, "archivo" | "estado" | "dimensiones">,
+      recortada = false,
+    ) => {
+      if (!mountedRef.current) return;
+
+      const previewUrl = URL.createObjectURL(resultado.archivo);
+      previewUrlsRef.current.add(previewUrl);
+      setDraft((actual) => {
+        const evidencia = actual.evidencias.find((item) => item.id === id);
+        if (!evidencia) {
+          revocarPreviewUrl(previewUrl);
+          return actual;
+        }
+        revocarPreviewUrl(evidencia.previewUrl);
+        const metadatos = actualizarMetadatosEvidencia(evidencia, resultado, recortada);
+        return {
+          ...actual,
+          evidencias: actual.evidencias.map((item) =>
+            item.id === id ? { ...item, ...metadatos, previewUrl } : item,
+          ),
+        };
+      });
+      setUi((actual) => ({ ...actual, evidenciaEditando: null, error: null }));
+    },
+    [revocarPreviewUrl],
+  );
 
   const setSinEvidencia = useCallback((sinEvidencia: SinEvidencia | null) => {
     setDraft((actual) => ({ ...actual, sinEvidencia }));
@@ -202,22 +252,11 @@ export function useReportarFlow() {
   }, [setStep]);
 
   const reiniciar = useCallback(() => {
-    setDraft((actual) => {
-      actual.evidencias.forEach((evidencia) => URL.revokeObjectURL(evidencia.previewUrl));
-      return createEmptyDraft();
-    });
+    if (!mountedRef.current) return;
+    revocarTodasLasPreview();
+    setDraft(createEmptyDraft());
     setUi(createInitialUiState());
-  }, []);
-
-  useEffect(() => {
-    evidenciasRef.current = draft.evidencias;
-  }, [draft.evidencias]);
-
-  useEffect(() => {
-    return () => {
-      evidenciasRef.current.forEach((evidencia) => URL.revokeObjectURL(evidencia.previewUrl));
-    };
-  }, []);
+  }, [revocarTodasLasPreview]);
 
   const fotoCount = useMemo(() => contar(draft, "foto"), [draft]);
   const videoCount = useMemo(() => contar(draft, "video"), [draft]);

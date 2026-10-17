@@ -17,6 +17,7 @@ export function ReportarEvidenceStep({
   onFiles,
   onRemove,
   onEdit,
+  onPreview,
   onSinEvidencia,
   onBack,
   onNext,
@@ -31,6 +32,7 @@ export function ReportarEvidenceStep({
   onFiles: (files: readonly File[]) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string) => void;
+  onPreview: (id: string) => void;
   onSinEvidencia: (value: SinEvidencia | null) => void;
   onBack: () => void;
   onNext: () => void;
@@ -88,7 +90,12 @@ export function ReportarEvidenceStep({
         </Button>
       </div>
 
-      <ReportarEvidenceList evidencias={evidencias} onRemove={onRemove} onEdit={onEdit} />
+      <ReportarEvidenceList
+        evidencias={evidencias}
+        onRemove={onRemove}
+        onEdit={onEdit}
+        onPreview={onPreview}
+      />
 
       {evidenciaObligatoria && evidencias.length === 0 && !sinEvidencia && (
         <div className="reportar-evidence-required">

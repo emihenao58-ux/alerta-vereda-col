@@ -1,14 +1,18 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TituloModulo } from "@/components/carta";
 import { confirmarReporteLocal, type MockSubmissionResult } from "@/lib/reportar/mock-submit";
 import { useReportarFlow } from "@/hooks/use-reportar-flow";
-import type { ReporteEvidencia } from "@/lib/reportar/types";
+import type {
+  DimensionesEvidencia,
+  EvidenciaProcesamiento,
+  ReporteEvidencia,
+} from "@/lib/reportar/types";
 import {
   leerDuracionVideo,
   MAX_VIDEO_BYTES,
   MAX_VIDEO_DURATION_SECONDS,
 } from "@/lib/reportar/media";
-import { procesarFotografiaEvidencia } from "@/lib/reportar/photo-processor";
+import { procesarFotografiaEvidenciaDetallada } from "@/lib/reportar/photo-processor";
 import { ReportarProgress } from "@/components/reportar/reportar-progress";
 import { ReportarCategoryStep } from "@/components/reportar/reportar-category-step";
 import { ReportarDetailsStep } from "@/components/reportar/reportar-details-step";
@@ -18,6 +22,7 @@ import { ReportarReviewStep } from "@/components/reportar/reportar-review-step";
 import { ReportarConfirmation } from "@/components/reportar/reportar-confirmation";
 import { ReportarMediaCapture } from "@/components/reportar/reportar-media-capture";
 import { ReportarPhotoCropper } from "@/components/reportar/reportar-photo-cropper";
+import { ReportarEvidencePreview } from "@/components/reportar/reportar-evidence-preview";
 
 function crearEvidencia({
   file,
@@ -25,6 +30,8 @@ function crearEvidencia({
   tipo,
   duracionSegundos,
   capturadaEn,
+  procesamiento,
+  dimensiones,
   archivoOriginal,
 }: {
   file: File;
@@ -32,6 +39,8 @@ function crearEvidencia({
   tipo: "foto" | "video";
   duracionSegundos?: number;
   capturadaEn: string | null;
+  procesamiento: EvidenciaProcesamiento;
+  dimensiones: DimensionesEvidencia | null;
   archivoOriginal?: File;
 }): ReporteEvidencia {
   return {
@@ -40,6 +49,8 @@ function crearEvidencia({
     archivo: file,
     previewUrl: URL.createObjectURL(file),
     fuente,
+    procesamiento,
+    dimensiones,
     capturadaEn,
     incorporadaEn: new Date().toISOString(),
     archivoOriginal: archivoOriginal ?? file,
@@ -47,11 +58,26 @@ function crearEvidencia({
   };
 }
 
+function revocarEvidenciasPendientes(evidencias: readonly ReporteEvidencia[]) {
+  evidencias.forEach((evidencia) => URL.revokeObjectURL(evidencia.previewUrl));
+}
+
 export function ReportarFlow() {
   const flow = useReportarFlow();
-  const { setUi, agregarEvidencias } = flow;
+  const { setUi, agregarEvidencias, fotoCount, videoCount } = flow;
   const [captureMode, setCaptureMode] = useState<"foto" | "video" | null>(null);
   const [submission, setSubmission] = useState<MockSubmissionResult | null>(null);
+  const [evidenciaVisualizadaId, setEvidenciaVisualizadaId] = useState<string | null>(null);
+  const mountedRef = useRef(false);
+  const operationRef = useRef(0);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      operationRef.current += 1;
+    };
+  }, []);
 
   const setCapturePermission = useCallback(
     (permission: "concedido" | "denegado" | "no-disponible") => {
@@ -62,19 +88,27 @@ export function ReportarFlow() {
 
   const onPhoto = useCallback(
     async (file: File, capturedAt: string) => {
-      // Optimizamos la fotografía capturada para que no exceda 1600px ni ~600KB,
-      // preservando el archivo original de la captura en archivoOriginal.
-      const procesada = await procesarFotografiaEvidencia(file);
+      const operation = ++operationRef.current;
+      const resultado = await procesarFotografiaEvidenciaDetallada(file);
+      if (!mountedRef.current || operation !== operationRef.current) return;
+      if (!resultado.puedeVisualizarse) {
+        throw new Error(
+          resultado.mensajeError ??
+            "No se pudo mostrar esta fotografía en este navegador. Elige otra imagen.",
+        );
+      }
+
       agregarEvidencias([
         crearEvidencia({
-          file: procesada,
+          file: resultado.archivo,
           fuente: "camara",
           tipo: "foto",
           capturadaEn: capturedAt,
+          procesamiento: resultado.estado,
+          dimensiones: resultado.dimensiones,
           archivoOriginal: file,
         }),
       ]);
-      setCaptureMode(null);
     },
     [agregarEvidencias],
   );
@@ -88,32 +122,53 @@ export function ReportarFlow() {
           tipo: "video",
           duracionSegundos: durationSeconds,
           capturadaEn: capturedAt,
+          procesamiento: "no-aplica",
+          dimensiones: null,
         }),
       ]);
-      setCaptureMode(null);
     },
     [agregarEvidencias],
   );
 
   const onFiles = useCallback(
     async (files: readonly File[]) => {
+      const operation = ++operationRef.current;
       const evidencias: ReporteEvidencia[] = [];
       const errores: string[] = [];
+      let fotosDisponibles = Math.max(0, 3 - fotoCount);
+      let videoDisponible = videoCount < 1;
 
       for (const file of files) {
         if (file.type.startsWith("image/")) {
+          if (fotosDisponibles <= 0) {
+            errores.push("Solo puedes agregar hasta 3 fotos por reporte.");
+            continue;
+          }
+
+          fotosDisponibles -= 1;
           try {
-            const procesada = await procesarFotografiaEvidencia(file);
+            const resultado = await procesarFotografiaEvidenciaDetallada(file);
+            if (!resultado.puedeVisualizarse) {
+              fotosDisponibles += 1;
+              errores.push(
+                resultado.mensajeError ??
+                  "No se pudo mostrar esta fotografía en este navegador. Elige otra imagen.",
+              );
+              continue;
+            }
             evidencias.push(
               crearEvidencia({
-                file: procesada,
+                file: resultado.archivo,
                 fuente: "galeria",
                 tipo: "foto",
                 capturadaEn: null, // De galería: no se inventa fecha de captura
+                procesamiento: resultado.estado,
+                dimensiones: resultado.dimensiones,
                 archivoOriginal: file,
               }),
             );
           } catch {
+            fotosDisponibles += 1;
             errores.push("No se pudo procesar una de las fotografías.");
           }
           continue;
@@ -121,7 +176,15 @@ export function ReportarFlow() {
 
         if (!file.type.startsWith("video/")) continue;
 
+        if (!videoDisponible) {
+          errores.push("Solo puedes agregar 1 video por reporte.");
+          continue;
+        }
+
+        videoDisponible = false;
+
         if (file.size > MAX_VIDEO_BYTES) {
+          videoDisponible = true;
           errores.push("Un video supera el límite de 15 MB.");
           continue;
         }
@@ -129,6 +192,7 @@ export function ReportarFlow() {
         try {
           const duration = await leerDuracionVideo(file);
           if (duration > MAX_VIDEO_DURATION_SECONDS) {
+            videoDisponible = true;
             errores.push("Un video supera el límite de 15 segundos.");
             continue;
           }
@@ -139,11 +203,19 @@ export function ReportarFlow() {
               tipo: "video",
               duracionSegundos: Math.max(1, Math.ceil(duration)),
               capturadaEn: null, // De galería: fecha de captura no verificable
+              procesamiento: "no-aplica",
+              dimensiones: null,
             }),
           );
         } catch {
+          videoDisponible = true;
           errores.push("No se pudo leer la duración de uno de los videos.");
         }
+      }
+
+      if (!mountedRef.current || operation !== operationRef.current) {
+        revocarEvidenciasPendientes(evidencias);
+        return;
       }
 
       if (evidencias.length > 0) agregarEvidencias(evidencias);
@@ -151,7 +223,7 @@ export function ReportarFlow() {
         setUi((actual) => ({ ...actual, error: errores[0] ?? null }));
       }
     },
-    [agregarEvidencias, setUi],
+    [agregarEvidencias, fotoCount, setUi, videoCount],
   );
 
   const prepararReporte = async () => {
@@ -164,6 +236,8 @@ export function ReportarFlow() {
   const isConfirmation = step === "confirmacion";
   const evidenciaEditando =
     flow.draft.evidencias.find((item) => item.id === flow.ui.evidenciaEditando) ?? null;
+  const evidenciaVisualizada =
+    flow.draft.evidencias.find((item) => item.id === evidenciaVisualizadaId) ?? null;
 
   return (
     <div className={`reportar-page${isConfirmation ? " reportar-page-confirmation" : ""}`}>
@@ -225,6 +299,7 @@ export function ReportarFlow() {
           onFiles={onFiles}
           onRemove={flow.quitarEvidencia}
           onEdit={(id) => flow.setUi((actual) => ({ ...actual, evidenciaEditando: id }))}
+          onPreview={setEvidenciaVisualizadaId}
           onSinEvidencia={flow.setSinEvidencia}
           onBack={flow.pasoAnterior}
           onNext={flow.siguientePaso}
@@ -261,10 +336,21 @@ export function ReportarFlow() {
       />
       <ReportarPhotoCropper
         evidencia={evidenciaEditando}
-        onClose={() => flow.setUi((actual) => ({ ...actual, evidenciaEditando: null }))}
-        onSave={(archivo) => {
-          if (evidenciaEditando) flow.reemplazarEvidencia(evidenciaEditando.id, archivo, true);
+        onClose={() => {
+          operationRef.current += 1;
+          flow.setUi((actual) => ({ ...actual, evidenciaEditando: null }));
         }}
+        onSave={async (archivo) => {
+          const operation = ++operationRef.current;
+          if (!evidenciaEditando) return;
+          const resultado = await procesarFotografiaEvidenciaDetallada(archivo);
+          if (!mountedRef.current || operation !== operationRef.current) return;
+          flow.reemplazarEvidencia(evidenciaEditando.id, resultado, true);
+        }}
+      />
+      <ReportarEvidencePreview
+        evidencia={evidenciaVisualizada}
+        onClose={() => setEvidenciaVisualizadaId(null)}
       />
     </div>
   );
