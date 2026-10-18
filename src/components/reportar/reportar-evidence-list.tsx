@@ -1,4 +1,4 @@
-import { Image as ImageIcon, Maximize2, Play, Scissors, Trash2, Video } from "lucide-react";
+import { Image as ImageIcon, Maximize2, Pencil, Play, Trash2, Video } from "lucide-react";
 import type { ReporteEvidencia } from "@/lib/reportar/types";
 import { etiquetaFechaEvidencia } from "@/lib/reportar/media";
 
@@ -62,18 +62,20 @@ export function ReportarEvidenceList({
               {evidencia.tipo === "foto" && (
                 <button
                   type="button"
+                  className="reportar-evidence-action reportar-evidence-action-edit"
                   onClick={() => onEdit(evidencia.id)}
                   aria-label={`Editar evidencia fotográfica ${index + 1}`}
                 >
-                  <Scissors size={15} /> Editar
+                  <Pencil size={15} aria-hidden="true" /> Editar
                 </button>
               )}
               <button
                 type="button"
+                className="reportar-evidence-action reportar-evidence-action-remove"
                 onClick={() => onRemove(evidencia.id)}
                 aria-label={`Eliminar evidencia ${index + 1}`}
               >
-                <Trash2 size={15} /> Eliminar
+                <Trash2 size={15} aria-hidden="true" /> Eliminar
               </button>
             </div>
           </div>

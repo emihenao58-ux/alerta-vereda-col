@@ -309,6 +309,7 @@ export function ReportarFlow() {
         <ReportarReviewStep
           draft={flow.draft}
           onEdit={flow.setStep}
+          onPreview={setEvidenciaVisualizadaId}
           onConfirm={() => void prepararReporte()}
         />
       )}

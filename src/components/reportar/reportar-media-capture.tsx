@@ -57,6 +57,7 @@ export function ReportarMediaCapture({
   const [ready, setReady] = useState(false);
   const [recording, setRecording] = useState(false);
   const [recordingStarting, setRecordingStarting] = useState(false);
+  const [capturingPhoto, setCapturingPhoto] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [cameraRetry, setCameraRetry] = useState(0);
@@ -90,6 +91,7 @@ export function ReportarMediaCapture({
     setReady(false);
     setRecording(false);
     setRecordingStarting(false);
+    setCapturingPhoto(false);
     setSeconds(0);
     onOpenChange(false);
   };
@@ -102,6 +104,7 @@ export function ReportarMediaCapture({
     setReady(false);
     setRecording(false);
     setRecordingStarting(false);
+    setCapturingPhoto(false);
     setSeconds(0);
     setCanRetryCamera(false);
     setAudioAvailable(false);
@@ -178,7 +181,8 @@ export function ReportarMediaCapture({
   }, [open]);
 
   const takePhoto = async () => {
-    if (!videoRef.current || !ready) return;
+    if (!videoRef.current || !ready || capturingPhoto) return;
+    setCapturingPhoto(true);
     try {
       const capturedAt = new Date().toISOString();
       const file = await capturarFotoDesdeVideo(videoRef.current);
@@ -189,6 +193,8 @@ export function ReportarMediaCapture({
       setReady(false);
       setCanRetryCamera(true);
       setError(mensajeDeErrorMedia(cause));
+    } finally {
+      setCapturingPhoto(false);
     }
   };
 
@@ -269,6 +275,31 @@ export function ReportarMediaCapture({
       ) {
         detenerStream(stream);
         return;
+      }
+
+      let capabilities = { canSwitchCamera: false, torch: false };
+      try {
+        capabilities = await detectarCapacidadesCamara(stream);
+      } catch {
+        // La grabación sigue siendo utilizable si el navegador no expone capacidades.
+      }
+      if (session !== sessionRef.current || abortController.signal.aborted) {
+        detenerStream(stream);
+        return;
+      }
+      setCanSwitchCamera(capabilities.canSwitchCamera);
+      setTorchSupported(capabilities.torch);
+      if (torchEnabled && capabilities.torch) {
+        const track = stream.getVideoTracks()[0];
+        try {
+          await track?.applyConstraints({
+            advanced: [{ torch: true }],
+          } as unknown as MediaTrackConstraints);
+        } catch {
+          setTorchEnabled(false);
+        }
+      } else if (!capabilities.torch) {
+        setTorchEnabled(false);
       }
 
       const recorder = new MediaRecorder(stream, { mimeType });
@@ -422,9 +453,9 @@ export function ReportarMediaCapture({
               type="button"
               className="reportar-media-primary"
               onClick={() => void takePhoto()}
-              disabled={!ready}
+              disabled={!ready || capturingPhoto}
             >
-              <Camera size={20} /> Capturar foto
+              <Camera size={20} /> {capturingPhoto ? "Procesando foto…" : "Capturar foto"}
             </Button>
           ) : recording ? (
             <Button
