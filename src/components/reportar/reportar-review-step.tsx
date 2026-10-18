@@ -6,6 +6,7 @@ import {
   MapPin,
   MessageSquare,
   Pencil,
+  Play,
   Send,
   UserRound,
 } from "lucide-react";
@@ -29,12 +30,14 @@ function accentStyle(color: string): CSSProperties {
 export function ReportarReviewStep({
   draft,
   onEdit,
+  onPreview,
   onConfirm,
 }: {
   draft: ReporteDraft;
   onEdit: (
     step: Extract<ReporteStep, "categoria" | "detalle" | "ubicacion" | "evidencias">,
   ) => void;
+  onPreview: (id: string) => void;
   onConfirm: () => void;
 }) {
   const categoria = categoriaConfig(draft.categoria);
@@ -222,27 +225,45 @@ export function ReportarReviewStep({
               >
                 {draft.evidencias.map((evidencia, index) => (
                   <li key={evidencia.id} className="reportar-review-evidence">
-                    {evidencia.tipo === "foto" ? (
-                      <img
-                        src={evidencia.previewUrl}
-                        alt={`Vista previa de la fotografía ${index + 1}`}
-                      />
-                    ) : (
-                      <video
-                        src={evidencia.previewUrl}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        aria-label={`Vista previa del video ${index + 1}`}
-                      />
-                    )}
-                    <span>
-                      {evidencia.tipo === "foto" ? "Fotografía" : "Video"}
-                      {evidencia.recortada ? " · recortada" : ""}
-                    </span>
-                    <small className="reportar-evidence-timestamp">
-                      {etiquetaFechaEvidencia(evidencia.fuente, evidencia.capturadaEn)}
-                    </small>
+                    <button
+                      type="button"
+                      className="reportar-review-evidence-trigger"
+                      onClick={() => onPreview(evidencia.id)}
+                      aria-label={
+                        evidencia.tipo === "foto"
+                          ? `Ver fotografía ${index + 1} ampliada`
+                          : `Ver video ${index + 1} ampliado`
+                      }
+                    >
+                      <div className="reportar-review-evidence-media">
+                        {evidencia.tipo === "foto" ? (
+                          <img
+                            src={evidencia.previewUrl}
+                            alt={`Vista previa de la fotografía ${index + 1}`}
+                          />
+                        ) : (
+                          <>
+                            <video
+                              src={evidencia.previewUrl}
+                              playsInline
+                              preload="metadata"
+                              tabIndex={-1}
+                              aria-label={`Vista previa del video ${index + 1}`}
+                            />
+                            <span className="reportar-review-evidence-play" aria-hidden="true">
+                              <Play size={20} />
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <span>
+                        {evidencia.tipo === "foto" ? "Fotografía" : "Video"}
+                        {evidencia.recortada ? " · recortada" : ""}
+                      </span>
+                      <small className="reportar-evidence-timestamp">
+                        {etiquetaFechaEvidencia(evidencia.fuente, evidencia.capturadaEn)}
+                      </small>
+                    </button>
                   </li>
                 ))}
               </ul>
