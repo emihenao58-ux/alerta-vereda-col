@@ -11,6 +11,7 @@ import { useEffect, useMemo, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthSplash } from "@/components/admin/auth-splash";
+import { LogoutTransition } from "@/components/logout-transition";
 import { ThemeTransitionLayers } from "@/components/theme-transition-layers";
 import { Toaster } from "@/components/ui/sonner";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
@@ -141,6 +142,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* The splash stays mounted across route changes so login never reveals a blank frame. */}
       <AuthSplash />
+      <LogoutTransition />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" />

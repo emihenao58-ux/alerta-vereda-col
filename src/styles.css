@@ -2768,34 +2768,55 @@
   gap: 0.35rem;
 }
 
-.splash-map {
-  fill: rgba(126, 190, 149, 0.13);
-  stroke: #aad19c;
-  stroke-width: 1.5;
-  stroke-dasharray: 5 4;
+.splash-map-territory {
+  fill: rgba(35, 105, 75, 0.58);
 }
 
-.splash-route {
+.splash-map-terrain {
+  fill: #2b7958;
+  opacity: 0.76;
+}
+
+.splash-map-terrain-alt {
+  fill: #0d4b3b;
+  opacity: 0.86;
+}
+
+.splash-map-territory-outline {
   fill: none;
-  stroke: #ead883;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 4;
-  animation: splash-route-draw 2.6s linear infinite;
+  stroke: #b9d28f;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
 }
 
-.splash-node {
-  fill: #d9e995;
-  stroke: #2f715e;
-  stroke-width: 2;
-  animation: splash-node-glow 1.9s ease-in-out infinite;
-}
-
-.splash-node-halo {
+.splash-map-contour {
   fill: none;
-  stroke: rgba(217, 233, 149, 0.44);
+  stroke: rgba(170, 215, 155, 0.48);
+  stroke-linecap: round;
   stroke-width: 1;
-  stroke-dasharray: 3 4;
-  animation: splash-halo-spin 5s linear infinite;
+}
+
+.splash-map-contour-gold {
+  stroke: rgba(225, 202, 107, 0.84);
+  stroke-width: 1.35;
+}
+
+.splash-map-pin-halo {
+  fill: rgba(214, 205, 111, 0.14);
+  stroke: rgba(214, 205, 111, 0.68);
+  stroke-dasharray: 2 3;
+  stroke-width: 1;
+}
+
+.splash-map-pin-shape {
+  fill: #e2cf6b;
+  stroke: #f7edb4;
+  stroke-linejoin: round;
+  stroke-width: 1;
+}
+
+.splash-map-pin-core {
+  fill: #0b4b3a;
 }
 
 .splash-hill-back {
@@ -2886,38 +2907,6 @@
   }
 }
 
-@keyframes splash-route-draw {
-  from {
-    stroke-dashoffset: 32;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes splash-node-glow {
-  0%,
-  100% {
-    transform: scale(0.85);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.22);
-    opacity: 1;
-  }
-}
-
-@keyframes splash-halo-spin {
-  from {
-    transform: rotate(0deg);
-    transform-origin: 116px 42px;
-  }
-  to {
-    transform: rotate(360deg);
-    transform-origin: 116px 42px;
-  }
-}
-
 @keyframes splash-sun-breathe {
   0%,
   100% {
@@ -2933,11 +2922,12 @@
 @media (prefers-reduced-motion: reduce) {
   .auth-splash,
   .auth-splash-panel,
-  .splash-route,
-  .splash-node,
-  .splash-node-halo,
   .splash-sun {
     animation: none;
+  }
+
+  .splash-map-pin-motion {
+    display: none;
   }
 
   .auth-splash-progress-track span {
@@ -7168,4 +7158,2907 @@ html.theme-transition-no-blur .mi-vereda-board {
   .reportar-confirmation-actions > a {
     flex-basis: 100%;
   }
+}
+
+/* Estilos Superadmin recuperados del build generado antes de esta corrección. */
+.app-shell-superadmin > main {
+  width: 100%;
+  padding: clamp(0.8rem, 2vw, 1.35rem) clamp(0.75rem, 3vw, 2.5rem) 2rem;
+  max-width: none !important;
+}
+.app-shell-superadmin .app-shell-header-inner {
+  justify-content: flex-end;
+  max-width: none;
+}
+.app-shell-superadmin .app-shell-header-inner > .brand-lockup {
+  display: none;
+}
+.app-shell-superadmin .admin-workspace-gestion {
+  --admin-surface: var(--card);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .app-shell-superadmin .admin-workspace-gestion {
+    --admin-surface: color-mix(in srgb, var(--card) 94%, transparent);
+  }
+}
+.app-shell-superadmin .admin-workspace-gestion {
+  --admin-border: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .app-shell-superadmin .admin-workspace-gestion {
+    --admin-border: color-mix(in srgb, var(--bosque) 24%, var(--border));
+  }
+}
+.superadmin-layout-root {
+  grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(0.85rem, 2vw, 1.5rem);
+  width: min(100%, 92rem);
+  margin-inline: auto;
+  display: grid;
+}
+.superadmin-layout-main {
+  min-width: 0;
+}
+.superadmin-surface {
+  border: 1px solid var(--bosque);
+  min-width: 0;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-surface {
+    border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--border));
+  }
+}
+.superadmin-surface {
+  background: var(--card);
+  border-radius: 1.1rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-surface {
+    background: color-mix(in srgb, var(--card) 94%, transparent);
+  }
+}
+.superadmin-surface {
+  box-shadow: 0 18px 40px var(--bosque-oscuro);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-surface {
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--bosque-oscuro) 10%, transparent);
+  }
+}
+.superadmin-surface .admin-workspace-header {
+  border-bottom-color: var(--bosque);
+  padding: clamp(1rem, 2vw, 1.35rem) clamp(1rem, 2.5vw, 1.6rem);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-surface .admin-workspace-header {
+    border-bottom-color: color-mix(in srgb, var(--bosque) 16%, var(--border));
+  }
+}
+.superadmin-surface .admin-workspace-content {
+  padding: clamp(0.85rem, 2vw, 1.35rem);
+}
+.admin-sidebar {
+  border: 1px solid var(--bosque);
+  flex-direction: column;
+  min-height: min(42rem, 100vh - 1.6rem);
+  padding: 1rem;
+  display: flex;
+  position: sticky;
+  top: 0.8rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar {
+    border: 1px solid color-mix(in srgb, var(--bosque) 22%, var(--border));
+  }
+}
+.admin-sidebar {
+  background: var(--card);
+  border-radius: 1.1rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar {
+    background: color-mix(in srgb, var(--card) 96%, transparent);
+  }
+}
+.admin-sidebar {
+  box-shadow: 0 16px 36px var(--bosque-oscuro);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar {
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--bosque-oscuro) 12%, transparent);
+  }
+}
+.admin-sidebar-header {
+  border-bottom: 1px solid var(--bosque);
+  align-items: center;
+  min-height: 3.25rem;
+  padding: 0.15rem 0.25rem 1rem;
+  display: flex;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--bosque) 16%, var(--border));
+  }
+}
+.admin-sidebar-header .brand-lockup {
+  min-height: 2.75rem;
+}
+.admin-sidebar-nav {
+  flex: auto;
+  padding-top: 0.8rem;
+}
+.admin-sidebar-menu,
+.admin-sidebar-submenu {
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+}
+.admin-sidebar-item,
+.admin-sidebar-group-trigger,
+.admin-sidebar-subitem {
+  width: 100%;
+  min-height: 2.75rem;
+  color: var(--tinta-suave);
+  border: 1px solid #0000;
+  border-radius: 0.72rem;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    color 0.16s ease-out,
+    transform 0.16s ease-out;
+  display: flex;
+}
+.admin-sidebar-item,
+.admin-sidebar-group-trigger {
+  padding: 0.55rem 0.7rem;
+}
+.admin-sidebar-subitem {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.55rem 0.45rem 2.35rem;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+.admin-sidebar-item:hover,
+.admin-sidebar-item:focus-visible,
+.admin-sidebar-group-trigger:hover,
+.admin-sidebar-group-trigger:focus-visible,
+.admin-sidebar-subitem:hover,
+.admin-sidebar-subitem:focus-visible {
+  border-color: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-item:hover,
+  .admin-sidebar-item:focus-visible,
+  .admin-sidebar-group-trigger:hover,
+  .admin-sidebar-group-trigger:focus-visible,
+  .admin-sidebar-subitem:hover,
+  .admin-sidebar-subitem:focus-visible {
+    border-color: color-mix(in srgb, var(--bosque) 26%, var(--border));
+  }
+}
+.admin-sidebar-item:hover,
+.admin-sidebar-item:focus-visible,
+.admin-sidebar-group-trigger:hover,
+.admin-sidebar-group-trigger:focus-visible,
+.admin-sidebar-subitem:hover,
+.admin-sidebar-subitem:focus-visible {
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-item:hover,
+  .admin-sidebar-item:focus-visible,
+  .admin-sidebar-group-trigger:hover,
+  .admin-sidebar-group-trigger:focus-visible,
+  .admin-sidebar-subitem:hover,
+  .admin-sidebar-subitem:focus-visible {
+    background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+  }
+}
+.admin-sidebar-item:hover,
+.admin-sidebar-item:focus-visible,
+.admin-sidebar-group-trigger:hover,
+.admin-sidebar-group-trigger:focus-visible,
+.admin-sidebar-subitem:hover,
+.admin-sidebar-subitem:focus-visible {
+  color: var(--bosque-oscuro);
+  transform: translate(1px);
+}
+.admin-sidebar-item-active,
+.admin-sidebar-subitem-active {
+  border-color: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-item-active,
+  .admin-sidebar-subitem-active {
+    border-color: color-mix(in srgb, var(--bosque) 34%, var(--border));
+  }
+}
+.admin-sidebar-item-active,
+.admin-sidebar-subitem-active {
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-item-active,
+  .admin-sidebar-subitem-active {
+    background: color-mix(in srgb, var(--bosque) 15%, var(--card));
+  }
+}
+.admin-sidebar-item-active,
+.admin-sidebar-subitem-active {
+  color: var(--bosque-oscuro);
+}
+.admin-sidebar-group-trigger {
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  justify-content: space-between;
+}
+.admin-sidebar-group-label {
+  align-items: center;
+  gap: 0.7rem;
+  display: inline-flex;
+}
+.admin-sidebar-submenu {
+  border-left: 1px solid var(--bosque);
+  margin: 0.2rem 0 0.4rem;
+  padding-left: 0.35rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-submenu {
+    border-left: 1px solid color-mix(in srgb, var(--bosque) 24%, var(--border));
+  }
+}
+.admin-sidebar-footer {
+  border-top: 1px solid var(--bosque);
+  margin-top: auto;
+  padding: 1rem 0.35rem 0.1rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .admin-sidebar-footer {
+    border-top: 1px solid color-mix(in srgb, var(--bosque) 16%, var(--border));
+  }
+}
+.admin-sidebar-community-tagline {
+  color: var(--tinta-suave);
+  font-family: var(--font-display);
+  margin: 0;
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.25;
+}
+.superadmin-reportar-container {
+  gap: 0.9rem;
+  display: grid;
+}
+.superadmin-reportar-header {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.1rem 0.1rem 0.25rem;
+  display: flex;
+}
+.superadmin-reportar-kicker,
+.superadmin-success-kicker {
+  color: var(--bosque);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+.superadmin-reportar-title {
+  color: var(--tinta);
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  line-height: 1;
+}
+.superadmin-reportar-subtitle {
+  max-width: 42rem;
+  color: var(--tinta-suave);
+  margin: 0.45rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.superadmin-local-badge {
+  border: 1px solid var(--dorado);
+  flex: none;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.7rem;
+  display: inline-flex;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-local-badge {
+    border: 1px solid color-mix(in srgb, var(--dorado) 58%, var(--border));
+  }
+}
+.superadmin-local-badge {
+  background: var(--dorado);
+  border-radius: 999px;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-local-badge {
+    background: color-mix(in srgb, var(--dorado) 12%, var(--card));
+  }
+}
+.superadmin-local-badge {
+  color: var(--tinta);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.superadmin-local-badge > span {
+  background: var(--dorado);
+  border-radius: 999px;
+  width: 0.46rem;
+  height: 0.46rem;
+}
+.superadmin-reportar-card {
+  border: 1px solid var(--bosque);
+  min-width: 0;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-reportar-card {
+    border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--border));
+  }
+}
+.superadmin-reportar-card {
+  background: var(--card);
+  border-radius: 0.95rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-reportar-card {
+    background: color-mix(in srgb, var(--card) 96%, transparent);
+  }
+}
+.superadmin-reportar-card {
+  box-shadow: 0 12px 28px var(--bosque-oscuro);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-reportar-card {
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--bosque-oscuro) 8%, transparent);
+  }
+}
+.superadmin-form-card {
+  gap: 0;
+  display: grid;
+  overflow: hidden;
+}
+.superadmin-form-section {
+  border-bottom: 1px solid var(--bosque);
+  gap: 0.8rem;
+  padding: clamp(1rem, 2.2vw, 1.35rem);
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-form-section {
+    border-bottom: 1px solid color-mix(in srgb, var(--bosque) 14%, var(--border));
+  }
+}
+.superadmin-form-section:last-child {
+  border-bottom: 0;
+}
+.superadmin-form-section-heading {
+  align-items: flex-start;
+  gap: 0.65rem;
+  display: flex;
+}
+.superadmin-form-section-number {
+  background: var(--bosque);
+  border-radius: 999px;
+  flex: none;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-form-section-number {
+    background: color-mix(in srgb, var(--bosque) 16%, var(--card));
+  }
+}
+.superadmin-form-section-number {
+  color: var(--bosque-oscuro);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+.superadmin-step-title {
+  color: var(--tinta);
+  margin: 0;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.1;
+}
+.superadmin-step-desc {
+  color: var(--tinta-suave);
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.superadmin-category-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  display: grid;
+}
+.superadmin-category-card,
+.superadmin-place-type-card,
+.superadmin-media-trigger-card {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 0.78rem;
+  align-content: start;
+  gap: 0.32rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  display: grid;
+  position: relative;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-category-card,
+  .superadmin-place-type-card,
+  .superadmin-media-trigger-card {
+    background: color-mix(in srgb, var(--card) 86%, var(--kraft));
+  }
+}
+.superadmin-category-card,
+.superadmin-place-type-card,
+.superadmin-media-trigger-card {
+  color: var(--tinta);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.16s ease-out,
+    background-color 0.16s ease-out,
+    box-shadow 0.16s ease-out,
+    transform 0.16s ease-out;
+}
+.superadmin-category-card {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  padding: 0.65rem;
+}
+.superadmin-category-card:hover,
+.superadmin-place-type-card:hover,
+.superadmin-media-trigger-card:hover,
+.superadmin-category-card:focus-visible,
+.superadmin-place-type-card:focus-visible,
+.superadmin-media-trigger-card:focus-visible {
+  border-color: var(--cat-color, var(--bosque));
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-category-card:hover,
+  .superadmin-place-type-card:hover,
+  .superadmin-media-trigger-card:hover,
+  .superadmin-category-card:focus-visible,
+  .superadmin-place-type-card:focus-visible,
+  .superadmin-media-trigger-card:focus-visible {
+    border-color: color-mix(in srgb, var(--cat-color, var(--bosque)) 68%, var(--border));
+  }
+}
+.superadmin-category-card:hover,
+.superadmin-place-type-card:hover,
+.superadmin-media-trigger-card:hover,
+.superadmin-category-card:focus-visible,
+.superadmin-place-type-card:focus-visible,
+.superadmin-media-trigger-card:focus-visible {
+  transform: translateY(-1px);
+}
+.superadmin-category-card.is-selected,
+.superadmin-place-type-card.is-selected {
+  border-color: var(--cat-color, var(--bosque));
+  background: var(--cat-color, var(--bosque));
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-category-card.is-selected,
+  .superadmin-place-type-card.is-selected {
+    background: color-mix(in srgb, var(--cat-color, var(--bosque)) 12%, var(--card));
+  }
+}
+.superadmin-category-card.is-selected,
+.superadmin-place-type-card.is-selected {
+  box-shadow: 0 0 0 2px var(--cat-color, var(--bosque));
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-category-card.is-selected,
+  .superadmin-place-type-card.is-selected {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--cat-color, var(--bosque)) 24%, transparent);
+  }
+}
+.superadmin-category-icon-wrapper {
+  background: var(--cat-color, var(--bosque));
+  border-radius: 0.65rem;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-category-icon-wrapper {
+    background: color-mix(in srgb, var(--cat-color, var(--bosque)) 16%, var(--card));
+  }
+}
+.superadmin-category-icon-wrapper {
+  color: var(--cat-color, var(--bosque));
+}
+.superadmin-category-info,
+.superadmin-place-type-card,
+.superadmin-media-trigger-card {
+  min-width: 0;
+}
+.superadmin-category-info {
+  gap: 0.12rem;
+  display: grid;
+}
+.superadmin-category-name,
+.superadmin-place-type-card strong,
+.superadmin-media-trigger-card strong {
+  color: var(--tinta);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+.superadmin-category-sublabel,
+.superadmin-place-type-card span,
+.superadmin-media-trigger-card span {
+  overflow-wrap: anywhere;
+  color: var(--tinta-suave);
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+.superadmin-selected-check {
+  background: var(--cat-color, var(--bosque));
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--card);
+  border-radius: 999px;
+  place-items: center;
+  display: grid;
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+}
+.superadmin-subcategories-panel,
+.superadmin-territory-selector-box {
+  border: 1px solid var(--bosque);
+  gap: 0.55rem;
+  padding: 0.75rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-subcategories-panel,
+  .superadmin-territory-selector-box {
+    border: 1px solid color-mix(in srgb, var(--bosque) 17%, var(--border));
+  }
+}
+.superadmin-subcategories-panel,
+.superadmin-territory-selector-box {
+  background: var(--bosque);
+  border-radius: 0.75rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-subcategories-panel,
+  .superadmin-territory-selector-box {
+    background: color-mix(in srgb, var(--bosque) 5%, var(--card));
+  }
+}
+.superadmin-subcategories-title,
+.superadmin-field-label {
+  color: var(--tinta);
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.superadmin-subcategories-grid {
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  display: flex;
+}
+.superadmin-subcategory-chip {
+  border: 1px solid var(--border);
+  background: var(--card);
+  min-height: 2.5rem;
+  color: var(--tinta-suave);
+  cursor: pointer;
+  border-radius: 999px;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.48rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+}
+.superadmin-subcategory-chip:hover,
+.superadmin-subcategory-chip:focus-visible,
+.superadmin-subcategory-chip.is-selected {
+  border-color: var(--bosque);
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-subcategory-chip:hover,
+  .superadmin-subcategory-chip:focus-visible,
+  .superadmin-subcategory-chip.is-selected {
+    background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  }
+}
+.superadmin-subcategory-chip:hover,
+.superadmin-subcategory-chip:focus-visible,
+.superadmin-subcategory-chip.is-selected {
+  color: var(--bosque-oscuro);
+}
+.superadmin-place-type-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  display: grid;
+}
+.superadmin-place-type-card {
+  padding: 0.65rem;
+}
+.superadmin-place-type-graphic {
+  background: var(--kraft);
+  border-radius: 0.6rem;
+  place-items: center;
+  height: 6.1rem;
+  display: grid;
+  overflow: hidden;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-place-type-graphic {
+    background: color-mix(in srgb, var(--kraft) 72%, var(--card));
+  }
+}
+.superadmin-place-img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.superadmin-place-type-card strong {
+  margin-top: 0.1rem;
+}
+.superadmin-territory-list {
+  gap: 0.35rem;
+  max-height: 11rem;
+  display: grid;
+  overflow: auto;
+}
+.superadmin-territory-item {
+  background: var(--card);
+  border: 1px solid #0000;
+  border-radius: 0.55rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.65rem;
+  display: flex;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-territory-item {
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+  }
+}
+.superadmin-territory-item {
+  color: var(--tinta);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.78rem;
+}
+.superadmin-territory-item:hover,
+.superadmin-territory-item:focus-visible,
+.superadmin-territory-item.is-selected {
+  border-color: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-territory-item:hover,
+  .superadmin-territory-item:focus-visible,
+  .superadmin-territory-item.is-selected {
+    border-color: color-mix(in srgb, var(--bosque) 42%, var(--border));
+  }
+}
+.superadmin-territory-item:hover,
+.superadmin-territory-item:focus-visible,
+.superadmin-territory-item.is-selected {
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-territory-item:hover,
+  .superadmin-territory-item:focus-visible,
+  .superadmin-territory-item.is-selected {
+    background: color-mix(in srgb, var(--bosque) 11%, var(--card));
+  }
+}
+.superadmin-territory-item:hover,
+.superadmin-territory-item:focus-visible,
+.superadmin-territory-item.is-selected {
+  color: var(--bosque-oscuro);
+}
+.superadmin-territory-selected {
+  border-left: 3px solid var(--bosque);
+  background: var(--bosque);
+  border-radius: 0.55rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.7rem;
+  display: flex;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-territory-selected {
+    background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+  }
+}
+.superadmin-territory-selected {
+  color: var(--tinta-suave);
+  font-size: 0.75rem;
+}
+.superadmin-territory-selected > svg {
+  color: var(--bosque);
+  flex: none;
+}
+.superadmin-territory-selected strong {
+  color: var(--tinta);
+}
+.superadmin-field-group {
+  gap: 0.35rem;
+  display: grid;
+}
+.superadmin-text-input {
+  border: 1px solid var(--input);
+  background: var(--card);
+  border-radius: 0.6rem;
+  width: 100%;
+  min-height: 2.75rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-text-input {
+    background: color-mix(in srgb, var(--card) 88%, transparent);
+  }
+}
+.superadmin-text-input {
+  color: var(--tinta);
+  font: inherit;
+  outline: none;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+}
+.superadmin-text-input::placeholder {
+  color: var(--tinta-suave);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-text-input::placeholder {
+    color: color-mix(in srgb, var(--tinta-suave) 75%, transparent);
+  }
+}
+.superadmin-text-input:focus {
+  border-color: var(--bosque);
+  box-shadow: 0 0 0 3px var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-text-input:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bosque) 18%, transparent);
+  }
+}
+.superadmin-gps-card {
+  border: 1px solid var(--bosque);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-gps-card {
+    border: 1px solid color-mix(in srgb, var(--bosque) 28%, var(--border));
+  }
+}
+.superadmin-gps-card {
+  background: var(--bosque);
+  border-radius: 0.75rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-gps-card {
+    background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  }
+}
+.superadmin-gps-icon {
+  background: var(--bosque);
+  border-radius: 0.65rem;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-gps-icon {
+    background: color-mix(in srgb, var(--bosque) 18%, var(--card));
+  }
+}
+.superadmin-gps-icon {
+  color: var(--bosque);
+}
+.superadmin-gps-text {
+  min-width: 0;
+}
+.superadmin-gps-text strong {
+  color: var(--tinta);
+  font-size: 0.82rem;
+}
+.superadmin-gps-text p {
+  color: var(--tinta-suave);
+  margin: 0.12rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+.superadmin-map-preview-box {
+  border: 1px dashed var(--bosque);
+  min-height: 5rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-map-preview-box {
+    border: 1px dashed color-mix(in srgb, var(--bosque) 38%, var(--border));
+  }
+}
+.superadmin-map-preview-box {
+  background:
+    linear-gradient(135deg, transparent 48%, var(--bosque) 49%, transparent 51%),
+    linear-gradient(35deg, transparent 48%, var(--bosque) 49%, transparent 51%), var(--kraft);
+  border-radius: 0.75rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-map-preview-box {
+    background:
+      linear-gradient(
+        135deg,
+        transparent 48%,
+        color-mix(in srgb, var(--bosque) 12%, transparent) 49%,
+        transparent 51%
+      ),
+      linear-gradient(
+        35deg,
+        transparent 48%,
+        color-mix(in srgb, var(--bosque) 10%, transparent) 49%,
+        transparent 51%
+      ),
+      color-mix(in srgb, var(--kraft) 55%, var(--card));
+  }
+}
+.superadmin-map-preview-box {
+  background-size:
+    4rem 4rem,
+    5rem 5rem,
+    auto;
+}
+.superadmin-map-placeholder {
+  min-height: 5rem;
+  color: var(--tinta-suave);
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  display: flex;
+}
+.superadmin-map-pin {
+  background: var(--bosque);
+  border-radius: 999px;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-map-pin {
+    background: color-mix(in srgb, var(--bosque) 17%, var(--card));
+  }
+}
+.superadmin-map-pin {
+  color: var(--bosque);
+}
+.superadmin-media-controls-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  display: grid;
+}
+.superadmin-media-trigger-card {
+  text-align: left;
+  justify-items: start;
+  padding: 0.75rem;
+}
+.superadmin-media-trigger-card > svg {
+  color: var(--bosque);
+}
+.superadmin-evidence-tray {
+  gap: 0.55rem;
+  display: grid;
+}
+.superadmin-evidence-count {
+  color: var(--tinta-suave);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+.superadmin-evidence-thumbs-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  display: grid;
+}
+.superadmin-evidence-thumb {
+  border: 1px solid var(--border);
+  background: #07151f;
+  border-radius: 0.65rem;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.superadmin-thumb-img,
+.superadmin-thumb-video {
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  place-items: center;
+  width: 100%;
+  display: grid;
+}
+.superadmin-thumb-video {
+  color: #fff;
+}
+.superadmin-thumb-actions {
+  justify-content: flex-end;
+  gap: 0.28rem;
+  display: flex;
+  position: absolute;
+  bottom: 0.35rem;
+  left: 0.35rem;
+  right: 0.35rem;
+}
+.superadmin-thumb-actions button {
+  color: #fff;
+  cursor: pointer;
+  background: #07151fc2;
+  border: 1px solid #ffffff6b;
+  border-radius: 999px;
+  justify-content: center;
+  align-items: center;
+  gap: 0.22rem;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  padding: 0.3rem;
+  font-size: 0.62rem;
+  font-weight: 750;
+  display: inline-flex;
+}
+.superadmin-thumb-actions button:hover,
+.superadmin-thumb-actions button:focus-visible {
+  background: #2f5d45eb;
+}
+.superadmin-empty-state {
+  border: 1px dashed var(--border);
+  color: var(--tinta-suave);
+  text-align: center;
+  border-radius: 0.6rem;
+  grid-column: 1/-1;
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.75rem;
+}
+.superadmin-review-section {
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-review-section {
+    background: color-mix(in srgb, var(--bosque) 3%, var(--card));
+  }
+}
+.superadmin-review-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  display: grid;
+}
+.superadmin-review-item {
+  border: 1px solid var(--border);
+  gap: 0.18rem;
+  min-width: 0;
+  padding: 0.65rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-review-item {
+    border: 1px solid color-mix(in srgb, var(--border) 86%, transparent);
+  }
+}
+.superadmin-review-item {
+  background: var(--card);
+  border-radius: 0.65rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-review-item {
+    background: color-mix(in srgb, var(--card) 88%, transparent);
+  }
+}
+.superadmin-review-label,
+.superadmin-summary-label {
+  color: var(--tinta-suave);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.64rem;
+  font-weight: 850;
+}
+.superadmin-review-value {
+  overflow-wrap: anywhere;
+  color: var(--tinta);
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+.superadmin-review-item small {
+  color: var(--tinta-suave);
+  font-size: 0.68rem;
+}
+.superadmin-notice-box {
+  border: 1px solid var(--dorado);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.7rem 0.75rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-notice-box {
+    border: 1px solid color-mix(in srgb, var(--dorado) 55%, var(--border));
+  }
+}
+.superadmin-notice-box {
+  background: var(--dorado);
+  border-radius: 0.65rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-notice-box {
+    background: color-mix(in srgb, var(--dorado) 9%, var(--card));
+  }
+}
+.superadmin-notice-box {
+  color: var(--tinta);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.superadmin-notice-box > svg {
+  color: var(--dorado);
+}
+.superadmin-actions-bar {
+  justify-content: flex-end;
+  gap: 0.55rem;
+  display: flex;
+}
+.superadmin-btn {
+  cursor: pointer;
+  border: 1px solid #0000;
+  border-radius: 0.62rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.38rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.82rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background-color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    transform 0.16s ease-out;
+  display: inline-flex;
+}
+.superadmin-btn:hover:not(:disabled),
+.superadmin-btn:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+}
+.superadmin-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+.superadmin-btn-primary {
+  border-color: var(--bosque);
+  background: var(--bosque);
+  color: var(--card);
+}
+.superadmin-btn-primary:hover:not(:disabled),
+.superadmin-btn-primary:focus-visible:not(:disabled) {
+  background: var(--bosque-oscuro);
+}
+.superadmin-btn-secondary {
+  border-color: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-btn-secondary {
+    border-color: color-mix(in srgb, var(--bosque) 38%, var(--border));
+  }
+}
+.superadmin-btn-secondary {
+  background: var(--bosque);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-btn-secondary {
+    background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  }
+}
+.superadmin-btn-secondary {
+  color: var(--bosque-oscuro);
+}
+.superadmin-reportar-success {
+  text-align: center;
+  gap: 1rem;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 1.8rem);
+  display: grid;
+}
+.superadmin-success-hero {
+  justify-items: center;
+  gap: 0.45rem;
+  display: grid;
+}
+.superadmin-success-badge {
+  border: 1px solid var(--normal);
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-success-badge {
+    border: 1px solid color-mix(in srgb, var(--normal) 62%, var(--border));
+  }
+}
+.superadmin-success-badge {
+  background: var(--normal);
+  border-radius: 1.35rem;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-success-badge {
+    background: color-mix(in srgb, var(--normal) 18%, var(--card));
+  }
+}
+.superadmin-success-badge {
+  color: var(--normal);
+  box-shadow: 0 10px 24px var(--normal);
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-success-badge {
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--normal) 16%, transparent);
+  }
+}
+.superadmin-success-title {
+  color: var(--tinta);
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  line-height: 1.05;
+}
+.superadmin-success-subtitle {
+  max-width: 34rem;
+  color: var(--tinta-suave);
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.superadmin-summary-box {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 0.75rem;
+  gap: 0.45rem;
+  padding: 0.8rem;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-summary-box {
+    background: color-mix(in srgb, var(--card) 82%, transparent);
+  }
+}
+.superadmin-summary-box {
+  text-align: left;
+}
+.superadmin-summary-row {
+  border-bottom: 1px solid var(--border);
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 0.7rem;
+  padding: 0.4rem 0;
+  display: grid;
+}
+@supports (color: color-mix(in lab, red, red)) {
+  .superadmin-summary-row {
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  }
+}
+.superadmin-summary-row:last-child {
+  border-bottom: 0;
+}
+.superadmin-summary-value {
+  overflow-wrap: anywhere;
+  color: var(--tinta);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.superadmin-success-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  display: flex;
+}
+.superadmin-status-note {
+  color: var(--tinta-suave);
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  display: flex;
+}
+.superadmin-status-note > svg {
+  color: var(--normal);
+  flex: none;
+}
+@media (width<=980px) {
+  .superadmin-layout-root {
+    grid-template-columns: minmax(13.5rem, 15rem) minmax(0, 1fr);
+  }
+  .superadmin-category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (width<=760px) {
+  .app-shell-superadmin > main {
+    padding-inline: 0.65rem;
+  }
+  .superadmin-layout-root {
+    display: block;
+  }
+  .admin-sidebar {
+    min-height: auto;
+    margin-bottom: 0.75rem;
+    padding: 0.65rem;
+    position: relative;
+    top: auto;
+  }
+  .admin-sidebar-header {
+    min-height: 2.7rem;
+    padding: 0.05rem 0.25rem 0.6rem;
+  }
+  .admin-sidebar-nav {
+    padding-top: 0.55rem;
+    overflow-x: auto;
+  }
+  .admin-sidebar-menu {
+    align-items: center;
+    gap: 0.35rem;
+    min-width: max-content;
+    display: flex;
+  }
+  .admin-sidebar-menu > li {
+    flex: none;
+  }
+  .admin-sidebar-item,
+  .admin-sidebar-group-trigger {
+    white-space: nowrap;
+    width: auto;
+    min-height: 2.75rem;
+  }
+  .admin-sidebar-submenu {
+    z-index: 2;
+    border: 1px solid var(--border);
+    background: var(--card);
+    min-width: 15rem;
+    box-shadow: 0 12px 28px var(--bosque-oscuro);
+    border-radius: 0.7rem;
+    margin-top: 0.25rem;
+    padding: 0.4rem;
+    display: grid;
+    position: absolute;
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    .admin-sidebar-submenu {
+      box-shadow: 0 12px 28px color-mix(in srgb, var(--bosque-oscuro) 18%, transparent);
+    }
+  }
+  .admin-sidebar-footer {
+    display: none;
+  }
+  .superadmin-surface .admin-workspace-header {
+    padding-inline: 0.85rem;
+  }
+  .superadmin-surface .admin-workspace-content {
+    padding: 0.6rem;
+  }
+  .superadmin-reportar-header {
+    display: grid;
+  }
+  .superadmin-local-badge {
+    justify-self: start;
+  }
+  .superadmin-place-type-grid,
+  .superadmin-media-controls-grid,
+  .superadmin-review-grid {
+    grid-template-columns: 1fr;
+  }
+  .superadmin-evidence-thumbs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .superadmin-gps-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .superadmin-gps-card > .superadmin-btn {
+    grid-column: 1/-1;
+    width: 100%;
+  }
+  .superadmin-actions-bar,
+  .superadmin-success-actions {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+  .superadmin-actions-bar .superadmin-btn,
+  .superadmin-success-actions .superadmin-btn,
+  .superadmin-success-actions a {
+    width: 100%;
+  }
+}
+@media (width<=420px) {
+  .superadmin-category-grid {
+    grid-template-columns: 1fr;
+  }
+  .superadmin-form-section {
+    padding: 0.85rem;
+  }
+  .superadmin-summary-row {
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar-item,
+  .admin-sidebar-group-trigger,
+  .admin-sidebar-subitem,
+  .superadmin-btn,
+  .superadmin-category-card,
+  .superadmin-place-type-card,
+  .superadmin-media-trigger-card {
+    transition: none;
+  }
+}
+
+/* Corrección Superadmin: cabecera integrada, flujo por etapas y navegación móvil contenida. */
+.app-shell-superadmin {
+  padding-bottom: 0;
+}
+
+.app-shell-superadmin .app-shell-header {
+  border-bottom-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell-superadmin .app-shell-header-inner {
+  min-height: 3.35rem;
+  justify-content: flex-end;
+  padding-block: 0.42rem;
+}
+
+.app-shell-superadmin .app-shell-header-inner > .brand-lockup {
+  display: none;
+}
+
+.app-shell-superadmin .app-emergency-bar {
+  display: none;
+}
+
+.app-shell-superadmin .account-button {
+  display: inline-flex;
+  width: auto;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  padding: 0.45rem 0.72rem;
+  border: 1px solid color-mix(in srgb, var(--header-foreground) 28%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--header-background) 42%, transparent);
+  color: var(--header-foreground);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.app-shell-superadmin .account-button:hover,
+.app-shell-superadmin .account-button:focus-visible {
+  border-color: color-mix(in srgb, var(--header-accent) 72%, var(--border));
+  background: color-mix(in srgb, var(--header-accent) 15%, var(--header-background));
+}
+
+.superadmin-reportar-wizard {
+  gap: 0.8rem;
+}
+
+.superadmin-reportar-wizard .reportar-progress {
+  border-color: color-mix(in srgb, var(--bosque) 24%, var(--border));
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--bosque-oscuro) 7%, transparent);
+}
+
+.superadmin-reportar-step {
+  min-width: 0;
+}
+
+.superadmin-reportar-step > .reportar-step {
+  margin: 0;
+  border-color: color-mix(in srgb, var(--bosque) 20%, var(--border));
+  background: color-mix(in srgb, var(--card) 96%, transparent);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--bosque-oscuro) 8%, transparent);
+}
+
+.superadmin-reportar-step .reportar-step-title {
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+}
+
+.superadmin-reportar-step .reportar-step-content {
+  gap: 1rem;
+}
+
+.superadmin-reportar-step .reportar-step-actions {
+  justify-content: space-between;
+  padding-top: 0.9rem;
+  border-top: 1px solid color-mix(in srgb, var(--bosque) 14%, var(--border));
+}
+
+.superadmin-reportar-step .reportar-step-actions > button {
+  min-height: 2.75rem;
+}
+
+.superadmin-local-flow-note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.4rem;
+  color: var(--tinta-suave);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.superadmin-local-flow-note > svg {
+  flex: 0 0 auto;
+  color: var(--normal);
+}
+
+.superadmin-reportar-confirmation .reportar-confirmation-screen {
+  width: min(100%, 58rem);
+  margin: 0;
+  margin-inline: auto;
+  border-color: color-mix(in srgb, var(--bosque) 20%, var(--border));
+  background: color-mix(in srgb, var(--card) 96%, transparent);
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin .app-shell-header-inner {
+    min-height: 3rem;
+    padding-inline: 0.7rem;
+  }
+
+  .app-shell-superadmin .account-button {
+    min-height: 2.6rem;
+    padding-inline: 0.62rem;
+  }
+
+  .superadmin-reportar-step .reportar-step-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .superadmin-reportar-step .reportar-step-actions > button {
+    width: 100%;
+  }
+
+  .app-shell-superadmin .admin-sidebar {
+    overflow: visible;
+  }
+
+  .app-shell-superadmin .admin-sidebar-nav {
+    overflow: visible;
+  }
+
+  .app-shell-superadmin .admin-sidebar-menu {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .app-shell-superadmin .admin-sidebar-menu > li {
+    min-width: 0;
+  }
+
+  .app-shell-superadmin .admin-sidebar-group {
+    grid-column: 1 / -1;
+    position: relative;
+  }
+
+  .app-shell-superadmin .admin-sidebar-item,
+  .app-shell-superadmin .admin-sidebar-group-trigger {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .app-shell-superadmin .admin-sidebar-submenu {
+    position: static;
+    min-width: 0;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-subitem {
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .superadmin-reportar-step .reportar-step-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Integración visual final del shell Superadmin: navegación vertical parte de la aplicación. */
+.app-shell-superadmin {
+  --superadmin-sidebar-bg: #073d32;
+  --superadmin-sidebar-bg-deep: #052f2b;
+  --superadmin-sidebar-text: #f2faf2;
+  --superadmin-sidebar-muted: #c9dfd3;
+  --superadmin-sidebar-border: rgb(255 255 255 / 18%);
+  --superadmin-sidebar-active: #2f8f74;
+}
+
+.dark .app-shell-superadmin {
+  --superadmin-sidebar-bg: #062f2d;
+  --superadmin-sidebar-bg-deep: #041f26;
+  --superadmin-sidebar-text: #f2faf2;
+  --superadmin-sidebar-muted: #c9dfd3;
+  --superadmin-sidebar-border: rgb(213 239 224 / 22%);
+  --superadmin-sidebar-active: #1f725f;
+}
+
+@media (min-width: 761px) {
+  .app-shell-superadmin .app-shell-header {
+    position: absolute;
+    inset: 0 0 auto;
+    border-bottom: 0;
+    background: transparent;
+  }
+
+  .app-shell-superadmin .app-shell-header-inner {
+    min-height: 4.25rem;
+    padding-inline: clamp(1rem, 3vw, 3rem);
+  }
+
+  .app-shell-superadmin > main {
+    min-height: 100dvh;
+    padding: 0;
+  }
+
+  .app-shell-superadmin > p {
+    display: none;
+  }
+
+  .app-shell-superadmin .superadmin-layout-root {
+    grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+  }
+
+  .app-shell-superadmin .admin-sidebar {
+    min-height: 100dvh;
+    border: 0;
+    border-right: 1px solid var(--superadmin-sidebar-border);
+    border-radius: 0;
+    background: var(--superadmin-sidebar-bg);
+    box-shadow: none;
+    position: relative;
+    top: auto;
+    overflow: hidden;
+  }
+
+  .app-shell-superadmin .admin-sidebar-header,
+  .app-shell-superadmin .admin-sidebar-nav,
+  .app-shell-superadmin .admin-sidebar-footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-shell-superadmin .admin-sidebar-header {
+    min-height: 4.25rem;
+    padding: 0.75rem 1rem 0.8rem;
+    border-bottom-color: var(--superadmin-sidebar-border);
+  }
+
+  .app-shell-superadmin .admin-sidebar-header .brand-lockup {
+    color: var(--superadmin-sidebar-text);
+  }
+
+  .app-shell-superadmin .admin-sidebar-nav {
+    padding: 1rem 0.7rem 0.5rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-item,
+  .app-shell-superadmin .admin-sidebar-group-trigger,
+  .app-shell-superadmin .admin-sidebar-subitem {
+    border-color: transparent;
+    color: var(--superadmin-sidebar-muted);
+  }
+
+  .app-shell-superadmin .admin-sidebar-item:hover,
+  .app-shell-superadmin .admin-sidebar-item:focus-visible,
+  .app-shell-superadmin .admin-sidebar-group-trigger:hover,
+  .app-shell-superadmin .admin-sidebar-group-trigger:focus-visible,
+  .app-shell-superadmin .admin-sidebar-subitem:hover,
+  .app-shell-superadmin .admin-sidebar-subitem:focus-visible {
+    border-color: var(--superadmin-sidebar-border);
+    background: rgb(255 255 255 / 9%);
+    color: var(--superadmin-sidebar-text);
+    transform: none;
+  }
+
+  .app-shell-superadmin .admin-sidebar-item-active,
+  .app-shell-superadmin .admin-sidebar-subitem-active {
+    border-color: rgb(255 255 255 / 20%);
+    background: var(--superadmin-sidebar-active);
+    color: var(--superadmin-sidebar-text);
+    box-shadow: inset 3px 0 0 rgb(255 255 255 / 78%);
+  }
+
+  .app-shell-superadmin .admin-sidebar-submenu {
+    border-left-color: var(--superadmin-sidebar-border);
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer {
+    border-top-color: var(--superadmin-sidebar-border);
+    margin-top: auto;
+    padding: 1rem 1rem 2rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-community-tagline {
+    color: var(--superadmin-sidebar-text);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .app-shell-superadmin .superadmin-layout-main {
+    min-width: 0;
+    padding: 5.4rem clamp(1rem, 3vw, 3rem) 2.25rem;
+  }
+
+  .app-shell-superadmin .superadmin-surface {
+    min-height: calc(100dvh - 7.65rem);
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin > p {
+    display: none;
+  }
+
+  .app-shell-superadmin .admin-sidebar {
+    border: 0;
+    border-bottom: 1px solid var(--superadmin-sidebar-border);
+    border-radius: 0;
+    background: var(--superadmin-sidebar-bg);
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-shell-superadmin .admin-sidebar-header,
+  .app-shell-superadmin .admin-sidebar-nav,
+  .app-shell-superadmin .admin-sidebar-footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-shell-superadmin .admin-sidebar-header {
+    border-bottom-color: var(--superadmin-sidebar-border);
+  }
+
+  .app-shell-superadmin .admin-sidebar-header .brand-lockup {
+    color: var(--superadmin-sidebar-text);
+  }
+
+  .app-shell-superadmin .admin-sidebar-item,
+  .app-shell-superadmin .admin-sidebar-group-trigger,
+  .app-shell-superadmin .admin-sidebar-subitem {
+    border-color: transparent;
+    color: var(--superadmin-sidebar-muted);
+  }
+
+  .app-shell-superadmin .admin-sidebar-item:hover,
+  .app-shell-superadmin .admin-sidebar-item:focus-visible,
+  .app-shell-superadmin .admin-sidebar-group-trigger:hover,
+  .app-shell-superadmin .admin-sidebar-group-trigger:focus-visible,
+  .app-shell-superadmin .admin-sidebar-subitem:hover,
+  .app-shell-superadmin .admin-sidebar-subitem:focus-visible {
+    border-color: var(--superadmin-sidebar-border);
+    background: rgb(255 255 255 / 9%);
+    color: var(--superadmin-sidebar-text);
+    transform: none;
+  }
+
+  .app-shell-superadmin .admin-sidebar-item-active,
+  .app-shell-superadmin .admin-sidebar-subitem-active {
+    border-color: rgb(255 255 255 / 20%);
+    background: var(--superadmin-sidebar-active);
+    color: var(--superadmin-sidebar-text);
+    box-shadow: inset 3px 0 0 rgb(255 255 255 / 78%);
+  }
+
+  .app-shell-superadmin .admin-sidebar-submenu {
+    border-left-color: var(--superadmin-sidebar-border);
+    background: rgb(0 0 0 / 9%);
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer {
+    display: block;
+    border-top-color: var(--superadmin-sidebar-border);
+    margin-top: 0.4rem;
+    padding: 0.8rem 0.65rem 1.1rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-community-tagline {
+    color: var(--superadmin-sidebar-text);
+    font-size: 0.76rem;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin > main {
+    padding: 0;
+  }
+
+  .app-shell-superadmin .superadmin-layout-main {
+    min-width: 0;
+    padding: 0.75rem 0.65rem 1.25rem;
+  }
+}
+
+/* Pie Superadmin: paisaje reutilizado, transición integrada y lema legible. */
+.app-shell-superadmin .admin-sidebar::after {
+  height: 12rem;
+  background-position: center 25%;
+  background-size: 100% auto;
+  opacity: 0.38;
+}
+
+.app-shell-superadmin .admin-sidebar-footer {
+  border-top-color: transparent;
+  background: linear-gradient(
+    to top,
+    rgb(73 154 112 / 22%),
+    rgb(73 154 112 / 8%) 52%,
+    transparent 100%
+  );
+}
+
+.app-shell-superadmin .admin-sidebar-community-tagline {
+  position: relative;
+  z-index: 1;
+  color: var(--superadmin-sidebar-text);
+  font-family: "Segoe Print", "Bradley Hand", "Apple Chancery", "URW Chancery L", cursive;
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  text-shadow: 0 1px 8px rgb(0 34 28 / 34%);
+}
+
+.dark .app-shell-superadmin .admin-sidebar-footer {
+  background: linear-gradient(
+    to top,
+    rgb(31 114 95 / 28%),
+    rgb(31 114 95 / 10%) 52%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin .admin-sidebar::after {
+    height: 7rem;
+    background-position: center 25%;
+    background-size: 100% auto;
+    opacity: 0.34;
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer {
+    border-top-color: transparent;
+  }
+
+  .app-shell-superadmin .admin-sidebar-community-tagline {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin .admin-sidebar::after {
+    display: none;
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer {
+    position: relative;
+    min-height: 6rem;
+    overflow: hidden;
+    isolation: isolate;
+  }
+}
+
+/* Montañas Superadmin: ilustración vectorial CSS, sin fotografía ni textura. */
+.app-shell-superadmin {
+  --superadmin-mountain-back: #1f5d4d;
+  --superadmin-mountain-mid: #2c735d;
+  --superadmin-mountain-front: #4b9679;
+}
+
+.dark .app-shell-superadmin {
+  --superadmin-mountain-back: #0b4038;
+  --superadmin-mountain-mid: #1b5e50;
+  --superadmin-mountain-front: #3d806b;
+}
+
+.app-shell-superadmin .admin-sidebar::before,
+.app-shell-superadmin .admin-sidebar::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  display: block;
+  background-image: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.app-shell-superadmin .admin-sidebar::before {
+  height: 9.2rem;
+  background-color: var(--superadmin-mountain-back);
+  clip-path: polygon(
+    0 100%,
+    0 72%,
+    16% 45%,
+    28% 58%,
+    48% 9%,
+    63% 47%,
+    76% 29%,
+    100% 70%,
+    100% 100%
+  );
+  opacity: 0.88;
+}
+
+.app-shell-superadmin .admin-sidebar::after {
+  height: 7.1rem;
+  background-color: var(--superadmin-mountain-front);
+  clip-path: polygon(
+    0 100%,
+    0 68%,
+    20% 48%,
+    35% 65%,
+    55% 20%,
+    71% 56%,
+    88% 37%,
+    100% 68%,
+    100% 100%
+  );
+  opacity: 0.9;
+}
+
+.app-shell-superadmin .admin-sidebar-community-tagline {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  font-size: 0.82rem;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.008em;
+  line-height: 1.42;
+}
+
+@media (max-width: 760px) {
+  .app-shell-superadmin .admin-sidebar::before {
+    height: 5.8rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar::after {
+    display: none;
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer::before {
+    inset: auto 0 0;
+    height: 100%;
+    z-index: 0;
+    background-image: none;
+    background-color: var(--superadmin-mountain-front);
+    clip-path: polygon(
+      0 100%,
+      0 65%,
+      21% 44%,
+      37% 62%,
+      57% 16%,
+      73% 55%,
+      89% 36%,
+      100% 65%,
+      100% 100%
+    );
+    opacity: 0.88;
+  }
+
+  .app-shell-superadmin .admin-sidebar-community-tagline {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+}
+
+/* Navegación Superadmin móvil compacta: mantiene destinos y reduce el espacio antes del wizard. */
+@media (max-width: 760px) {
+  .app-shell-superadmin .admin-sidebar {
+    margin-bottom: 0.5rem;
+    padding: 0.45rem 0.5rem 0.5rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-header {
+    min-height: 2.7rem;
+    padding: 0.05rem 0.2rem 0.45rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-nav {
+    padding: 0.35rem 0 0;
+    overflow: visible;
+  }
+
+  .app-shell-superadmin .admin-sidebar-menu {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .app-shell-superadmin .admin-sidebar-menu > li,
+  .app-shell-superadmin .admin-sidebar-group {
+    min-width: 0;
+    grid-column: auto;
+  }
+
+  .app-shell-superadmin .admin-sidebar-item,
+  .app-shell-superadmin .admin-sidebar-group-trigger {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.35rem;
+    padding: 0.34rem 0.35rem;
+    gap: 0.3rem;
+    border-radius: 0.55rem;
+    font-size: 0.72rem;
+    line-height: 1.12;
+    white-space: normal;
+  }
+
+  .app-shell-superadmin .admin-sidebar-group-trigger {
+    justify-content: space-between;
+  }
+
+  .app-shell-superadmin .admin-sidebar-group-label {
+    min-width: 0;
+    gap: 0.3rem;
+  }
+
+  .app-shell-superadmin .admin-sidebar-group-label > span {
+    overflow-wrap: anywhere;
+  }
+
+  .app-shell-superadmin .admin-sidebar-submenu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    z-index: 4;
+    width: max-content;
+    min-width: 13rem;
+    margin: 0;
+    padding: 0.35rem;
+    border: 1px solid var(--superadmin-sidebar-border);
+    border-radius: 0.6rem;
+    background: var(--superadmin-sidebar-bg-deep);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 22%);
+  }
+
+  .app-shell-superadmin .admin-sidebar-footer {
+    min-height: 4.2rem;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.45rem 0.65rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell-superadmin .admin-sidebar-item,
+  .app-shell-superadmin .admin-sidebar-group-trigger {
+    font-size: 0.68rem;
+  }
+}
+
+/* Pantalla de cierre administrativo: transición completa, opaca y guiada por el tema guardado. */
+body.logout-transition-active {
+  overflow: hidden;
+}
+
+.logout-transition,
+.logout-transition * {
+  box-sizing: border-box;
+}
+
+.logout-transition {
+  --logout-sky: #fffaf0;
+  --logout-sky-deep: #fff5dc;
+  --logout-text: #07584e;
+  --logout-muted: #5c7890;
+  --logout-accent: #27bd9b;
+  --logout-accent-deep: #008a78;
+  --logout-mountain-back: #8bd5be;
+  --logout-mountain-middle: #4db893;
+  --logout-mountain-front: #229b76;
+  --logout-house: #fff8dc;
+  --logout-roof: #ef7941;
+  --logout-window: #f3b949;
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    var(--logout-sky) 0%,
+    var(--logout-sky-deep) 67%,
+    #d9f1e8 100%
+  );
+  color: var(--logout-text);
+}
+
+.logout-transition-dark {
+  --logout-sky: #082d50;
+  --logout-sky-deep: #0b3d68;
+  --logout-text: #f1f8f3;
+  --logout-muted: #b6d0df;
+  --logout-accent: #65e0c1;
+  --logout-accent-deep: #16a98d;
+  --logout-mountain-back: #164c68;
+  --logout-mountain-middle: #103c5d;
+  --logout-mountain-front: #0a2c50;
+  --logout-house: #e7edf0;
+  --logout-roof: #e16b3c;
+  --logout-window: #ffd36b;
+  background: linear-gradient(180deg, #082b4d 0%, #0a3d68 67%, #071e39 100%);
+}
+
+.logout-transition.is-error {
+  --logout-accent: #d89d54;
+}
+
+.logout-sky-decor,
+.logout-sky-decor::before,
+.logout-sky-decor::after {
+  position: absolute;
+  pointer-events: none;
+}
+
+.logout-sky-decor {
+  z-index: 0;
+  inset: 0;
+}
+
+.logout-sky-decor::before,
+.logout-sky-decor::after {
+  content: "";
+  width: 20rem;
+  height: 10rem;
+  border-radius: 50%;
+  opacity: 0.26;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.66), transparent 68%);
+  filter: blur(0.4rem);
+}
+
+.logout-sky-decor::before {
+  top: 7%;
+  left: -7rem;
+}
+
+.logout-sky-decor::after {
+  top: 17%;
+  right: -8rem;
+  opacity: 0.18;
+}
+
+.logout-sun,
+.logout-moon {
+  position: absolute;
+  top: clamp(2.5rem, 10vh, 7rem);
+  left: clamp(1.6rem, 10vw, 8rem);
+  display: block;
+  width: clamp(3.8rem, 8vw, 6rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.logout-sun {
+  background: #ffe675;
+  box-shadow: 0 0 2.8rem rgba(255, 217, 74, 0.26);
+}
+
+.logout-moon {
+  display: none;
+}
+
+.logout-transition-dark .logout-sun {
+  display: none;
+}
+
+.logout-transition-dark .logout-moon {
+  display: block;
+  left: auto;
+  right: clamp(1.6rem, 10vw, 8rem);
+  background: #d9e9f0;
+}
+
+.logout-transition-dark .logout-moon::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translate(-1.15rem, -0.3rem);
+  border-radius: 50%;
+  background: #082d50;
+}
+
+.logout-cloud {
+  position: absolute;
+  display: block;
+  width: clamp(5rem, 10vw, 8rem);
+  height: 1.7rem;
+  border-radius: 999px;
+  background: rgba(190, 235, 226, 0.58);
+}
+
+.logout-cloud::before,
+.logout-cloud::after {
+  position: absolute;
+  bottom: 0;
+  content: "";
+  border-radius: 50% 50% 0 0;
+  background: inherit;
+}
+
+.logout-cloud::before {
+  left: 18%;
+  width: 2.5rem;
+  height: 2.7rem;
+}
+
+.logout-cloud::after {
+  right: 12%;
+  width: 2.7rem;
+  height: 2.3rem;
+}
+
+.logout-cloud-one {
+  top: 20%;
+  left: -0.8rem;
+}
+
+.logout-cloud-two {
+  top: 10%;
+  right: 13%;
+  transform: scale(0.76);
+}
+
+.logout-cloud-three {
+  top: 30%;
+  right: -1.3rem;
+  transform: scale(0.66);
+}
+
+.logout-transition-dark .logout-cloud {
+  background: rgba(42, 112, 159, 0.55);
+}
+
+.logout-star {
+  position: absolute;
+  display: none;
+  width: 0.22rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #e5f5ff;
+  box-shadow: 0 0 0.45rem rgba(222, 246, 255, 0.75);
+}
+
+.logout-transition-dark .logout-star {
+  display: block;
+}
+
+.logout-star-one {
+  top: 12%;
+  left: 16%;
+}
+
+.logout-star-two {
+  top: 18%;
+  left: 32%;
+}
+
+.logout-star-three {
+  top: 9%;
+  right: 28%;
+}
+
+.logout-star-four {
+  top: 25%;
+  right: 18%;
+}
+
+.logout-transition-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  width: min(100%, 34rem);
+  height: 100dvh;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1.5rem, 5vh, 4.25rem) 1rem calc(7rem + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.logout-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--logout-text);
+}
+
+.logout-brand img {
+  display: block;
+  width: clamp(4.3rem, 10vw, 6.8rem);
+  height: auto;
+  object-fit: contain;
+}
+
+.logout-brand-wordmark {
+  margin-top: -0.1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+}
+
+.logout-brand-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  width: min(12rem, 58vw);
+  margin-top: 0.3rem;
+}
+
+.logout-brand-rule::before,
+.logout-brand-rule::after {
+  width: 3.8rem;
+  height: 0.24rem;
+  content: "";
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--logout-accent), #f2b532);
+}
+
+.logout-brand-rule i {
+  width: 0.33rem;
+  height: 0.33rem;
+  border-radius: 50%;
+  background: #f2b532;
+}
+
+.logout-brand-rule b {
+  width: 0.33rem;
+  height: 0.33rem;
+  border-radius: 50%;
+  background: var(--logout-accent);
+}
+
+.logout-village {
+  display: block;
+  width: clamp(14rem, 32vw, 21rem);
+  height: auto;
+  margin-top: clamp(1.15rem, 3vh, 2rem);
+  overflow: visible;
+}
+
+.logout-village-mountain-back {
+  fill: var(--logout-mountain-back);
+}
+
+.logout-village-mountain-front {
+  fill: var(--logout-mountain-middle);
+}
+
+.logout-village-tree-line {
+  fill: var(--logout-mountain-front);
+}
+
+.logout-village-houses path {
+  fill: var(--logout-house);
+}
+
+.logout-village-houses .logout-village-roof {
+  fill: var(--logout-roof);
+}
+
+.logout-village-houses .logout-village-window {
+  fill: var(--logout-window);
+}
+
+.logout-village-ground {
+  fill: var(--logout-mountain-front);
+}
+
+.logout-transition-copy {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 29rem);
+  margin-top: clamp(0.7rem, 2.5vh, 1.45rem);
+}
+
+.logout-transition-copy h1 {
+  margin: 0;
+  color: var(--logout-text);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+.logout-role-line {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: clamp(0.7rem, 1.7vh, 1.1rem);
+  color: var(--logout-accent-deep);
+}
+
+.logout-role-line span {
+  display: block;
+  width: clamp(2rem, 7vw, 4rem);
+  height: 0.1rem;
+  background: linear-gradient(90deg, transparent, var(--logout-accent));
+}
+
+.logout-role-line span:last-child {
+  background: linear-gradient(90deg, var(--logout-accent), transparent);
+}
+
+.logout-role-line strong {
+  font-size: clamp(0.98rem, 2vw, 1.24rem);
+  font-weight: 700;
+}
+
+.logout-transition-copy > p {
+  max-width: 25rem;
+  margin: clamp(0.9rem, 2vh, 1.35rem) auto 0;
+  color: var(--logout-muted);
+  font-size: clamp(0.98rem, 2vw, 1.2rem);
+  line-height: 1.48;
+}
+
+.logout-spinner {
+  display: block;
+  width: clamp(3.25rem, 7vw, 4.2rem);
+  aspect-ratio: 1;
+  margin-top: clamp(1.45rem, 4vh, 2.9rem);
+  border: clamp(0.48rem, 1vw, 0.65rem) solid
+    color-mix(in srgb, var(--logout-accent) 35%, transparent);
+  border-right-color: var(--logout-accent-deep);
+  border-top-color: #71e0c5;
+  border-radius: 50%;
+  animation: logout-spinner-rotate 1.25s linear infinite;
+}
+
+.logout-retry {
+  min-height: 2.85rem;
+  margin-top: 1.6rem;
+  border: 1px solid color-mix(in srgb, var(--logout-accent-deep) 58%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--logout-accent) 16%, transparent);
+  padding: 0.7rem 1.1rem;
+  color: var(--logout-text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logout-retry:hover {
+  background: color-mix(in srgb, var(--logout-accent) 28%, transparent);
+}
+
+.logout-retry:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--logout-accent) 70%, white);
+  outline-offset: 3px;
+}
+
+.logout-retry:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.logout-landscape {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: -0.1rem;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: min(29vh, 20rem);
+  min-height: 9rem;
+  pointer-events: none;
+}
+
+.logout-landscape-back {
+  fill: color-mix(in srgb, var(--logout-mountain-back) 64%, transparent);
+}
+
+.logout-landscape-middle {
+  fill: color-mix(in srgb, var(--logout-mountain-middle) 78%, transparent);
+}
+
+.logout-landscape-front,
+.logout-landscape-plants path {
+  fill: color-mix(in srgb, var(--logout-mountain-front) 87%, transparent);
+}
+
+.logout-landscape-lights {
+  display: none;
+  fill: #f2c649;
+}
+
+.logout-transition-dark .logout-landscape-lights {
+  display: block;
+}
+
+@keyframes logout-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .logout-transition-content {
+    padding-top: max(1.1rem, env(safe-area-inset-top));
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .logout-brand img {
+    width: 4.55rem;
+  }
+
+  .logout-brand-wordmark {
+    font-size: 2.1rem;
+  }
+
+  .logout-village {
+    width: min(17rem, 67vw);
+    margin-top: 0.85rem;
+  }
+
+  .logout-transition-copy {
+    margin-top: 0.55rem;
+  }
+
+  .logout-transition-copy h1 {
+    font-size: clamp(1.85rem, 9vw, 2.45rem);
+  }
+
+  .logout-transition-copy > p {
+    max-width: 19rem;
+    font-size: 0.98rem;
+  }
+
+  .logout-landscape {
+    height: 23vh;
+    min-height: 8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logout-spinner {
+    animation: none;
+  }
+}
+
+/* Splash administrativo: composición fija verde oscuro inspirada en la referencia. */
+.auth-splash {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(71, 139, 92, 0.18), transparent 34%),
+    linear-gradient(180deg, #063b2f 0%, #07503b 56%, #0b3d31 100%);
+  color: #f8f5e9;
+}
+
+.auth-splash::after {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 35%;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(1, 28, 23, 0.42));
+  pointer-events: none;
+}
+
+.auth-splash-exiting .auth-splash-contours,
+.auth-splash-exiting .auth-splash-landscape {
+  opacity: 0;
+  transition: opacity 420ms ease-out;
+}
+
+.auth-splash-contours {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(139, 181, 110, 0.24);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.auth-splash-landscape {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 0;
+  width: 100%;
+  height: min(42vh, 27rem);
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.auth-splash-landscape-back {
+  fill: #1c6a4a;
+}
+
+.auth-splash-landscape-middle {
+  fill: #11543d;
+}
+
+.auth-splash-landscape-front {
+  fill: #073a2f;
+}
+
+.auth-splash-landscape-plants {
+  fill: #052e28;
+}
+
+.auth-splash-landscape-contour {
+  fill: none;
+  stroke: rgba(133, 190, 127, 0.38);
+  stroke-linecap: round;
+  stroke-width: 1.2;
+}
+
+.auth-splash-landscape-contour-gold {
+  fill: none;
+  stroke: rgba(213, 193, 103, 0.68);
+  stroke-width: 1.35;
+}
+
+.auth-splash-panel {
+  z-index: 1;
+  width: min(calc(100% - 2rem), 53.2rem);
+  gap: 0.65rem;
+  border: 1px solid rgba(196, 207, 102, 0.72);
+  border-radius: 1.2rem;
+  background: linear-gradient(142deg, rgba(7, 64, 48, 0.96), rgba(4, 48, 39, 0.98));
+  padding: 1.75rem 2.7rem 1.45rem;
+  box-shadow:
+    0 28px 90px rgba(1, 23, 19, 0.42),
+    inset 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(3px);
+}
+
+.auth-splash-admin_vereda .auth-splash-panel {
+  background: linear-gradient(142deg, rgba(31, 83, 53, 0.97), rgba(16, 61, 43, 0.98));
+}
+
+.auth-splash-brand {
+  position: relative;
+  z-index: 2;
+  gap: 0.5rem;
+  color: #f5f5dc;
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 2.4vw, 1.62rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.auth-splash-logo {
+  width: 2.9rem;
+  height: 2.9rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.auth-splash-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.auth-splash-brand-name span {
+  color: #66c86e;
+}
+
+.auth-splash-illustration {
+  top: 3.8rem;
+  right: 2.7rem;
+  z-index: 2;
+  width: clamp(10.5rem, 23vw, 14.5rem);
+}
+
+.auth-splash-copy {
+  max-width: 58%;
+  padding: 1.45rem 0 0.75rem;
+}
+
+.auth-splash-eyebrow {
+  color: #d4df9d;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+}
+
+.auth-splash-copy h1 {
+  max-width: 24rem;
+  margin-top: 0.48rem;
+  color: #fffbe9;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 0.98;
+}
+
+.auth-splash-copy p:last-child {
+  margin-top: 0.78rem;
+  color: #c4dacd;
+  font-size: 0.92rem;
+}
+
+.auth-splash-progress {
+  position: relative;
+  z-index: 2;
+  gap: 0.65rem;
+}
+
+.auth-splash-progress-track {
+  height: 0.55rem;
+  border-color: rgba(196, 207, 102, 0.48);
+  background: rgba(1, 29, 23, 0.5);
+}
+
+.auth-splash-progress-track span {
+  background: linear-gradient(90deg, #f0bd3f 0%, #f2df7d 34%, #62d47c 100%);
+}
+
+.auth-splash-progress-text {
+  color: #f4e58f;
+}
+
+.auth-splash-features {
+  position: relative;
+  z-index: 2;
+  gap: 0.5rem;
+  border-top-color: rgba(196, 207, 102, 0.25);
+  padding-top: 0.82rem;
+  color: #e6ebc9;
+}
+
+.auth-splash-features span {
+  gap: 0.4rem;
+}
+
+.auth-splash-features svg {
+  color: #e4d879;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-splash-contours,
+  .auth-splash-landscape {
+    transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-splash {
+    padding: 0.75rem;
+  }
+
+  .auth-splash-panel {
+    width: min(100%, 31rem);
+    max-height: calc(100svh - 1.5rem);
+    gap: 0.45rem;
+    border-radius: 1rem;
+    padding: 1.15rem 1.05rem 0.95rem;
+  }
+
+  .auth-splash-brand {
+    font-size: 1.22rem;
+  }
+
+  .auth-splash-logo {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .auth-splash-illustration {
+    top: auto;
+    right: auto;
+    justify-self: end;
+    width: min(45vw, 11rem);
+    margin: -1.3rem 0.2rem 0.25rem auto;
+  }
+
+  .auth-splash-copy {
+    max-width: 100%;
+    padding: 0.25rem 0 0.65rem;
+  }
+
+  .auth-splash-copy h1 {
+    max-width: 18rem;
+    font-size: clamp(1.85rem, 9vw, 2.45rem);
+  }
+
+  .auth-splash-copy p:last-child {
+    margin-top: 0.6rem;
+    font-size: 0.84rem;
+  }
+
+  .auth-splash-features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 0.65rem;
+    padding-top: 0.72rem;
+    font-size: 0.7rem;
+  }
+
+  .auth-splash-landscape {
+    height: 34vh;
+    opacity: 0.5;
+  }
+}
+
+.auth-splash-copy {
+  max-width: 64%;
+}
+
+.auth-splash-copy h1 {
+  max-width: 27rem;
+  font-size: clamp(1.9rem, 3.65vw, 2.9rem);
+  letter-spacing: -0.018em;
+}
+
+.auth-splash-admin_vereda .auth-splash-copy h1 {
+  max-width: 28rem;
+}
+
+@media (max-width: 720px) {
+  .auth-splash-copy {
+    max-width: 100%;
+  }
+
+  .auth-splash-copy h1,
+  .auth-splash-admin_vereda .auth-splash-copy h1 {
+    max-width: 20rem;
+    font-size: clamp(1.75rem, 8vw, 2.35rem);
+    letter-spacing: -0.02em;
+  }
+}
+
+.auth-splash-admin_vereda .auth-splash-copy {
+  max-width: 67%;
+}
+
+.auth-splash-admin_vereda .auth-splash-copy h1 {
+  max-width: 31rem;
+  font-size: clamp(1.85rem, 3.2vw, 2.65rem);
+}
+
+.auth-splash-admin_vereda .auth-splash-illustration {
+  width: clamp(11rem, 20vw, 13rem);
+}
+
+@media (max-width: 720px) {
+  .auth-splash-admin_vereda .auth-splash-copy {
+    max-width: 100%;
+  }
+
+  .auth-splash-admin_vereda .auth-splash-copy h1 {
+    max-width: 20rem;
+    font-size: clamp(1.7rem, 8vw, 2.35rem);
+  }
+
+  .auth-splash-admin_vereda .auth-splash-illustration {
+    width: min(45vw, 11rem);
+  }
+}
+
+/* Paisaje territorial abstracto del Administrador de Vereda. */
+.splash-territory-back {
+  fill: #286a50;
+}
+
+.splash-territory-mid {
+  fill: #1d5945;
+}
+
+.splash-territory-front {
+  fill: #12483c;
+}
+
+.splash-territory-belt {
+  fill: #0d3d35;
+}
+
+.splash-territory-contour {
+  fill: none;
+  stroke: rgba(151, 205, 153, 0.4);
+  stroke-linecap: round;
+  stroke-width: 1.35;
+}
+
+.splash-territory-contour-gold {
+  stroke: rgba(215, 194, 103, 0.82);
+  stroke-width: 1.55;
+}
+
+.splash-territory-forest {
+  fill: #0a352f;
+}
+
+.splash-territory-foreground {
+  fill: #082b29;
+}
+
+.splash-territory-link {
+  fill: none;
+  stroke: rgba(200, 193, 104, 0.58);
+  stroke-dasharray: 2.5 3;
+  stroke-linecap: round;
+  stroke-width: 1;
+}
+
+.splash-territory-node {
+  fill: #b8d88e;
+  stroke: #d6c268;
+  stroke-width: 0.8;
+}
+
+.splash-territory-accent {
+  fill: #d7c264;
+}
+
+.auth-splash-landscape-base {
+  fill: #0a3b32;
 }

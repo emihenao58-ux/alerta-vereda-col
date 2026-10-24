@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { ArrowLeft, LayoutDashboard, Settings2, ShieldCheck, Trees } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { useAuth } from "@/hooks/use-auth";
 
 export type AdminArea = "local" | "governance" | "gestion";
@@ -26,9 +27,50 @@ const areaCopy: Record<AdminArea, { eyebrow: string; title: string; subtitle: st
   },
 };
 
-export function AdminShell({ area, children }: { area: AdminArea; children: ReactNode }) {
+export function AdminShell({
+  area,
+  children,
+  compactHeader = false,
+}: {
+  area: AdminArea;
+  children: ReactNode;
+  compactHeader?: boolean;
+}) {
   const { esAdminVereda, esSuperadmin } = useAuth();
   const copy = areaCopy[area];
+
+  // Si el usuario es Superadmin, proporcionamos la experiencia de layout con barra lateral dedicada
+  if (esSuperadmin) {
+    return (
+      <AppShell wide variant="superadmin">
+        <div className="superadmin-layout-root">
+          <AdminSidebar />
+          <div className="superadmin-layout-main">
+            <div className={`admin-workspace admin-workspace-${area} superadmin-surface`}>
+              {!compactHeader && (
+                <header className="admin-workspace-header">
+                  <div className="admin-workspace-heading">
+                    <div className="admin-workspace-eyebrow">
+                      <ShieldCheck size={15} aria-hidden="true" />
+                      <span>{copy.eyebrow}</span>
+                    </div>
+                    <h1 className="admin-workspace-title">{copy.title}</h1>
+                    <p className="admin-workspace-subtitle">{copy.subtitle}</p>
+                  </div>
+                  <div className="admin-workspace-scope" aria-label="Alcance de la cuenta">
+                    <span className="admin-scope-dot" aria-hidden="true" />
+                    <span>Superadministrador</span>
+                  </div>
+                </header>
+              )}
+
+              <div className="admin-workspace-content">{children}</div>
+            </div>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell wide>
