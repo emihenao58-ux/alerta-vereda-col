@@ -185,7 +185,7 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
     <section className="mt-10 space-y-4">
       <h2 className="text-xl font-semibold">Supervisión del sistema</h2>
 
-      <section className="carta space-y-3">
+      <section id="solicitudes" className="carta space-y-3">
         <h3 className="text-lg font-semibold">Solicitudes pendientes</h3>
         {(solicitudes.data ?? []).length === 0 && (
           <p className="text-sm text-[color:var(--tinta-suave)]">No hay solicitudes pendientes.</p>
@@ -261,7 +261,7 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
         })}
       </section>
 
-      <section className="carta space-y-3">
+      <section id="administradores" className="carta space-y-3">
         <h3 className="text-lg font-semibold">Administradores de vereda</h3>
         {(administradores.data?.perfiles ?? []).length === 0 && (
           <p className="text-sm text-[color:var(--tinta-suave)]">
@@ -310,7 +310,7 @@ export function AdminSupervision({ correoActual }: { correoActual: string | unde
         })}
       </section>
 
-      <section className="carta space-y-3">
+      <section id="auditoria" className="carta space-y-3">
         <h3 className="text-lg font-semibold">Auditoría administrativa</h3>
         <p className="text-sm text-[color:var(--tinta-suave)]">
           Historial de decisiones y cambios administrativos. Solo el superadmin puede consultar este

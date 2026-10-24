@@ -1,1 +1,20 @@
-{"routes":[{"path":"/","title":"Inicio"},{"path":"/mi-vereda","title":"Mi Vereda"},{"path":"/emergencias","title":"Emergencias"},{"path":"/vias","title":"Vías"},{"path":"/servicios","title":"Servicios"},{"path":"/avisos","title":"Avisos"},{"path":"/reportar","title":"Reportar"},{"path":"/auth","title":"Acceso"},{"path":"/mapa","title":"Mapa"}]}
+{
+  "routes": [
+    { "path": "/", "title": "Inicio" },
+    { "path": "/admin", "title": "Espacios administrativos" },
+    { "path": "/admin/configuracion", "title": "Configuración" },
+    { "path": "/admin/gestion", "title": "Centro de Gestión" },
+    { "path": "/admin/gestion/reportar", "title": "Reportar Superadmin" },
+    { "path": "/admin/jac", "title": "Panel JAC" },
+    { "path": "/admin/jac-superadmin", "title": "Panel JAC Superadmin" },
+    { "path": "/auth", "title": "Acceso" },
+    { "path": "/auth/reset-password", "title": "Restablecer contraseña" },
+    { "path": "/avisos", "title": "Avisos" },
+    { "path": "/emergencias", "title": "Emergencias" },
+    { "path": "/mapa", "title": "Mapa" },
+    { "path": "/mi-vereda", "title": "Mi Vereda" },
+    { "path": "/reportar", "title": "Reportar" },
+    { "path": "/servicios", "title": "Servicios" },
+    { "path": "/vias", "title": "Vías" }
+  ]
+}
