@@ -1,9 +1,11 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavegacionSesion } from "@/components/navegacion-sesion";
 import { isThemeTransitionInitialized, subscribeThemeTarget } from "@/lib/theme-transition";
 import { getStartupPhraseFromDocument } from "@/lib/startup-phrases";
+
+const STARTUP_SPLASH_MINIMUM_MS = 1500;
 
 function getThemeReadySnapshot() {
   return isThemeTransitionInitialized();
@@ -23,6 +25,8 @@ export function AppStartupSplash() {
     getServerThemeReadySnapshot,
   );
   const [componentesMontados, setComponentesMontados] = useState(false);
+  const [duracionMinimaCumplida, setDuracionMinimaCumplida] = useState(false);
+  const splashVisibleDesdeRef = useRef<number | null>(null);
 
   useEffect(() => {
     setComponentesMontados(true);
@@ -30,10 +34,39 @@ export function AppStartupSplash() {
 
   const requiereAcceso = pathname === "/admin" || pathname.startsWith("/admin/");
   const accesoListo = !requiereAcceso || !cargandoAcceso;
-  const listo = temaInicializado && navegacionInicializada && componentesMontados && accesoListo;
+  const aplicacionLista =
+    temaInicializado && navegacionInicializada && componentesMontados && accesoListo;
+  const splashVisible = !aplicacionLista || !duracionMinimaCumplida;
+
+  useEffect(() => {
+    if (!splashVisible) {
+      splashVisibleDesdeRef.current = null;
+      return;
+    }
+
+    const ahora = performance.now();
+    const visibleDesde = splashVisibleDesdeRef.current ?? ahora;
+    if (splashVisibleDesdeRef.current === null) {
+      splashVisibleDesdeRef.current = visibleDesde;
+      setDuracionMinimaCumplida(false);
+    }
+    const restante = Math.max(0, STARTUP_SPLASH_MINIMUM_MS - (ahora - visibleDesde));
+
+    if (restante === 0) {
+      setDuracionMinimaCumplida(true);
+      return;
+    }
+
+    const temporizador = window.setTimeout(() => {
+      setDuracionMinimaCumplida(true);
+    }, restante);
+
+    return () => window.clearTimeout(temporizador);
+  }, [splashVisible]);
+
   const frase = getStartupPhraseFromDocument();
 
-  if (listo) return null;
+  if (!splashVisible) return null;
 
   return (
     <div
