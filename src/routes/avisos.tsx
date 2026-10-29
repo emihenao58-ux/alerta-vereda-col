@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import { fecha } from "@/lib/alerta";
+import { Vacio, TituloModulo } from "@/components/carta";
+import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
 import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
+import { esPublicacionPublica } from "@/lib/reportes-publicos";
 
 export const Route = createFileRoute("/avisos")({
   head: () => ({
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/avisos")({
 });
 
 function Avisos() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["avisos"],
     queryFn: () =>
       consultarCartelera({
@@ -33,6 +34,7 @@ function Avisos() {
         p_excluir_nivel_normal: false,
       }),
   });
+  const publicaciones = data?.filter(esPublicacionPublica) ?? [];
 
   return (
     <AppShell>
@@ -40,18 +42,20 @@ function Avisos() {
         titulo="Avisos"
         bajada="Reuniones y actividades de la Junta de Acción Comunal."
       />
-      {isLoading && <Vacio texto="Cargando…" />}
-      {data?.length === 0 && <Vacio texto="No hay avisos publicados." />}
-      {data?.map((a) => (
-        <Carta
-          key={a.publicacion_id}
-          titulo={a.titulo}
-          acento="#C99A2E"
-          meta={`${a.vereda_nombre ?? ""}${a.lugar ? ` · ${a.lugar}` : ""}${a.fecha_evento ? ` · ${fecha(a.fecha_evento)}` : ""}`}
-        >
-          {a.descripcion}
-        </Carta>
-      ))}
+      {isLoading && <Vacio texto="Cargando avisos…" />}
+      {isError && <Vacio texto="No fue posible cargar los avisos. Intenta más tarde." />}
+      {!isLoading && !isError && publicaciones.length === 0 && (
+        <Vacio texto="No hay avisos públicos publicados." />
+      )}
+      <div className="reportes-public-list">
+        {publicaciones.map((publicacion) => (
+          <TarjetaReportePublica
+            key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+            publicacion={publicacion}
+            mostrarCategoria={false}
+          />
+        ))}
+      </div>
     </AppShell>
   );
 }

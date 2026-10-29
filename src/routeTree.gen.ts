@@ -17,6 +17,7 @@ import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as MiVeredaRouteImport } from './routes/mi-vereda'
 import { Route as ReportarRouteImport } from './routes/reportar'
+import { Route as ReportesRouteImport } from './routes/reportes'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as ViasRouteImport } from './routes/vias'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -25,6 +26,8 @@ import { Route as AdminGestionRouteImport } from './routes/admin/gestion'
 import { Route as AdminJacRouteImport } from './routes/admin/jac'
 import { Route as AdminJacSuperadminRouteImport } from './routes/admin/jac-superadmin'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as ReportesIdRouteImport } from './routes/reportes.$id'
+import { Route as ReportesTodosRouteImport } from './routes/reportes.todos'
 import { Route as AdminGestionReportarRouteImport } from './routes/admin/gestion/reportar'
 
 const IndexRoute = IndexRouteImport.update({
@@ -67,6 +70,11 @@ const ReportarRoute = ReportarRouteImport.update({
   path: '/reportar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportesRoute = ReportesRouteImport.update({
+  id: '/reportes',
+  path: '/reportes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServiciosRoute = ServiciosRouteImport.update({
   id: '/servicios',
   path: '/servicios',
@@ -107,6 +115,16 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const ReportesIdRoute = ReportesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ReportesRoute,
+} as any)
+const ReportesTodosRoute = ReportesTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
+  getParentRoute: () => ReportesRoute,
+} as any)
 const AdminGestionReportarRoute = AdminGestionReportarRouteImport.update({
   id: '/reportar',
   path: '/reportar',
@@ -122,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
+  '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
   '/admin/configuracion': typeof AdminConfiguracionRoute
@@ -129,6 +148,8 @@ export interface FileRoutesByFullPath {
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/reportes/$id': typeof ReportesIdRoute
+  '/reportes/todos': typeof ReportesTodosRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/gestion/reportar': typeof AdminGestionReportarRoute
 }
@@ -140,6 +161,7 @@ export interface FileRoutesByTo {
   '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
+  '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
   '/admin/configuracion': typeof AdminConfiguracionRoute
@@ -147,6 +169,8 @@ export interface FileRoutesByTo {
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/reportes/$id': typeof ReportesIdRoute
+  '/reportes/todos': typeof ReportesTodosRoute
   '/admin': typeof AdminIndexRoute
   '/admin/gestion/reportar': typeof AdminGestionReportarRoute
 }
@@ -160,6 +184,7 @@ export interface FileRoutesById {
   '/mapa': typeof MapaRoute
   '/mi-vereda': typeof MiVeredaRoute
   '/reportar': typeof ReportarRoute
+  '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
   '/vias': typeof ViasRoute
   '/admin/configuracion': typeof AdminConfiguracionRoute
@@ -167,6 +192,8 @@ export interface FileRoutesById {
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/reportes/$id': typeof ReportesIdRoute
+  '/reportes/todos': typeof ReportesTodosRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/gestion/reportar': typeof AdminGestionReportarRoute
 }
@@ -181,6 +208,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/mi-vereda'
     | '/reportar'
+    | '/reportes'
     | '/servicios'
     | '/vias'
     | '/admin/configuracion'
@@ -188,6 +216,8 @@ export interface FileRouteTypes {
     | '/admin/jac'
     | '/admin/jac-superadmin'
     | '/auth/reset-password'
+    | '/reportes/$id'
+    | '/reportes/todos'
     | '/admin/'
     | '/admin/gestion/reportar'
   fileRoutesByTo: FileRoutesByTo
@@ -199,6 +229,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/mi-vereda'
     | '/reportar'
+    | '/reportes'
     | '/servicios'
     | '/vias'
     | '/admin/configuracion'
@@ -206,6 +237,8 @@ export interface FileRouteTypes {
     | '/admin/jac'
     | '/admin/jac-superadmin'
     | '/auth/reset-password'
+    | '/reportes/$id'
+    | '/reportes/todos'
     | '/admin'
     | '/admin/gestion/reportar'
   id:
@@ -218,6 +251,7 @@ export interface FileRouteTypes {
     | '/mapa'
     | '/mi-vereda'
     | '/reportar'
+    | '/reportes'
     | '/servicios'
     | '/vias'
     | '/admin/configuracion'
@@ -225,6 +259,8 @@ export interface FileRouteTypes {
     | '/admin/jac'
     | '/admin/jac-superadmin'
     | '/auth/reset-password'
+    | '/reportes/$id'
+    | '/reportes/todos'
     | '/admin/'
     | '/admin/gestion/reportar'
   fileRoutesById: FileRoutesById
@@ -238,6 +274,7 @@ export interface RootRouteChildren {
   MapaRoute: typeof MapaRoute
   MiVeredaRoute: typeof MiVeredaRoute
   ReportarRoute: typeof ReportarRoute
+  ReportesRoute: typeof ReportesRouteWithChildren
   ServiciosRoute: typeof ServiciosRoute
   ViasRoute: typeof ViasRoute
 }
@@ -300,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reportes': {
+      id: '/reportes'
+      path: '/reportes'
+      fullPath: '/reportes'
+      preLoaderRoute: typeof ReportesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/servicios': {
       id: '/servicios'
       path: '/servicios'
@@ -356,6 +400,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/reportes/$id': {
+      id: '/reportes/$id'
+      path: '/$id'
+      fullPath: '/reportes/$id'
+      preLoaderRoute: typeof ReportesIdRouteImport
+      parentRoute: typeof ReportesRoute
+    }
+    '/reportes/todos': {
+      id: '/reportes/todos'
+      path: '/todos'
+      fullPath: '/reportes/todos'
+      preLoaderRoute: typeof ReportesTodosRouteImport
+      parentRoute: typeof ReportesRoute
+    }
     '/admin/gestion/reportar': {
       id: '/admin/gestion/reportar'
       path: '/reportar'
@@ -406,6 +464,20 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ReportesRouteChildren {
+  ReportesIdRoute: typeof ReportesIdRoute
+  ReportesTodosRoute: typeof ReportesTodosRoute
+}
+
+const ReportesRouteChildren: ReportesRouteChildren = {
+  ReportesIdRoute: ReportesIdRoute,
+  ReportesTodosRoute: ReportesTodosRoute,
+}
+
+const ReportesRouteWithChildren = ReportesRoute._addFileChildren(
+  ReportesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -415,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapaRoute: MapaRoute,
   MiVeredaRoute: MiVeredaRoute,
   ReportarRoute: ReportarRoute,
+  ReportesRoute: ReportesRouteWithChildren,
   ServiciosRoute: ServiciosRoute,
   ViasRoute: ViasRoute,
 }

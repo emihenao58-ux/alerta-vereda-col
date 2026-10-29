@@ -13,6 +13,9 @@
     { "path": "/emergencias", "title": "Emergencias" },
     { "path": "/mapa", "title": "Mapa" },
     { "path": "/mi-vereda", "title": "Mi Vereda" },
+    { "path": "/reportes", "title": "Reportes" },
+    { "path": "/reportes/todos", "title": "Todos los reportes" },
+    { "path": "/reportes/:id", "title": "Detalle del reporte" },
     { "path": "/reportar", "title": "Reportar" },
     { "path": "/servicios", "title": "Servicios" },
     { "path": "/vias", "title": "Vías" }

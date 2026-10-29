@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import { URL_FOTO, severidadDeNivel, fecha } from "@/lib/alerta";
+import { Vacio, TituloModulo } from "@/components/carta";
+import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
 import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
+import { esPublicacionPublica } from "@/lib/reportes-publicos";
 
 export const Route = createFileRoute("/vias")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/vias")({
         content:
           "Consulta si las vías veredales de Ebéjico están habilitadas, con precaución, afectadas o cerradas.",
       },
-      { property: "og:title", content: "Estado de las vías · AlertaVereda" },
+      { property: "og:title", content: "Vías · AlertaVereda" },
       {
         property: "og:description",
         content: "Habilitada, precaución, afectada o cerrada: el estado de cada vía veredal.",
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/vias")({
 });
 
 function Vias() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["vias"],
     queryFn: () =>
       consultarCartelera({
@@ -34,26 +35,25 @@ function Vias() {
         p_excluir_nivel_normal: false,
       }),
   });
+  const publicaciones = data?.filter(esPublicacionPublica) ?? [];
 
   return (
     <AppShell>
       <TituloModulo titulo="Vías" bajada="Cómo está hoy el paso por cada vía de la vereda." />
-      {isLoading && <Vacio texto="Cargando…" />}
-      {data?.length === 0 && <Vacio texto="Todavía no hay vías registradas." />}
-      {data?.map((v) => (
-        <Carta
-          key={v.publicacion_id}
-          titulo={v.titulo}
-          severidad={severidadDeNivel(v.nivel)}
-          etiqueta={v.estado_operativo ?? ""}
-          meta={`${v.vereda_nombre ?? ""} · actualizado ${fecha(v.created_at)}`}
-        >
-          {v.descripcion}
-          {URL_FOTO(v.foto_url) && (
-            <img src={URL_FOTO(v.foto_url)!} alt={v.titulo} className="mt-2 w-full rounded-md" />
-          )}
-        </Carta>
-      ))}
+      {isLoading && <Vacio texto="Cargando vías…" />}
+      {isError && <Vacio texto="No fue posible cargar las vías. Intenta más tarde." />}
+      {!isLoading && !isError && publicaciones.length === 0 && (
+        <Vacio texto="Todavía no hay vías públicas registradas." />
+      )}
+      <div className="reportes-public-list">
+        {publicaciones.map((publicacion) => (
+          <TarjetaReportePublica
+            key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+            publicacion={publicacion}
+            mostrarCategoria={false}
+          />
+        ))}
+      </div>
     </AppShell>
   );
 }

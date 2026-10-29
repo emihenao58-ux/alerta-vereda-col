@@ -1,24 +1,26 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
 import {
+  ClipboardList,
   House,
   LayoutDashboard,
   Map as MapIcon,
   Mountain,
-  Pencil,
+  Plus,
   Trees,
   UserRound,
 } from "lucide-react";
 import { BrandLockup } from "@/components/brand-lockup";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useNavegacionSesion } from "@/components/navegacion-sesion";
 import { dispatchLogoutTransition } from "@/lib/logout-transition";
 
 const MODULOS = [
   { to: "/", label: "Inicio", Icono: House },
-  { to: "/mi-vereda", label: "Veredas", Icono: Mountain },
+  { to: "/reportes", label: "Reportes", Icono: ClipboardList },
   { to: "/mapa", label: "Mapa", Icono: MapIcon },
-  { to: "/reportar", label: "Reportar", Icono: Pencil },
+  { to: "/mi-vereda", label: "Veredas", Icono: Mountain },
 ] as const;
 
 export function BotonEmergencias() {
@@ -42,6 +44,17 @@ export function BotonEmergencias() {
         </span>
       </a>
     </div>
+  );
+}
+
+export function BotonReportarFlotante() {
+  return (
+    <Link to="/reportar" className="app-report-fab" aria-label="Crear un reporte">
+      <span className="app-report-fab-circle" aria-hidden="true">
+        <Plus size={32} strokeWidth={2.5} />
+      </span>
+      <span className="app-report-fab-label">Reportar</span>
+    </Link>
   );
 }
 
@@ -124,7 +137,17 @@ export interface AppShellProps {
 
 export function AppShell({ children, wide = false, variant = "default" }: AppShellProps) {
   const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
+  const { activarNavegacion } = useNavegacionSesion();
+  const location = useLocation();
   const isSuperadminLayout = variant === "superadmin" && esSuperadmin;
+  const mostrarBotonReportar =
+    !isSuperadminLayout &&
+    (!location.pathname.startsWith("/admin") || esAdminVereda) &&
+    location.pathname !== "/reportar";
+
+  useEffect(() => {
+    if (!isSuperadminLayout) activarNavegacion();
+  }, [activarNavegacion, isSuperadminLayout]);
 
   return (
     <div
@@ -202,6 +225,7 @@ export function AppShell({ children, wide = false, variant = "default" }: AppShe
         </span>
       </p>
 
+      {mostrarBotonReportar && <BotonReportarFlotante />}
       {!isSuperadminLayout && <BotonEmergencias />}
     </div>
   );

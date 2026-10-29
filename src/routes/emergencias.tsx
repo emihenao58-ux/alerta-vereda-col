@@ -1,23 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { Carta, TituloModulo, Vacio } from "@/components/carta";
-import { URL_FOTO, severidadDeNivel, ETIQUETA_ESTADO, fecha } from "@/lib/alerta";
+import { Vacio, TituloModulo } from "@/components/carta";
+import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
 import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
+import { esPublicacionPublica } from "@/lib/reportes-publicos";
 
 export const Route = createFileRoute("/emergencias")({
   head: () => ({
     meta: [
-      { title: "Emergencias activas · AlertaVereda Ebéjico" },
+      { title: "Emergencias · AlertaVereda Ebéjico" },
       {
         name: "description",
         content:
-          "Emergencias activas reportadas y verificadas en las veredas de Ebéjico, Antioquia.",
+          "Consulta emergencias y situaciones reportadas en las veredas de Ebéjico, Antioquia.",
       },
-      { property: "og:title", content: "Emergencias activas · AlertaVereda" },
+      { property: "og:title", content: "Emergencias · AlertaVereda" },
       {
         property: "og:description",
-        content: "Situaciones urgentes verificadas por la Junta de Acción Comunal.",
+        content: "Información pública sobre emergencias de las veredas de Ebéjico.",
       },
     ],
   }),
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/emergencias")({
 });
 
 function Emergencias() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["emergencias"],
     queryFn: () =>
       consultarCartelera({
@@ -34,29 +35,28 @@ function Emergencias() {
         p_excluir_nivel_normal: false,
       }),
   });
+  const publicaciones = data?.filter(esPublicacionPublica) ?? [];
 
   return (
     <AppShell>
       <TituloModulo
         titulo="Emergencias"
-        bajada="Situaciones urgentes verificadas por la Junta de Acción Comunal."
+        bajada="Consulta situaciones reportadas en las veredas y actúa con información clara."
       />
-      {isLoading && <Vacio texto="Cargando…" />}
-      {data?.length === 0 && <Vacio texto="No hay emergencias activas en este momento." />}
-      {data?.map((e) => (
-        <Carta
-          key={e.publicacion_id}
-          titulo={e.titulo}
-          severidad={severidadDeNivel(e.nivel)}
-          etiqueta={ETIQUETA_ESTADO("emergencia", e.estado_operativo)}
-          meta={`${e.vereda_nombre ?? ""} · ${e.lugar ?? "sin ubicación"} · ${fecha(e.created_at)}`}
-        >
-          {e.descripcion}
-          {URL_FOTO(e.foto_url) && (
-            <img src={URL_FOTO(e.foto_url)!} alt={e.titulo} className="mt-2 w-full rounded-md" />
-          )}
-        </Carta>
-      ))}
+      {isLoading && <Vacio texto="Cargando emergencias…" />}
+      {isError && <Vacio texto="No fue posible cargar las emergencias. Intenta más tarde." />}
+      {!isLoading && !isError && publicaciones.length === 0 && (
+        <Vacio texto="No hay emergencias públicas para mostrar." />
+      )}
+      <div className="reportes-public-list">
+        {publicaciones.map((publicacion) => (
+          <TarjetaReportePublica
+            key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+            publicacion={publicacion}
+            mostrarCategoria={false}
+          />
+        ))}
+      </div>
     </AppShell>
   );
 }

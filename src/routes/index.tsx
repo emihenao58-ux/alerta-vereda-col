@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import type { ComponentType, CSSProperties } from "react";
-import type { LucideProps } from "lucide-react";
-import { AlertTriangle, ArrowRight, Droplet, Megaphone, Plus } from "lucide-react";
-import { AppShell } from "@/components/app-shell";
-import { CartaCompacta, ChipSeveridad, Vacio } from "@/components/carta";
-import { RoadIcon } from "@/components/road-icon";
-import { URL_FOTO, severidadDeNivel } from "@/lib/alerta";
+import { ArrowRight, ClipboardList, Megaphone } from "lucide-react";
+import { AppShell, BotonEmergencias, CuentaControl } from "@/components/app-shell";
+import { Vacio } from "@/components/carta";
+import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavegacionSesion } from "@/components/navegacion-sesion";
 import { consultarCartelera, type MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
+import { esPublicacionPublica } from "@/lib/reportes-publicos";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,236 +26,212 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: Portada,
+  component: Inicio,
 });
 
-const ATAJOS = [
-  { to: "/emergencias", label: "Emergencias", color: "#D83644", textColor: "#FFFFFF" },
-  { to: "/vias", label: "Vías", color: "#E58129", textColor: "#1B2B24" },
-  { to: "/servicios", label: "Servicios", color: "#208666", textColor: "#FFFFFF" },
-  { to: "/avisos", label: "Avisos", color: "#E7A836", textColor: "#1B2B24" },
-] as const;
+function Inicio() {
+  const { pathname } = useLocation();
+  const { navegacionActiva } = useNavegacionSesion();
 
-type Atajo = (typeof ATAJOS)[number];
-type TarjetaInicioRuta = "/emergencias" | "/vias" | "/servicios" | "/avisos";
+  if (pathname !== "/") return null;
 
-const ICONOS_ATAJO: Record<Atajo["to"], ComponentType<LucideProps>> = {
-  "/emergencias": AlertTriangle,
-  "/vias": RoadIcon,
-  "/servicios": Droplet,
-  "/avisos": Megaphone,
-};
+  if (!navegacionActiva) {
+    return <PortadaEspecial />;
+  }
 
-const DESCRIPCIONES_ATAJO: Record<Atajo["to"], string> = {
-  "/emergencias": "Reporta situaciones urgentes.",
-  "/vias": "Reporta daños o bloqueos en la vía.",
-  "/servicios": "Reporta fallas en servicios públicos.",
-  "/avisos": "Comparte información importante.",
-};
+  return <InicioHabitual />;
+}
 
-const ACENTOS_CATEGORIA: Record<TarjetaInicioRuta, string> = {
-  "/emergencias": "#D83644",
-  "/vias": "#E58129",
-  "/servicios": "#208666",
-  "/avisos": "#E7A836",
-};
+function PortadaEspecial() {
+  const { usuario, salir, esAdminVereda, esSuperadmin } = useAuth();
+  const { activarNavegacion } = useNavegacionSesion();
+  const accesoAdministrativo = esSuperadmin
+    ? { to: "/admin/gestion" as const, label: "Centro de Gestión" }
+    : esAdminVereda
+      ? { to: "/admin/jac" as const, label: "Panel JAC" }
+      : null;
 
-function Portada() {
+  return (
+    <div className="portada-especial-page">
+      <header className="portada-especial-header">
+        <Link to="/" className="portada-especial-brand" aria-label="AlertaVereda, Inicio">
+          <span className="portada-especial-mark" aria-hidden="true">
+            <img src="/images/branding/alertavereda-icono.png" alt="" width="42" height="42" />
+          </span>
+          <span>AlertaVereda</span>
+        </Link>
+
+        <div className="portada-especial-header-actions">
+          {accesoAdministrativo && (
+            <Link to={accesoAdministrativo.to} className="portada-role-link">
+              {accesoAdministrativo.label}
+            </Link>
+          )}
+          <div className="portada-especial-controls">
+            <ThemeToggle />
+            <span className="portada-control-separator" aria-hidden="true" />
+            <CuentaControl usuario={Boolean(usuario)} salir={salir} />
+          </div>
+        </div>
+      </header>
+
+      <main className="portada-especial-main">
+        <div className="portada-especial-content">
+          <h1 className="sr-only">AlertaVereda</h1>
+          <blockquote className="portada-especial-verse">
+            <p>“Sobrellevad los unos las cargas de los otros.”</p>
+            <cite>Gálatas 6:2</cite>
+          </blockquote>
+
+          <nav className="portada-especial-actions" aria-label="Acciones principales">
+            <Link
+              to="/reportar"
+              className="portada-action portada-action-reportar"
+              onClick={activarNavegacion}
+            >
+              <span className="portada-action-icon" aria-hidden="true">
+                <Megaphone size={34} strokeWidth={2} />
+              </span>
+              <span className="portada-action-copy">
+                <strong>Reportar</strong>
+                <small>Registrar una nueva novedad.</small>
+              </span>
+              <ArrowRight
+                className="portada-action-arrow"
+                size={23}
+                strokeWidth={2.2}
+                aria-hidden="true"
+              />
+            </Link>
+
+            <Link
+              to="/reportes"
+              className="portada-action portada-action-reportes"
+              onClick={activarNavegacion}
+            >
+              <span className="portada-action-icon" aria-hidden="true">
+                <ClipboardList size={34} strokeWidth={2} />
+              </span>
+              <span className="portada-action-copy">
+                <strong>Ver reportes</strong>
+                <small>Consultar emergencias, vías, servicios y avisos.</small>
+              </span>
+              <ArrowRight
+                className="portada-action-arrow"
+                size={23}
+                strokeWidth={2.2}
+                aria-hidden="true"
+              />
+            </Link>
+          </nav>
+        </div>
+      </main>
+
+      <BotonEmergencias />
+    </div>
+  );
+}
+
+function InicioHabitual() {
   const { data, isError, isLoading } = useQuery({
-    queryKey: ["portada"],
+    queryKey: ["portada-habitual"],
     queryFn: async () => {
-      const [emergencias, vias, servicios, avisos] = await Promise.all([
+      const [emergencias, ultimosReportes] = await Promise.all([
         consultarCartelera({
           p_categoria: "emergencia",
           p_limit: 3,
-          p_excluir_nivel_normal: true,
+          p_excluir_nivel_normal: false,
         }),
         consultarCartelera({
-          p_categoria: "via",
-          p_limit: 3,
-          p_excluir_nivel_normal: true,
-        }),
-        consultarCartelera({
-          p_categoria: "servicio",
-          p_limit: 3,
-          p_excluir_nivel_normal: true,
-        }),
-        consultarCartelera({
-          p_categoria: "aviso",
+          p_categoria: null,
           p_limit: 2,
           p_excluir_nivel_normal: false,
         }),
       ]);
-      return { emergencias, vias, servicios, avisos };
+      return {
+        emergencias: emergencias.filter(esPublicacionPublica),
+        ultimosReportes: ultimosReportes.filter(esPublicacionPublica),
+      };
     },
   });
 
   const sinNovedades =
-    !isLoading &&
-    data &&
-    data.emergencias.length === 0 &&
-    data.vias.length === 0 &&
-    data.servicios.length === 0;
+    !isLoading && data && data.emergencias.length === 0 && data.ultimosReportes.length === 0;
 
   return (
     <AppShell wide>
-      <div className="inicio-page">
+      <div className="inicio-page inicio-page-habitual">
         <section className="inicio-hero" aria-labelledby="inicio-titulo">
           <div>
+            <p className="inicio-welcome-kicker">Consulta comunitaria</p>
             <h1 id="inicio-titulo">
-              <span>¿Qué está pasando</span>
-              <span>en la vereda?</span>
+              <span>Bienvenido a</span>
+              <span>AlertaVereda</span>
             </h1>
-            <p className="inicio-hero-lead">Reporta, consulta y mantente informado.</p>
+            <p className="inicio-hero-lead">Tu comunidad, más informada y segura.</p>
           </div>
-          <blockquote className="inicio-verse">
-            <span className="inicio-verse-symbol" aria-hidden="true">
-              †
-            </span>
-            <div>
-              <p>“Sobrellevad los unos las cargas de los otros.”</p>
-              <cite>Gálatas 6:2</cite>
-            </div>
-          </blockquote>
+          <div className="inicio-hero-note" aria-hidden="true">
+            <span>Hoy en la comunidad</span>
+            <strong>Consulta las novedades reales de tu vereda.</strong>
+          </div>
         </section>
 
-        <nav className="inicio-category-grid" aria-label="Categorías de la cartelera">
-          {ATAJOS.map((atajo) => {
-            const Icono = ICONOS_ATAJO[atajo.to];
-            return (
-              <Link
-                key={atajo.to}
-                to={atajo.to}
-                className="inicio-category-card"
-                style={{ backgroundColor: atajo.color, color: atajo.textColor }}
-              >
-                <span className="inicio-category-card-inner">
-                  <span
-                    className="inicio-category-icon"
-                    aria-hidden="true"
-                    style={{ color: atajo.textColor }}
-                  >
-                    <Icono
-                      size={48}
-                      strokeWidth={1.8}
-                      fill="currentColor"
-                      stroke="var(--icon-cutout)"
-                      style={{ "--icon-cutout": atajo.color } as CSSProperties}
-                    />
-                  </span>
-                  <span>
-                    <strong>{atajo.label}</strong>
-                    <small>{DESCRIPCIONES_ATAJO[atajo.to]}</small>
-                  </span>
-                  <span className="inicio-category-arrow" aria-hidden="true">
-                    →
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <Link to="/reportar" className="inicio-report-cta">
-          <Plus size={24} strokeWidth={2.5} aria-hidden="true" />
-          Reportar algo en mi vereda
-          <ArrowRight size={18} aria-hidden="true" />
-        </Link>
-
-        {isLoading && <Vacio texto="Cargando la cartelera…" />}
+        {isLoading && <Vacio texto="Cargando las novedades…" />}
         {isError && (
-          <Vacio texto="No fue posible cargar la cartelera. Intenta de nuevo más tarde." />
+          <Vacio texto="No fue posible cargar las novedades. Intenta de nuevo más tarde." />
         )}
         {sinNovedades && (
           <div className="inicio-status">
-            <ChipSeveridad severidad="normal" texto="Normal" />
-            <p>Sin novedades urgentes activas.</p>
+            <p>No hay novedades recientes activas por ahora.</p>
           </div>
         )}
 
-        <section className="inicio-feed" aria-labelledby="inicio-feed-titulo">
-          <div className="inicio-feed-heading">
+        {data && data.emergencias.length > 0 && (
+          <section className="inicio-emergency-section" aria-labelledby="inicio-emergencias-titulo">
+            <div className="inicio-section-heading inicio-emergency-heading">
+              <div>
+                <p className="inicio-section-kicker">Atención comunitaria</p>
+                <h2 id="inicio-emergencias-titulo">Emergencias activas</h2>
+              </div>
+              <Link to="/emergencias" className="inicio-section-link">
+                Ver todas
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="inicio-emergency-list">
+              {data.emergencias.slice(0, 2).map((publicacion) => (
+                <TarjetaInicio key={publicacion.publicacion_id} publicacion={publicacion} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="inicio-recent-section" aria-labelledby="inicio-recientes-titulo">
+          <div className="inicio-section-heading">
             <div>
-              <h2 id="inicio-feed-titulo">Últimos avisos</h2>
+              <h2 id="inicio-recientes-titulo">Últimos reportes</h2>
+              <p>Las dos novedades más recientes de la comunidad.</p>
             </div>
           </div>
 
-          {data?.emergencias.map((publicacion) => (
-            <TarjetaInicio
-              key={publicacion.publicacion_id}
-              to="/emergencias"
-              publicacion={publicacion}
-              categoria="emergencia"
-            />
+          {data?.ultimosReportes.map((publicacion) => (
+            <TarjetaInicio key={publicacion.publicacion_id} publicacion={publicacion} />
           ))}
-          {data?.vias.map((publicacion) => (
-            <TarjetaInicio
-              key={publicacion.publicacion_id}
-              to="/vias"
-              publicacion={publicacion}
-              categoria="via"
-            />
-          ))}
-          {data?.servicios.map((publicacion) => (
-            <TarjetaInicio
-              key={publicacion.publicacion_id}
-              to="/servicios"
-              publicacion={publicacion}
-              categoria="servicio"
-            />
-          ))}
-          {data?.avisos.map((publicacion) => (
-            <TarjetaInicio
-              key={publicacion.publicacion_id}
-              to="/avisos"
-              publicacion={publicacion}
-              categoria="aviso"
-            />
-          ))}
+
+          {data && data.ultimosReportes.length === 0 && (
+            <Vacio texto="Aún no hay reportes recientes para mostrar." />
+          )}
+
+          <Link to="/reportes" className="inicio-see-all-reports">
+            Ver todos los reportes
+            <ArrowRight size={17} aria-hidden="true" />
+          </Link>
         </section>
       </div>
     </AppShell>
   );
 }
 
-function TarjetaInicio({
-  to,
-  publicacion,
-  categoria,
-}: {
-  to: TarjetaInicioRuta;
-  publicacion: MiVeredaPublicacion;
-  categoria: "emergencia" | "via" | "servicio" | "aviso";
-}) {
-  return (
-    <Link to={to} className="carta-compacta-link">
-      <CartaCompacta
-        categoria={categoria}
-        titulo={publicacion.titulo}
-        descripcion={publicacion.descripcion}
-        fotoUrl={URL_FOTO(publicacion.foto_url)}
-        vereda={publicacion.vereda_nombre ?? publicacion.lugar}
-        momento={tiempoRelativo(publicacion.fecha_evento ?? publicacion.created_at)}
-        severidad={severidadDeNivel(publicacion.nivel)}
-        etiqueta={publicacion.estado_operativo ?? undefined}
-        acento={ACENTOS_CATEGORIA[to]}
-      />
-    </Link>
-  );
-}
-
-function tiempoRelativo(valor: string | null | undefined) {
-  if (!valor) return null;
-  const diferencia = Date.now() - new Date(valor).getTime();
-  const minutos = Math.max(0, Math.round(diferencia / 60_000));
-  if (minutos < 1) return "Ahora";
-  if (minutos < 60) return `Hace ${minutos} min`;
-  const horas = Math.round(minutos / 60);
-  if (horas < 24) return `Hace ${horas} h`;
-  const dias = Math.round(horas / 24);
-  if (dias < 7) return `Hace ${dias} ${dias === 1 ? "día" : "días"}`;
-  return new Date(valor).toLocaleDateString("es-CO", {
-    day: "2-digit",
-    month: "short",
-  });
+function TarjetaInicio({ publicacion }: { publicacion: MiVeredaPublicacion }) {
+  return <TarjetaReportePublica publicacion={publicacion} mostrarCategoria compacta />;
 }
