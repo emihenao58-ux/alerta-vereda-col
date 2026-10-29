@@ -14,6 +14,12 @@ export type MiVeredaPublicacion = {
   resultado: string | null;
   cerrado_en: string | null;
   foto_url: string | null;
+  /** Puede llegar cuando la RPC pública incorpore metadatos de evidencia. */
+  capturado_en?: string | null;
+  /** Solo se usa si la capa pública confirma que la ubicación puede divulgarse. */
+  latitud?: number | null;
+  longitud?: number | null;
+  coordenadas_publicas?: boolean | null;
   fecha_evento: string | null;
   created_at: string;
   nivel: string | null;
@@ -95,6 +101,25 @@ type ClosedPublicationsClient = {
   from: (table: "mi_vereda_publicaciones") => ClosedPublicationsQuery;
 };
 
+const CONSULTA_PUBLICA_TIMEOUT_MS = 12_000;
+
+function conTiempoLimite<T>(promesa: Promise<T>, mensaje: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const temporizador = setTimeout(() => reject(new Error(mensaje)), CONSULTA_PUBLICA_TIMEOUT_MS);
+
+    promesa.then(
+      (valor) => {
+        clearTimeout(temporizador);
+        resolve(valor);
+      },
+      (error: unknown) => {
+        clearTimeout(temporizador);
+        reject(error);
+      },
+    );
+  });
+}
+
 /**
  * Adaptador temporal mientras se regeneran los tipos de Supabase con v3.3.
  * El contrato de retorno coincide con public.mi_vereda_publicaciones.
@@ -107,14 +132,17 @@ export async function consultarCartelera(
   },
 ): Promise<MiVeredaPublicacion[]> {
   const rpcClient = supabase as unknown as MiVeredaRpcClient;
-  const { data, error } = await rpcClient.rpc("mi_vereda_cartelera", {
-    p_vereda_id: args.p_vereda_id ?? null,
-    p_busqueda: args.p_busqueda ?? null,
-    p_categoria: args.p_categoria,
-    p_limit: args.p_limit,
-    p_offset: args.p_offset ?? 0,
-    p_excluir_nivel_normal: args.p_excluir_nivel_normal,
-  });
+  const { data, error } = await conTiempoLimite(
+    rpcClient.rpc("mi_vereda_cartelera", {
+      p_vereda_id: args.p_vereda_id ?? null,
+      p_busqueda: args.p_busqueda ?? null,
+      p_categoria: args.p_categoria,
+      p_limit: args.p_limit,
+      p_offset: args.p_offset ?? 0,
+      p_excluir_nivel_normal: args.p_excluir_nivel_normal,
+    }),
+    "La cartelera tardó demasiado en responder.",
+  );
 
   if (error) throw error;
   return Array.isArray(data) ? (data as MiVeredaPublicacion[]) : [];
@@ -128,16 +156,19 @@ export async function consultarHistorial(
   },
 ): Promise<MiVeredaHistorialPublicacion[]> {
   const rpcClient = supabase as unknown as MiVeredaRpcClient;
-  const { data, error } = await rpcClient.rpc("mi_vereda_historial", {
-    p_vereda_id: args.p_vereda_id ?? null,
-    p_busqueda: args.p_busqueda ?? null,
-    p_resultado: args.p_resultado,
-    p_categoria: args.p_categoria,
-    p_desde: args.p_desde,
-    p_hasta: args.p_hasta,
-    p_limit: args.p_limit,
-    p_offset: args.p_offset ?? 0,
-  });
+  const { data, error } = await conTiempoLimite(
+    rpcClient.rpc("mi_vereda_historial", {
+      p_vereda_id: args.p_vereda_id ?? null,
+      p_busqueda: args.p_busqueda ?? null,
+      p_resultado: args.p_resultado,
+      p_categoria: args.p_categoria,
+      p_desde: args.p_desde,
+      p_hasta: args.p_hasta,
+      p_limit: args.p_limit,
+      p_offset: args.p_offset ?? 0,
+    }),
+    "El historial tardó demasiado en responder.",
+  );
 
   if (error) throw error;
   return Array.isArray(data) ? (data as MiVeredaHistorialPublicacion[]) : [];

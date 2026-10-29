@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   ChevronDown,
@@ -8,11 +8,7 @@ import {
   CircleX,
   Filter,
   History,
-  House,
-  Map as MapIcon,
   MapPin,
-  Mountain,
-  Pencil,
   Search,
   Sparkles,
   Volume2,
@@ -36,10 +32,7 @@ import {
   type CategoriaMiVereda,
   type EstadoMiVereda,
 } from "@/lib/mi-vereda-demo";
-import { BotonEmergencias, CuentaControl } from "@/components/app-shell";
-import { BrandLockup } from "@/components/brand-lockup";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useAuth } from "@/hooks/use-auth";
+import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/mi-vereda")({
   head: () => ({
@@ -394,7 +387,7 @@ function MiVereda() {
   };
 
   return (
-    <MiVeredaShell>
+    <AppShell>
       <div className="mi-vereda-guided-stage">
         <div className="mi-vereda-guide-wrap">
           <GuiaHablada
@@ -689,58 +682,6 @@ function MiVereda() {
           <span>Esta pantalla usa datos reales de Mi Vereda en el proyecto real.</span>
         </aside>
       </div>
-    </MiVeredaShell>
-  );
-}
-
-function MiVeredaShell({ children }: { children: ReactNode }) {
-  const { usuario, salir } = useAuth();
-
-  return (
-    <div className="app-shell-page min-h-screen">
-      <header className="app-shell-header">
-        <div className="app-shell-header-inner mx-auto max-w-6xl px-4 py-2">
-          <BrandLockup to="/mi-vereda" />
-          <nav className="app-shell-main-nav" aria-label="Navegación principal">
-            <ul className="flex gap-1">
-              {(
-                [
-                  ["/", "Inicio", House],
-                  ["/mi-vereda", "Veredas", Mountain],
-                  ["/mapa", "Mapa", MapIcon],
-                  ["/reportar", "Reportar", Pencil],
-                ] as const
-              ).map(([to, label, Icono]) => (
-                <li key={to}>
-                  <Link
-                    to={to as "/" | "/mi-vereda" | "/mapa" | "/reportar"}
-                    className="app-shell-nav-link"
-                    activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
-                  >
-                    <Icono size={16} strokeWidth={2.2} aria-hidden="true" />
-                    <span className="nav-link-label">{label}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="header-controls">
-            <ThemeToggle />
-            <span className="header-control-separator" aria-hidden="true" />
-            <CuentaControl usuario={Boolean(usuario)} salir={salir} />
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
-      <p className="mx-auto max-w-3xl px-4 pb-6 text-center text-xs text-[color:var(--tinta-suave)]">
-        <span className="app-community-note">
-          Herramienta comunitaria — complementa, no reemplaza a las autoridades
-        </span>
-        <span className="app-community-tagline mt-1 block italic">
-          Hecho para servir a nuestra comunidad, con Cristo en el centro. †
-        </span>
-      </p>
-      <BotonEmergencias />
-    </div>
+    </AppShell>
   );
 }

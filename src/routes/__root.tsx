@@ -11,11 +11,17 @@ import { useEffect, useMemo, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthSplash } from "@/components/admin/auth-splash";
+import { AppStartupSplash } from "@/components/app-startup-splash";
 import { LogoutTransition } from "@/components/logout-transition";
+import { NavegacionSesionProvider } from "@/components/navegacion-sesion";
 import { ThemeTransitionLayers } from "@/components/theme-transition-layers";
 import { Toaster } from "@/components/ui/sonner";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import {
+  STARTUP_PHRASE_APPLY_SCRIPT,
+  STARTUP_PHRASE_BOOTSTRAP_SCRIPT,
+} from "@/lib/startup-phrases";
 
 function NotFoundComponent() {
   return (
@@ -124,11 +130,13 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="es" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: STARTUP_PHRASE_BOOTSTRAP_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
         <ThemeTransitionLayers />
         {children}
+        <script dangerouslySetInnerHTML={{ __html: STARTUP_PHRASE_APPLY_SCRIPT }} />
         <Scripts />
       </body>
     </html>
@@ -140,12 +148,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* The splash stays mounted across route changes so login never reveals a blank frame. */}
-      <AuthSplash />
-      <LogoutTransition />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" />
+      <NavegacionSesionProvider>
+        <AppStartupSplash />
+        {/* The splash stays mounted across route changes so login never reveals a blank frame. */}
+        <AuthSplash />
+        <LogoutTransition />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" />
+      </NavegacionSesionProvider>
     </QueryClientProvider>
   );
 }

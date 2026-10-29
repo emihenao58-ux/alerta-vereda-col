@@ -46,3 +46,8 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Documentación técnica
+
+- [Módulo 2 — Auditoría técnica de reportes, Reportar y dependencias](docs/modulo-2-auditoria-reportar-dependencias.md)
+- [Pendientes de backend](docs/pendientes-backend.md)

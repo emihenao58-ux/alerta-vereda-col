@@ -71,13 +71,17 @@ export function getThemeTarget(): AppTheme {
   return state.initialized ? state.targetTheme : themeFromRoot();
 }
 
+export function isThemeTransitionInitialized(): boolean {
+  return state.initialized;
+}
+
 export function subscribeThemeTarget(listener: () => void): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
 
-function notifyTarget(theme: AppTheme) {
-  if (state.targetTheme === theme) return;
+function notifyTarget(theme: AppTheme, force = false) {
+  if (!force && state.targetTheme === theme) return;
   state.targetTheme = theme;
   listeners.forEach((listener) => listener());
 }
@@ -108,6 +112,7 @@ function setInterfaceTheme(theme: AppTheme) {
   root.classList.toggle("dark", theme === "dark");
   root.dataset["theme"] = theme;
   root.style.colorScheme = theme;
+  notifyTarget(theme);
 }
 
 function isReducedMotion(): boolean {
@@ -353,6 +358,7 @@ export function registerThemeTransitionLayers(elements: TransitionElements) {
     state.forcedQuality = resolved.forced;
     state.initialized = true;
     setQualityClasses(state.quality, false);
+    notifyTarget(initialTheme, true);
   }
   setLayerStyles(state.progress);
   schedulePreload();
@@ -369,7 +375,6 @@ export function registerThemeTransitionLayers(elements: TransitionElements) {
 
 export function transitionToTheme(theme: AppTheme) {
   if (typeof window === "undefined" || typeof document === "undefined") return;
-  notifyTarget(theme);
   setStoredTheme(theme);
   const target = targetToProgress(theme);
 
