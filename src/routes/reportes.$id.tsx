@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CalendarDays, MapPin, Navigation, TriangleAlert } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { EstadoPublicoChip } from "@/components/reportes/estado-publico";
@@ -64,9 +64,9 @@ function ReporteDetalle() {
           <p>
             Este reporte no existe, fue retirado de la consulta pública o ya no está disponible.
           </p>
-          <a href="/reportes/todos" className="report-detail-back-button">
+          <Link to="/reportes/todos" className="report-detail-back-button">
             <ArrowLeft size={17} aria-hidden="true" /> Volver a los reportes
-          </a>
+          </Link>
         </div>
       </AppShell>
     );
@@ -93,9 +93,9 @@ function ReporteDetalle() {
   return (
     <AppShell wide>
       <div className="report-detail-page">
-        <a href="/reportes/todos" className="reportes-back-link">
+        <Link to="/reportes/todos" className="reportes-back-link">
           <ArrowLeft size={17} aria-hidden="true" /> Volver a los reportes
-        </a>
+        </Link>
 
         <header className="report-detail-header">
           <div className="report-detail-heading-line">
