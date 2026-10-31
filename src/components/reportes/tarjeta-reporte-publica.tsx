@@ -5,6 +5,7 @@ import {
   MapPin,
   TriangleAlert,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { URL_FOTO } from "@/lib/alerta";
 import {
@@ -16,21 +17,32 @@ import {
   coordenadasPublicasDe,
   severidadPublicaDe,
   ETIQUETAS_SEVERIDAD_PUBLICA,
+  type EstadoPublico,
 } from "@/lib/reportes-publicos";
 import type { MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
+import type { OrigenListaReporte } from "@/lib/reportes-navegacion";
 import { EstadoPublicoChip } from "./estado-publico";
 import { FotoEvidenciaPublica } from "./evidencia-publica";
+import { MetaPublicacionCompacta, type MetadatosPublicacion } from "./metadatos-publicacion";
 
 export function TarjetaReportePublica({
   publicacion,
   mostrarCategoria,
+  origenLista = "todos",
   compacta = false,
+  metadatosPublicacion,
+  estadoPublicoOverride,
+  metadatosCategoria,
 }: {
   publicacion: MiVeredaPublicacion;
   mostrarCategoria: boolean;
+  origenLista?: OrigenListaReporte;
   compacta?: boolean;
+  metadatosPublicacion?: MetadatosPublicacion | null;
+  estadoPublicoOverride?: EstadoPublico;
+  metadatosCategoria?: ReactNode;
 }) {
-  const estado = estadoPublicoDe(publicacion);
+  const estado = estadoPublicoOverride ?? estadoPublicoDe(publicacion);
   if (!estado) return null;
 
   const fotoUrl = URL_FOTO(publicacion.foto_url);
@@ -55,6 +67,7 @@ export function TarjetaReportePublica({
       <Link
         to="/reportes/$id"
         params={{ id: publicacion.publicacion_id }}
+        search={{ origen: origenLista }}
         className="reporte-card-publico-hit-area"
         aria-label={`Abrir detalle del reporte: ${publicacion.titulo}`}
       >
@@ -103,6 +116,9 @@ export function TarjetaReportePublica({
             <ChevronRight size={22} />
           </span>
         </div>
+
+        <MetaPublicacionCompacta metadatos={metadatosPublicacion ?? null} />
+        {metadatosCategoria}
 
         <div className="reporte-card-publico-location">
           <MapPin size={16} aria-hidden="true" />

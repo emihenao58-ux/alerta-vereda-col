@@ -5,7 +5,13 @@ import {
   type MiVeredaPublicacion,
 } from "@/lib/mi-vereda-cartelera";
 
-export type EstadoPublico = "en_revision" | "verificado_activo" | "verificado_solucionado";
+export type EstadoPublico =
+  | "en_revision"
+  | "verificado_activo"
+  | "en_atencion"
+  | "verificado_solucionado"
+  | "cerrado_sin_solucion"
+  | "no_clasificado";
 
 export type SeveridadPublica = "urgente" | "precaucion";
 
@@ -17,7 +23,10 @@ export type CoordenadasPublicas = {
 export const ETIQUETAS_ESTADO_PUBLICO: Record<EstadoPublico, string> = {
   en_revision: "En revisión",
   verificado_activo: "Verificado y activo",
+  en_atencion: "En atención",
   verificado_solucionado: "Verificado y solucionado",
+  cerrado_sin_solucion: "Cerrado sin solución",
+  no_clasificado: "Estado no disponible",
 };
 
 export const ETIQUETAS_CATEGORIA_PUBLICA: Record<MiVeredaCategoria, string> = {
@@ -32,26 +41,40 @@ export const ETIQUETAS_SEVERIDAD_PUBLICA: Record<SeveridadPublica, string> = {
   precaucion: "Precaución",
 };
 
-const ESTADOS_RECHAZADOS = new Set(["rechazado", "retirado"]);
+const ESTADOS_NO_PUBLICOS = new Set(["rechazado", "retirado"]);
 const ESTADOS_REVISION = new Set(["pendiente", "en observacion", "en revision"]);
-const ESTADOS_ACTIVOS = new Set([
-  "activa",
-  "activo",
-  "habilitada",
-  "habilitado",
-  "publicado",
-  "publicada",
-  "precaucion",
-  "cerrada",
-  "normal",
-]);
+const ESTADOS_ATENCION = new Set(["en atencion", "en proceso", "en intervencion"]);
+const ESTADOS_ACTIVOS_EXPLICITOS = new Set(["activa", "activo", "verificado activo"]);
+const ESTADOS_SOLUCIONADOS = new Set(["solucionado", "verificado solucionado"]);
 
-function normalizar(valor: string | null | undefined) {
+export function normalizarEstadoPublico(valor: string | null | undefined) {
   return (valor ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replaceAll("_", " ")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function tieneFechaCierreValida(publicacion: MiVeredaPublicacion) {
+  const cerradoEn = publicacion.cerrado_en?.trim();
+  if (!cerradoEn) return false;
+
+  const partes =
+    /^(\d{4})-(\d{2})-(\d{2})(?:T(2[0-3]|[01]\d):([0-5]\d):([0-5]\d)(?:\.\d+)?(?:Z|[+-](?:(?:0\d|1[0-3]):[0-5]\d|14:00)))?$/i.exec(
+      cerradoEn,
+    );
+  if (!partes || !Number.isFinite(Date.parse(cerradoEn))) return false;
+
+  const anio = Number(partes[1]);
+  const mes = Number(partes[2]);
+  const dia = Number(partes[3]);
+  if (anio < 1 || mes < 1 || mes > 12) return false;
+
+  const esBisiesto = anio % 4 === 0 && (anio % 100 !== 0 || anio % 400 === 0);
+  const diasEnMes = mes === 2 ? (esBisiesto ? 29 : 28) : [4, 6, 9, 11].includes(mes) ? 30 : 31;
+  return dia >= 1 && dia <= diasEnMes;
 }
 
 /**
@@ -60,22 +83,35 @@ function normalizar(valor: string | null | undefined) {
  * se limita a emergencias pendientes de verificación.
  */
 export function estadoPublicoDe(publicacion: MiVeredaPublicacion): EstadoPublico | null {
-  const resultado = normalizar(publicacion.resultado);
-  const estado = normalizar(publicacion.estado_operativo);
+  const resultado = normalizarEstadoPublico(publicacion.resultado);
+  const estado = normalizarEstadoPublico(publicacion.estado_operativo);
 
-  if (ESTADOS_RECHAZADOS.has(resultado) || resultado === "no solucionado") return null;
-  if (resultado === "solucionado") return "verificado_solucionado";
+  if (ESTADOS_NO_PUBLICOS.has(resultado) || ESTADOS_NO_PUBLICOS.has(estado)) return null;
 
-  if (ESTADOS_REVISION.has(estado)) {
+  if (resultado === "no solucionado") {
+    if (tieneFechaCierreValida(publicacion)) return "cerrado_sin_solucion";
+    return "no_clasificado";
+  }
+
+  if (ESTADOS_REVISION.has(resultado) || ESTADOS_REVISION.has(estado)) {
     return publicacion.categoria === "emergencia" ? "en_revision" : null;
   }
 
-  // La cartelera pública actual ya devuelve publicaciones visibles. Cuando el
-  // contrato no trae una etiqueta operativa reconocible, se conserva esa
-  // visibilidad como publicación activa sin exponer el valor interno.
-  if (!estado || ESTADOS_ACTIVOS.has(estado)) return "verificado_activo";
+  if (ESTADOS_SOLUCIONADOS.has(resultado) || ESTADOS_SOLUCIONADOS.has(estado)) {
+    return "verificado_solucionado";
+  }
 
-  return "verificado_activo";
+  // «En atención» se reconoce solo con un valor explícito; no se infiere de
+  // antigüedad, severidad ni de una condición específica de la categoría.
+  if (ESTADOS_ATENCION.has(resultado) || ESTADOS_ATENCION.has(estado)) return "en_atencion";
+
+  if (ESTADOS_ACTIVOS_EXPLICITOS.has(resultado) || ESTADOS_ACTIVOS_EXPLICITOS.has(estado)) {
+    return "verificado_activo";
+  }
+
+  // Un estado desconocido puede permanecer visible si la consulta pública ya
+  // lo autorizó, pero no se presenta como verificado.
+  return "no_clasificado";
 }
 
 export function esEmergenciaEnRevision(publicacion: MiVeredaPublicacion) {
@@ -88,7 +124,7 @@ export function severidadPublicaDe(
 ): SeveridadPublica | null {
   if (publicacion.categoria !== "emergencia" && publicacion.categoria !== "via") return null;
 
-  const nivel = normalizar(publicacion.nivel);
+  const nivel = normalizarEstadoPublico(publicacion.nivel);
   if (nivel === "urgente") return "urgente";
   if (nivel === "atencion" || nivel === "precaucion") return "precaucion";
   return null;
@@ -132,7 +168,7 @@ export function etiquetaCategoria(categoria: MiVeredaCategoria) {
 }
 
 export function ilustracionPublicaDe(publicacion: MiVeredaPublicacion) {
-  const tipo = normalizar(publicacion.tipo).replaceAll(" ", "_");
+  const tipo = normalizarEstadoPublico(publicacion.tipo).replaceAll(" ", "_");
   const candidatos = [tipo];
 
   if (publicacion.categoria === "emergencia") candidatos.push("otra_emergencia");
