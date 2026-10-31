@@ -1,0 +1,35 @@
+.avisos-origin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 999px;
+  padding: 0.26rem 0.56rem;
+  font-size: 0.69rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.avisos-origin-chip-oficial {
+  border-color: color-mix(in srgb, #e7a836 48%, var(--border));
+  background: color-mix(in srgb, #e7a836 18%, var(--card));
+  color: #664a11;
+}
+
+.avisos-origin-chip-habitantes {
+  border-color: color-mix(in srgb, var(--bosque) 35%, var(--border));
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  color: var(--bosque-oscuro);
+}
+
+.dark .avisos-origin-chip-oficial,
+.dark .avisos-origin-chip-habitantes {
+  color: var(--tinta);
+}
+
+.avisos-origin-chip svg {
+  flex: 0 0 auto;
+}

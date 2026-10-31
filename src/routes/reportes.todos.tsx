@@ -110,7 +110,10 @@ function TodosLosReportes() {
         <header className="reportes-todos-header">
           <p className="reportes-eyebrow">Consulta comunitaria</p>
           <h1>Todos los reportes</h1>
-          <p>Consulta las publicaciones verificadas y las emergencias provisionales autorizadas.</p>
+          <p>
+            Consulta las publicaciones con visibilidad pública autorizada, incluidas emergencias en
+            revisión.
+          </p>
         </header>
 
         <section className="reportes-filters" aria-label="Filtros de reportes">
@@ -222,6 +225,7 @@ function TodosLosReportes() {
                   key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
                   publicacion={publicacion}
                   mostrarCategoria
+                  origenLista="todos"
                 />
               ))}
             </div>

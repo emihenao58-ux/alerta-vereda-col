@@ -2,10 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, CalendarDays, MapPin, Navigation, TriangleAlert } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import {
+  EtiquetaProcedenciaAviso,
+  type ProcedenciaAvisoPublica,
+} from "@/components/reportes/etiqueta-procedencia-aviso";
 import { EstadoPublicoChip } from "@/components/reportes/estado-publico";
 import { FotoEvidenciaPublica } from "@/components/reportes/evidencia-publica";
+import { InformacionPublicacion } from "@/components/reportes/metadatos-publicacion";
 import { Vacio } from "@/components/carta";
 import { URL_FOTO } from "@/lib/alerta";
+import { estadoGeneralAvisoDe, etiquetaTipoAvisoDe } from "@/lib/avisos-publicos";
+import { normalizarOrigenListaReporte, ORIGENES_LISTA_REPORTE } from "@/lib/reportes-navegacion";
+import {
+  estadoGeneralViaDe,
+  esPublicacionViasPublica,
+  etiquetaCondicionViaDe,
+} from "@/lib/vias-publicas";
 import {
   ETIQUETAS_CATEGORIA_PUBLICA,
   coordenadasPublicasDe,
@@ -17,8 +29,16 @@ import {
   ETIQUETAS_SEVERIDAD_PUBLICA,
   consultarReportePublicoPorId,
 } from "@/lib/reportes-publicos";
+import {
+  condicionOperativaServicioDe,
+  etiquetaTipoServicioDe,
+  estadoGeneralServicioDe,
+} from "@/lib/servicios-publicos";
 
 export const Route = createFileRoute("/reportes/$id")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    origen: normalizarOrigenListaReporte(search["origen"]),
+  }),
   head: () => ({
     meta: [
       { title: "Detalle del reporte · AlertaVereda" },
@@ -33,6 +53,8 @@ export const Route = createFileRoute("/reportes/$id")({
 
 function ReporteDetalle() {
   const { id } = Route.useParams();
+  const { origen } = Route.useSearch();
+  const retorno = ORIGENES_LISTA_REPORTE[origen];
   const reporte = useQuery({
     queryKey: ["reporte-publico-detalle", id],
     queryFn: () => consultarReportePublicoPorId(decodeURIComponent(id)),
@@ -64,8 +86,8 @@ function ReporteDetalle() {
           <p>
             Este reporte no existe, fue retirado de la consulta pública o ya no está disponible.
           </p>
-          <Link to="/reportes/todos" className="report-detail-back-button">
-            <ArrowLeft size={17} aria-hidden="true" /> Volver a los reportes
+          <Link to={retorno.ruta} className="report-detail-back-button">
+            <ArrowLeft size={17} aria-hidden="true" /> {retorno.etiqueta}
           </Link>
         </div>
       </AppShell>
@@ -73,7 +95,16 @@ function ReporteDetalle() {
   }
 
   const publicacion = reporte.data;
-  const estado = estadoPublicoDe(publicacion);
+  const estado =
+    publicacion.categoria === "via"
+      ? esPublicacionViasPublica(publicacion)
+        ? estadoGeneralViaDe(publicacion)
+        : null
+      : publicacion.categoria === "servicio"
+        ? estadoGeneralServicioDe(publicacion)
+        : publicacion.categoria === "aviso"
+          ? estadoGeneralAvisoDe(publicacion)
+          : estadoPublicoDe(publicacion);
   if (!estado) {
     return (
       <AppShell wide>
@@ -89,12 +120,14 @@ function ReporteDetalle() {
   const emergenciaSinVerificar = esEmergenciaEnRevision(publicacion);
   const severidad = severidadPublicaDe(publicacion);
   const ubicacion = publicacion.vereda_nombre ?? publicacion.lugar;
+  const procedenciaAviso: ProcedenciaAvisoPublica | null = null;
 
   return (
     <AppShell wide>
       <div className="report-detail-page">
-        <Link to="/reportes/todos" className="reportes-back-link">
-          <ArrowLeft size={17} aria-hidden="true" /> Volver a los reportes
+        <Link to={retorno.ruta} className="reportes-back-link">
+          <ArrowLeft size={17} aria-hidden="true" />
+          {retorno.etiqueta}
         </Link>
 
         <header className="report-detail-header">
@@ -112,6 +145,10 @@ function ReporteDetalle() {
             incorporará cuando esté disponible el contrato de Supabase.
           </p>
         </header>
+
+        {publicacion.categoria === "aviso" && (
+          <EtiquetaProcedenciaAviso procedencia={procedenciaAviso} />
+        )}
 
         {emergenciaSinVerificar && (
           <aside className="report-detail-unverified" role="note">
@@ -177,6 +214,30 @@ function ReporteDetalle() {
                   <dd>{publicacion.lugar}</dd>
                 </div>
               )}
+              {publicacion.categoria === "via" && (
+                <div>
+                  <dt>Condición de la vía</dt>
+                  <dd>{etiquetaCondicionViaDe(publicacion) ?? "No disponible"}</dd>
+                </div>
+              )}
+              {publicacion.categoria === "servicio" && (
+                <>
+                  <div>
+                    <dt>Tipo de servicio</dt>
+                    <dd>{etiquetaTipoServicioDe(publicacion.tipo)}</dd>
+                  </div>
+                  <div>
+                    <dt>Condición operativa</dt>
+                    <dd>{condicionOperativaServicioDe(publicacion) ?? "No disponible"}</dd>
+                  </div>
+                </>
+              )}
+              {publicacion.categoria === "aviso" && (
+                <div>
+                  <dt>Tipo de aviso</dt>
+                  <dd>{etiquetaTipoAvisoDe(publicacion.tipo) ?? "Tipo de aviso no disponible"}</dd>
+                </div>
+              )}
               {severidad && (
                 <div>
                   <dt>Severidad</dt>
@@ -189,6 +250,10 @@ function ReporteDetalle() {
                 </div>
               )}
             </dl>
+
+            {publicacion.categoria === "emergencia" && (
+              <InformacionPublicacion publicadaEn={publicacion.created_at} />
+            )}
 
             <div className="report-detail-description">
               <h3>Descripción</h3>
