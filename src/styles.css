@@ -254,17 +254,23 @@
   gap: 1rem;
   padding: 1.35rem;
   border-radius: 1rem;
-  color: var(--card);
+  color: #f7f3e8;
   background:
-    radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.33), transparent 26%),
-    linear-gradient(135deg, var(--gradient-bosque-oscuro), var(--gradient-bosque));
+    radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.12), transparent 26%),
+    linear-gradient(135deg, rgba(43, 69, 55, 0.92), rgba(61, 80, 65, 0.9));
   box-shadow: 0 8px 24px rgba(31, 68, 51, 0.16);
+}
+
+.dark .mi-vereda-hero {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.1), transparent 26%),
+    linear-gradient(135deg, rgba(31, 53, 52, 0.94), rgba(46, 67, 62, 0.92));
 }
 
 .mi-vereda-hero h1,
 .mi-vereda-hero p,
 .mi-vereda-hero .eyebrow {
-  color: var(--card);
+  color: #f7f3e8;
 }
 
 .mi-vereda-hero h1 {
@@ -276,7 +282,7 @@
 .mi-vereda-hero p:not(.eyebrow) {
   max-width: 36rem;
   margin: 0.7rem 0 0;
-  color: rgba(247, 243, 232, 0.88);
+  color: #f7f3e8;
   font-size: 0.98rem;
   line-height: 1.55;
 }
@@ -290,7 +296,7 @@
   min-height: 4.75rem;
   border: 1px solid rgba(247, 243, 232, 0.3);
   border-radius: 1rem;
-  color: var(--kraft);
+  color: #f7f3e8;
   font-size: 0.7rem;
   font-weight: 800;
   text-align: center;
@@ -299,6 +305,7 @@
 }
 
 .mi-vereda-selector,
+.mi-vereda-selector-view,
 .mi-vereda-board {
   margin-top: 1rem;
   padding: 1rem;
@@ -324,6 +331,7 @@
 }
 
 .mi-vereda-selector h2,
+.mi-vereda-selector-view h2,
 .mi-vereda-board h2 {
   margin: 0.2rem 0 0;
   font-size: clamp(1.35rem, 5vw, 1.8rem);
@@ -379,6 +387,226 @@
   transform: translateY(-50%);
 }
 
+.mi-vereda-selector-current,
+.mi-vereda-selector-view-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mi-vereda-selector-current h2 {
+  color: var(--bosque-oscuro);
+  font-weight: 600;
+}
+
+.mi-vereda-selector-current h2,
+.mi-vereda-selector-view-heading h2 {
+  overflow-wrap: anywhere;
+}
+
+.mi-vereda-selector-current .mi-vereda-inactive-badge {
+  flex: 0 0 auto;
+  margin-top: 0.3rem;
+}
+
+.mi-vereda-selector-view-heading > div > p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: 0.5rem 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.mi-vereda-change-button,
+.mi-vereda-back-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--card);
+  color: var(--bosque-oscuro);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mi-vereda-change-button {
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 0.9rem;
+  padding: 0 0.85rem;
+}
+
+.mi-vereda-change-button > svg:first-child {
+  color: var(--bosque);
+}
+
+.mi-vereda-change-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mi-vereda-back-button {
+  padding: 0 0.75rem;
+  white-space: nowrap;
+}
+
+.mi-vereda-vereda-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.9rem;
+  margin-top: 1rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--card);
+  color: var(--bosque);
+}
+
+.mi-vereda-vereda-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.mi-vereda-vereda-search:focus-within,
+.mi-vereda-search-wrap:focus-within {
+  border-color: var(--bosque);
+  outline: 3px solid var(--bosque-oscuro);
+  outline-offset: 2px;
+}
+
+.mi-vereda-vereda-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mi-vereda-vereda-grid li {
+  min-width: 0;
+}
+
+.mi-vereda-vereda-option {
+  display: grid;
+  grid-template-columns: 2.35rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 4.35rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--card);
+  color: var(--tinta);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mi-vereda-vereda-option.is-selected {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bosque) 24%, transparent);
+}
+
+.mi-vereda-vereda-option-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--bosque) 11%, var(--card));
+  color: var(--bosque);
+}
+
+.mi-vereda-vereda-option-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.mi-vereda-vereda-option-name {
+  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.mi-vereda-vereda-option-state {
+  color: var(--tinta-suave);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.mi-vereda-vereda-option > svg:last-child {
+  color: var(--bosque);
+}
+
+.mi-vereda-selector-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.8rem;
+  color: var(--tinta-suave);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.mi-vereda-selector-feedback h3,
+.mi-vereda-selector-feedback p {
+  margin: 0;
+}
+
+.mi-vereda-selector-feedback p {
+  margin-top: 0.3rem;
+}
+
+.mi-vereda-selector-feedback button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.45rem;
+  margin-top: 0.8rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--card);
+  color: var(--bosque-oscuro);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mi-vereda-selector-feedback button:hover {
+  color: var(--terracota);
+}
+
+.mi-vereda-selector-feedback button:focus-visible,
+.mi-vereda-results-panel:focus-visible {
+  outline: 3px solid var(--bosque-oscuro);
+  outline-offset: 2px;
+}
+
+.mi-vereda-selector-note {
+  margin-top: 0.9rem;
+}
+
 .mi-vereda-note,
 .mi-vereda-board-description {
   display: flex;
@@ -422,6 +650,10 @@
 
 .mi-vereda-tab,
 .mi-vereda-filter-button,
+.mi-vereda-change-button,
+.mi-vereda-back-button,
+.mi-vereda-vereda-option,
+.mi-vereda-filter-close,
 .mi-vereda-clear,
 .mi-vereda-help-link,
 .mi-vereda-empty button,
@@ -512,18 +744,122 @@
   color: var(--card);
 }
 
-.mi-vereda-filters {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  padding: 0.8rem;
-  border: 1px dashed var(--border);
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--kraft) 72%, var(--card));
+.mi-vereda-filter-anchor {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.mi-vereda-filter-field select {
-  padding: 0.55rem 0.65rem;
+.mi-vereda-filter-anchor.is-open {
+  z-index: 26;
+}
+
+.mi-vereda-filters {
+  position: absolute;
+  z-index: 26;
+  bottom: calc(100% + 0.55rem);
+  right: -1rem;
+  display: block;
+  width: min(22rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: var(--popover);
+  color: var(--tinta);
+  box-shadow: 0 14px 34px rgba(16, 39, 31, 0.24);
+}
+
+.mi-vereda-filter-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  min-height: 2.9rem;
+  padding: 0.45rem 0.65rem 0.45rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--kraft-oscuro) 42%, var(--popover));
+}
+
+.mi-vereda-filter-panel-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--bosque);
+}
+
+.mi-vereda-filter-panel-heading h3 {
+  overflow: hidden;
+  margin: 0;
+  color: var(--bosque-oscuro);
+  font-size: 0.88rem;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mi-vereda-filter-close {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--bosque-oscuro);
+  cursor: pointer;
+}
+
+.mi-vereda-filter-options {
+  display: grid;
+}
+
+.mi-vereda-filter-row {
+  display: grid;
+  grid-template-columns: 1.2rem minmax(4.6rem, 0.72fr) minmax(0, 1.35fr);
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 3.3rem;
+  padding: 0.42rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.mi-vereda-filter-row > svg {
+  color: var(--bosque);
+}
+
+.mi-vereda-filter-row label {
+  margin: 0;
+  color: var(--tinta);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.mi-vereda-filter-row select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.45rem;
+  padding: 0.35rem 1.45rem 0.35rem 0.4rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background-color: transparent;
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+.mi-vereda-filter-row select:focus-visible,
+.mi-vereda-filter-close:focus-visible,
+.mi-vereda-change-button:focus-visible,
+.mi-vereda-back-button:focus-visible,
+.mi-vereda-vereda-option:focus-visible {
+  outline: 3px solid var(--bosque-oscuro);
+  outline-offset: 2px;
 }
 
 .mi-vereda-clear {
@@ -536,6 +872,17 @@
   text-underline-offset: 0.18rem;
 }
 
+.mi-vereda-filters .mi-vereda-clear {
+  display: flex;
+  width: 100%;
+  min-height: 2.8rem;
+  margin: 0;
+  border-top: 0;
+  border-radius: 0;
+  color: var(--bosque);
+  text-decoration: none;
+}
+
 .mi-vereda-results-heading {
   align-items: center;
   margin-top: 1.25rem;
@@ -546,6 +893,13 @@
 .mi-vereda-results-heading h3 {
   margin: 0.2rem 0 0;
   font-size: 1.35rem;
+}
+
+.mi-vereda-results-limit {
+  margin: 0.3rem 0 0;
+  color: var(--tinta-suave);
+  font-size: 0.69rem;
+  line-height: 1.35;
 }
 
 .mi-vereda-help-link {
@@ -1028,6 +1382,17 @@
   outline-offset: 2px;
 }
 
+.mi-vereda-tab:focus-visible,
+.mi-vereda-filter-button:focus-visible,
+.mi-vereda-clear:focus-visible,
+.mi-vereda-help-link:focus-visible,
+.mi-vereda-empty button:focus-visible,
+.mi-vereda-select:focus-visible,
+.mi-vereda-filter-field select:focus-visible,
+.mi-vereda-search-wrap input:focus-visible {
+  outline-color: var(--bosque-oscuro);
+}
+
 .mi-vereda-tab:active,
 .mi-vereda-filter-button:active,
 .mi-vereda-clear:active,
@@ -1042,18 +1407,21 @@
 
 @media (min-width: 640px) {
   .mi-vereda-selector,
+  .mi-vereda-selector-view,
   .mi-vereda-board {
     padding: 1.35rem;
   }
-  .mi-vereda-filters {
-    grid-template-columns: repeat(3, 1fr);
-    align-items: end;
+
+  .mi-vereda-vereda-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
   .mi-vereda-filter-field label {
     margin-top: 0;
   }
-  .mi-vereda-clear {
-    margin-bottom: 0.15rem;
+
+  .mi-vereda-filters .mi-vereda-clear {
+    margin-bottom: 0;
   }
 }
 
@@ -1104,11 +1472,57 @@
   .mi-vereda-help-link {
     font-size: 0.7rem;
   }
+
+  .mi-vereda-selector-current {
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .mi-vereda-selector-current .mi-vereda-inactive-badge {
+    margin-top: 0;
+  }
+
+  .mi-vereda-selector-view-heading {
+    gap: 0.65rem;
+  }
+
+  .mi-vereda-selector-view-heading > div {
+    min-width: 0;
+  }
+
+  .mi-vereda-back-button {
+    min-height: 2.4rem;
+    padding: 0 0.55rem;
+    font-size: 0.75rem;
+  }
+
+  .mi-vereda-filter-row {
+    grid-template-columns: 1.1rem minmax(4.2rem, 0.68fr) minmax(0, 1.25fr);
+    gap: 0.4rem;
+    padding-right: 0.65rem;
+    padding-left: 0.65rem;
+  }
+
+  .mi-vereda-filter-row label {
+    font-size: 0.76rem;
+  }
+
+  .mi-vereda-filter-row select {
+    font-size: 0.72rem;
+  }
+
+  .mi-vereda-filter-panel-heading h3 {
+    font-size: 0.82rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mi-vereda-tab,
   .mi-vereda-filter-button,
+  .mi-vereda-change-button,
+  .mi-vereda-back-button,
+  .mi-vereda-vereda-option,
+  .mi-vereda-filter-close,
   .mi-vereda-clear,
   .mi-vereda-help-link,
   .guia-hablada-launcher,
@@ -4192,12 +4606,6 @@ body {
     background: color-mix(in srgb, var(--card) 68%, transparent);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
-  }
-
-  .mi-vereda-hero {
-    background:
-      radial-gradient(circle at 88% 20%, rgba(201, 154, 46, 0.24), transparent 26%),
-      linear-gradient(135deg, rgba(31, 68, 51, 0.72), rgba(47, 113, 94, 0.68));
   }
 
   .mi-vereda-hero-copy {
