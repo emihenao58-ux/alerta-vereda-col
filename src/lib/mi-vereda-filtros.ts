@@ -55,13 +55,15 @@ export function registroDentroDelPeriodo(
     : [registro.fechaCreacion];
   const fechas = valores.map(obtenerTimestampFechaMiVereda);
 
-  // Una marca temporal futura vuelve el registro inelegible, incluso en «Todo».
-  if (fechas.some((fecha) => fecha !== null && fecha > ahora)) return false;
-  if (!fechas.some((fecha) => fecha !== null)) return false;
+  // Las fechas futuras no califican, pero no descartan otra fecha válida del mismo registro.
+  const fechasNoFuturas = fechas.filter(
+    (fecha): fecha is number => fecha !== null && fecha <= ahora,
+  );
+  if (fechasNoFuturas.length === 0) return false;
   if (periodo === "todo") return true;
 
   const limiteInferior = ahora - Number(periodo) * MILISEGUNDOS_POR_DIA;
-  return fechas.some((fecha) => fecha !== null && fecha >= limiteInferior && fecha <= ahora);
+  return fechasNoFuturas.some((fecha) => fecha >= limiteInferior);
 }
 
 export function ordenarRegistrosPorFecha<T extends RegistroConFechasMiVereda>(

@@ -80,11 +80,50 @@ test("Historial coincide si creación o cierre cae en el período", () => {
   assert.equal(registroDentroDelPeriodo(registro(dia(120), dia(90)), "30", AHORA, true), false);
 });
 
-test("una fecha futura en el cierre excluye el registro de Historial, incluso con creación reciente", () => {
+test("una fecha futura en el cierre no descarta Historial si la creación cumple el período", () => {
   assert.equal(
     registroDentroDelPeriodo(
       registro(dia(5), new Date(AHORA + 24 * 60 * 60 * 1000).toISOString()),
+      "15",
+      AHORA,
+      true,
+    ),
+    true,
+  );
+});
+
+test("una creación futura no descarta Historial si el cierre cumple el período", () => {
+  assert.equal(
+    registroDentroDelPeriodo(
+      registro(new Date(AHORA + 24 * 60 * 60 * 1000).toISOString(), dia(5)),
+      "15",
+      AHORA,
+      true,
+    ),
+    true,
+  );
+});
+
+test("Historial excluye el registro si todas sus fechas relevantes son futuras", () => {
+  assert.equal(
+    registroDentroDelPeriodo(
+      registro(
+        new Date(AHORA + 24 * 60 * 60 * 1000).toISOString(),
+        new Date(AHORA + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      ),
       "todo",
+      AHORA,
+      true,
+    ),
+    false,
+  );
+});
+
+test("una fecha pasada fuera del período no califica cuando la otra fecha es futura", () => {
+  assert.equal(
+    registroDentroDelPeriodo(
+      registro(dia(120), new Date(AHORA + 24 * 60 * 60 * 1000).toISOString()),
+      "30",
       AHORA,
       true,
     ),
@@ -102,6 +141,7 @@ test("Novedades evalúa creación y no usa un cierre que no forma parte de su cr
     ),
     true,
   );
+  assert.equal(registroDentroDelPeriodo(registro(dia(30), dia(5)), "15", AHORA, false), false);
 });
 
 test("Novedades ordena explícitamente por creación en ambos sentidos sin mutar el arreglo", () => {
