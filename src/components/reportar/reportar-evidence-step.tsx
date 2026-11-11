@@ -13,6 +13,7 @@ export function ReportarEvidenceStep({
   evidenciaObligatoria,
   sinEvidencia,
   error,
+  procesando = false,
   onOpenCapture,
   onFiles,
   onRemove,
@@ -28,6 +29,7 @@ export function ReportarEvidenceStep({
   evidenciaObligatoria: boolean;
   sinEvidencia: SinEvidencia | null;
   error: string | null;
+  procesando?: boolean;
   onOpenCapture: (mode: "foto" | "video") => void;
   onFiles: (files: readonly File[]) => void;
   onRemove: (id: string) => void;
@@ -67,28 +69,41 @@ export function ReportarEvidenceStep({
       </div>
 
       <div className="reportar-evidence-add-grid">
-        <Button type="button" onClick={() => onOpenCapture("foto")} disabled={fotoCount >= 3}>
+        <Button
+          type="button"
+          onClick={() => onOpenCapture("foto")}
+          disabled={procesando || fotoCount >= 3}
+        >
           <Camera size={17} /> Tomar foto
         </Button>
-        <label className={`reportar-file-button ${galeriaLlena ? "is-disabled" : ""}`}>
+        <label
+          className={`reportar-file-button ${procesando || galeriaLlena ? "is-disabled" : ""}`}
+        >
           <FolderOpen size={17} /> Elegir de galería
           <input
             type="file"
             accept="image/*,video/*"
             multiple
             onChange={elegirArchivos}
-            disabled={galeriaLlena}
+            disabled={procesando || galeriaLlena}
           />
         </label>
         <Button
           type="button"
           variant="outline"
           onClick={() => onOpenCapture("video")}
-          disabled={videoCount >= 1}
+          disabled={procesando || videoCount >= 1}
         >
           <Film size={17} /> Grabar video
         </Button>
       </div>
+
+      {procesando && (
+        <p className="reportar-evidence-limit" role="status" aria-live="polite">
+          Preparando tus evidencias… Espera a que termine este lote antes de agregar otro o
+          continuar.
+        </p>
+      )}
 
       <ReportarEvidenceList
         evidencias={evidencias}
@@ -180,11 +195,11 @@ export function ReportarEvidenceStep({
       )}
 
       <ReportarStepActions>
-        <Button type="button" variant="outline" onClick={onBack}>
+        <Button type="button" variant="outline" onClick={onBack} disabled={procesando}>
           <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
-        <Button type="button" onClick={onNext}>
+        <Button type="button" onClick={onNext} disabled={procesando}>
           <ArrowRight size={16} aria-hidden="true" />
           Conservar y continuar
         </Button>

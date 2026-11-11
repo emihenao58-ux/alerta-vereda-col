@@ -10,12 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccesoAdministrativoRouteImport } from './routes/acceso-administrativo'
+import { Route as AcercaDeRouteImport } from './routes/acerca-de'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AvisosRouteImport } from './routes/avisos'
+import { Route as ConfiguracionRouteImport } from './routes/configuracion'
 import { Route as EmergenciasRouteImport } from './routes/emergencias'
 import { Route as MapaRouteImport } from './routes/mapa'
+import { Route as MiPerfilRouteImport } from './routes/mi-perfil'
 import { Route as MiVeredaRouteImport } from './routes/mi-vereda'
+import { Route as MisReportesRouteImport } from './routes/mis-reportes'
 import { Route as ReportarRouteImport } from './routes/reportar'
 import { Route as ReportesRouteImport } from './routes/reportes'
 import { Route as ServiciosRouteImport } from './routes/servicios'
@@ -35,6 +40,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccesoAdministrativoRoute = AccesoAdministrativoRouteImport.update({
+  id: '/acceso-administrativo',
+  path: '/acceso-administrativo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcercaDeRoute = AcercaDeRouteImport.update({
+  id: '/acerca-de',
+  path: '/acerca-de',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -50,6 +65,11 @@ const AvisosRoute = AvisosRouteImport.update({
   path: '/avisos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfiguracionRoute = ConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmergenciasRoute = EmergenciasRouteImport.update({
   id: '/emergencias',
   path: '/emergencias',
@@ -60,9 +80,19 @@ const MapaRoute = MapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MiPerfilRoute = MiPerfilRouteImport.update({
+  id: '/mi-perfil',
+  path: '/mi-perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MiVeredaRoute = MiVeredaRouteImport.update({
   id: '/mi-vereda',
   path: '/mi-vereda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisReportesRoute = MisReportesRouteImport.update({
+  id: '/mis-reportes',
+  path: '/mis-reportes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportarRoute = ReportarRouteImport.update({
@@ -133,12 +163,17 @@ const AdminGestionReportarRoute = AdminGestionReportarRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acceso-administrativo': typeof AccesoAdministrativoRoute
+  '/acerca-de': typeof AcercaDeRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/mi-perfil': typeof MiPerfilRoute
   '/mi-vereda': typeof MiVeredaRoute
+  '/mis-reportes': typeof MisReportesRoute
   '/reportar': typeof ReportarRoute
   '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
@@ -155,11 +190,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acceso-administrativo': typeof AccesoAdministrativoRoute
+  '/acerca-de': typeof AcercaDeRoute
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/mi-perfil': typeof MiPerfilRoute
   '/mi-vereda': typeof MiVeredaRoute
+  '/mis-reportes': typeof MisReportesRoute
   '/reportar': typeof ReportarRoute
   '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
@@ -177,12 +217,17 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/acceso-administrativo': typeof AccesoAdministrativoRoute
+  '/acerca-de': typeof AcercaDeRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/avisos': typeof AvisosRoute
+  '/configuracion': typeof ConfiguracionRoute
   '/emergencias': typeof EmergenciasRoute
   '/mapa': typeof MapaRoute
+  '/mi-perfil': typeof MiPerfilRoute
   '/mi-vereda': typeof MiVeredaRoute
+  '/mis-reportes': typeof MisReportesRoute
   '/reportar': typeof ReportarRoute
   '/reportes': typeof ReportesRouteWithChildren
   '/servicios': typeof ServiciosRoute
@@ -201,12 +246,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/acceso-administrativo'
+    | '/acerca-de'
     | '/admin'
     | '/auth'
     | '/avisos'
+    | '/configuracion'
     | '/emergencias'
     | '/mapa'
+    | '/mi-perfil'
     | '/mi-vereda'
+    | '/mis-reportes'
     | '/reportar'
     | '/reportes'
     | '/servicios'
@@ -223,11 +273,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/acceso-administrativo'
+    | '/acerca-de'
     | '/auth'
     | '/avisos'
+    | '/configuracion'
     | '/emergencias'
     | '/mapa'
+    | '/mi-perfil'
     | '/mi-vereda'
+    | '/mis-reportes'
     | '/reportar'
     | '/reportes'
     | '/servicios'
@@ -244,12 +299,17 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/acceso-administrativo'
+    | '/acerca-de'
     | '/admin'
     | '/auth'
     | '/avisos'
+    | '/configuracion'
     | '/emergencias'
     | '/mapa'
+    | '/mi-perfil'
     | '/mi-vereda'
+    | '/mis-reportes'
     | '/reportar'
     | '/reportes'
     | '/servicios'
@@ -267,12 +327,17 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccesoAdministrativoRoute: typeof AccesoAdministrativoRoute
+  AcercaDeRoute: typeof AcercaDeRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   AvisosRoute: typeof AvisosRoute
+  ConfiguracionRoute: typeof ConfiguracionRoute
   EmergenciasRoute: typeof EmergenciasRoute
   MapaRoute: typeof MapaRoute
+  MiPerfilRoute: typeof MiPerfilRoute
   MiVeredaRoute: typeof MiVeredaRoute
+  MisReportesRoute: typeof MisReportesRoute
   ReportarRoute: typeof ReportarRoute
   ReportesRoute: typeof ReportesRouteWithChildren
   ServiciosRoute: typeof ServiciosRoute
@@ -286,6 +351,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acceso-administrativo': {
+      id: '/acceso-administrativo'
+      path: '/acceso-administrativo'
+      fullPath: '/acceso-administrativo'
+      preLoaderRoute: typeof AccesoAdministrativoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/acerca-de': {
+      id: '/acerca-de'
+      path: '/acerca-de'
+      fullPath: '/acerca-de'
+      preLoaderRoute: typeof AcercaDeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -309,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AvisosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configuracion': {
+      id: '/configuracion'
+      path: '/configuracion'
+      fullPath: '/configuracion'
+      preLoaderRoute: typeof ConfiguracionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emergencias': {
       id: '/emergencias'
       path: '/emergencias'
@@ -323,11 +409,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MapaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mi-perfil': {
+      id: '/mi-perfil'
+      path: '/mi-perfil'
+      fullPath: '/mi-perfil'
+      preLoaderRoute: typeof MiPerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mi-vereda': {
       id: '/mi-vereda'
       path: '/mi-vereda'
       fullPath: '/mi-vereda'
       preLoaderRoute: typeof MiVeredaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mis-reportes': {
+      id: '/mis-reportes'
+      path: '/mis-reportes'
+      fullPath: '/mis-reportes'
+      preLoaderRoute: typeof MisReportesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reportar': {
@@ -480,12 +580,17 @@ const ReportesRouteWithChildren = ReportesRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccesoAdministrativoRoute: AccesoAdministrativoRoute,
+  AcercaDeRoute: AcercaDeRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   AvisosRoute: AvisosRoute,
+  ConfiguracionRoute: ConfiguracionRoute,
   EmergenciasRoute: EmergenciasRoute,
   MapaRoute: MapaRoute,
+  MiPerfilRoute: MiPerfilRoute,
   MiVeredaRoute: MiVeredaRoute,
+  MisReportesRoute: MisReportesRoute,
   ReportarRoute: ReportarRoute,
   ReportesRoute: ReportesRouteWithChildren,
   ServiciosRoute: ServiciosRoute,

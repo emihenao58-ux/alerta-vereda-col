@@ -14,6 +14,7 @@ import {
   type ReporteSubcategoriaSeleccion,
   type SinEvidencia,
 } from "@/lib/reportar/types";
+import { usePerfilLocal } from "@/hooks/use-perfil-local";
 
 const STEPS: readonly ReporteStep[] = [
   "categoria",
@@ -28,11 +29,22 @@ function contar(draft: ReporteDraft, tipo: ReporteEvidencia["tipo"]) {
   return draft.evidencias.filter((evidencia) => evidencia.tipo === tipo).length;
 }
 
-export function useReportarFlow() {
+export function useReportarFlow({
+  ubicacionEmergenciaRequerida = true,
+  nombreIdentidadAdmin,
+}: {
+  ubicacionEmergenciaRequerida?: boolean;
+  nombreIdentidadAdmin?: string;
+} = {}) {
+  const { perfil, listo: perfilListo } = usePerfilLocal();
+  const nombreCompletoPerfil = [perfil?.nombre?.trim(), perfil?.apellido?.trim()]
+    .filter(Boolean)
+    .join(" ");
   const [draft, setDraft] = useState<ReporteDraft>(createEmptyDraft);
   const [ui, setUi] = useState<ReportarUiState>(createInitialUiState);
   const mountedRef = useRef(false);
   const previewUrlsRef = useRef<Set<string>>(new Set());
+  const nombreEditadoRef = useRef(false);
 
   const revocarPreviewUrl = useCallback((previewUrl: string) => {
     if (previewUrlsRef.current.delete(previewUrl)) {
@@ -54,7 +66,24 @@ export function useReportarFlow() {
     };
   }, [revocarTodasLasPreview]);
 
+  useEffect(() => {
+    if (nombreIdentidadAdmin !== undefined) {
+      nombreEditadoRef.current = true;
+      setDraft((actual) =>
+        actual.nombre === nombreIdentidadAdmin
+          ? actual
+          : { ...actual, nombre: nombreIdentidadAdmin },
+      );
+      return;
+    }
+    if (!perfilListo || nombreEditadoRef.current) return;
+    setDraft((actual) => ({ ...actual, nombre: nombreCompletoPerfil }));
+  }, [nombreCompletoPerfil, nombreIdentidadAdmin, perfilListo]);
+
   const updateDraft = useCallback((patch: Partial<ReporteDraft>) => {
+    if (Object.prototype.hasOwnProperty.call(patch, "nombre")) {
+      nombreEditadoRef.current = true;
+    }
     setDraft((actual) => ({ ...actual, ...patch }));
     setUi((actual) => ({ ...actual, error: null }));
   }, []);
@@ -178,6 +207,22 @@ export function useReportarFlow() {
     [revocarPreviewUrl],
   );
 
+  const actualizarUbicacionEvidencia = useCallback(
+    (id: string, ubicacionCaptura: ReporteEvidencia["ubicacionCaptura"]) => {
+      if (!mountedRef.current || !ubicacionCaptura) return;
+      setDraft((actual) => {
+        if (!actual.evidencias.some((evidencia) => evidencia.id === id)) return actual;
+        return {
+          ...actual,
+          evidencias: actual.evidencias.map((evidencia) =>
+            evidencia.id === id ? { ...evidencia, ubicacionCaptura } : evidencia,
+          ),
+        };
+      });
+    },
+    [],
+  );
+
   const setSinEvidencia = useCallback((sinEvidencia: SinEvidencia | null) => {
     setDraft((actual) => ({ ...actual, sinEvidencia }));
     setUi((actual) => ({ ...actual, error: null }));
@@ -199,6 +244,7 @@ export function useReportarFlow() {
       }
       if (step === "ubicacion") {
         return (
+          !ubicacionEmergenciaRequerida ||
           draft.categoria !== "emergencia" ||
           draft.ubicacionEstado === "confirmada" ||
           Boolean(draft.lugar.trim())
@@ -213,7 +259,7 @@ export function useReportarFlow() {
       }
       return true;
     },
-    [draft],
+    [draft, ubicacionEmergenciaRequerida],
   );
 
   const siguientePaso = useCallback(() => {
@@ -254,9 +300,13 @@ export function useReportarFlow() {
   const reiniciar = useCallback(() => {
     if (!mountedRef.current) return;
     revocarTodasLasPreview();
-    setDraft(createEmptyDraft());
+    nombreEditadoRef.current = false;
+    setDraft({
+      ...createEmptyDraft(),
+      nombre: nombreIdentidadAdmin ?? nombreCompletoPerfil,
+    });
     setUi(createInitialUiState());
-  }, [revocarTodasLasPreview]);
+  }, [nombreCompletoPerfil, nombreIdentidadAdmin, revocarTodasLasPreview]);
 
   const fotoCount = useMemo(() => contar(draft, "foto"), [draft]);
   const videoCount = useMemo(() => contar(draft, "video"), [draft]);
@@ -275,6 +325,7 @@ export function useReportarFlow() {
     agregarEvidencias,
     quitarEvidencia,
     reemplazarEvidencia,
+    actualizarUbicacionEvidencia,
     setSinEvidencia,
     setStep,
     siguientePaso,

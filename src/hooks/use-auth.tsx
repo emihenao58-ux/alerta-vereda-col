@@ -66,7 +66,7 @@ export function useAuth() {
       if (!activo) return;
 
       if (error) {
-        console.error("Error cargando perfil:", error);
+        console.error("Error cargando perfil.");
         setPerfil(null);
         setVeredaAsignadaId(null);
         setCargandoPerfil(false);
@@ -97,7 +97,7 @@ export function useAuth() {
       if (!activo) return;
 
       if (asignacionError) {
-        console.error("Error cargando asignación administrativa:", asignacionError);
+        console.error("Error cargando asignación administrativa.");
         setVeredaAsignadaId(null);
         setCargandoPerfil(false);
         return;
