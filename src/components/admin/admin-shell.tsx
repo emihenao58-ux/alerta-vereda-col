@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { ArrowLeft, LayoutDashboard, Settings2, ShieldCheck, Trees } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Map, Settings2, ShieldCheck, Trees } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
@@ -31,10 +31,12 @@ export function AdminShell({
   area,
   children,
   compactHeader = false,
+  headerContent,
 }: {
   area: AdminArea;
   children: ReactNode;
   compactHeader?: boolean;
+  headerContent?: ReactNode;
 }) {
   const { esAdminVereda, esSuperadmin } = useAuth();
   const copy = areaCopy[area];
@@ -75,28 +77,30 @@ export function AdminShell({
   return (
     <AppShell wide>
       <div className={`admin-workspace admin-workspace-${area}`}>
-        <header className="admin-workspace-header">
-          <div className="admin-workspace-heading">
-            <div className="admin-workspace-eyebrow">
-              {area === "local" ? (
-                <Trees size={15} aria-hidden="true" />
-              ) : (
-                <ShieldCheck size={15} aria-hidden="true" />
-              )}
-              <span>{copy.eyebrow}</span>
+        {headerContent ?? (
+          <header className="admin-workspace-header">
+            <div className="admin-workspace-heading">
+              <div className="admin-workspace-eyebrow">
+                {area === "local" ? (
+                  <Trees size={15} aria-hidden="true" />
+                ) : (
+                  <ShieldCheck size={15} aria-hidden="true" />
+                )}
+                <span>{copy.eyebrow}</span>
+              </div>
+              <h1 className="admin-workspace-title">{copy.title}</h1>
+              <p className="admin-workspace-subtitle">{copy.subtitle}</p>
             </div>
-            <h1 className="admin-workspace-title">{copy.title}</h1>
-            <p className="admin-workspace-subtitle">{copy.subtitle}</p>
-          </div>
-          <div className="admin-workspace-scope" aria-label="Alcance de la cuenta">
-            <span className="admin-scope-dot" aria-hidden="true" />
-            {esSuperadmin
-              ? "Superadmin"
-              : esAdminVereda
-                ? "Administrador de vereda"
-                : "Acceso administrativo"}
-          </div>
-        </header>
+            <div className="admin-workspace-scope" aria-label="Alcance de la cuenta">
+              <span className="admin-scope-dot" aria-hidden="true" />
+              {esSuperadmin
+                ? "Superadmin"
+                : esAdminVereda
+                  ? "Administrador de vereda"
+                  : "Acceso administrativo"}
+            </div>
+          </header>
+        )}
 
         <nav className="admin-area-nav" aria-label="Espacios administrativos">
           {esAdminVereda && (
@@ -108,6 +112,22 @@ export function AdminShell({
               <Trees size={16} aria-hidden="true" />
               <span>Mi Panel JAC</span>
             </Link>
+          )}
+          {area === "local" && esAdminVereda && (
+            <span
+              className="admin-area-link admin-area-link-upcoming"
+              aria-disabled="true"
+              aria-label="Mapa administrativo. Consulta y gestión territorial de tu vereda. Próximamente."
+            >
+              <Map size={16} aria-hidden="true" />
+              <span className="admin-jac-map-copy">
+                <span>Mapa administrativo</span>
+                <span className="admin-jac-map-description">
+                  Consulta y gestión territorial de tu vereda
+                </span>
+              </span>
+              <small>Próximamente</small>
+            </span>
           )}
           {esSuperadmin && (
             <>

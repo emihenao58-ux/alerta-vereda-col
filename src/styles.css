@@ -17442,6 +17442,173 @@ body [class~="text-[0.8rem]"] {
   }
 }
 
+/* Resumen local del Panel JAC y presentación de identidad administrativa. */
+.admin-jac-territory-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-jac-territory-item {
+  display: grid;
+  min-width: 0;
+  gap: 0.3rem;
+}
+
+.admin-jac-territory-item strong {
+  overflow-wrap: anywhere;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 1.08rem);
+  line-height: 1.2;
+}
+
+.admin-jac-summary {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.admin-jac-summary-card {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  background: var(--admin-surface);
+  padding: clamp(0.9rem, 1.7vw, 1.25rem);
+  color: var(--admin-ink);
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(31, 68, 51, 0.07);
+  transition:
+    transform 160ms ease-out,
+    box-shadow 160ms ease-out,
+    border-color 160ms ease-out;
+}
+
+.admin-jac-summary-card[href]:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--bosque) 40%, var(--admin-border));
+  box-shadow: 0 14px 28px rgba(31, 68, 51, 0.12);
+}
+
+.admin-jac-summary-card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--bosque) 45%, transparent);
+  outline-offset: 3px;
+}
+
+.admin-jac-summary-icon {
+  display: grid;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--admin-border));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 11%, var(--card));
+  color: var(--bosque);
+}
+
+.admin-jac-summary-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.22rem;
+}
+
+.admin-jac-summary-copy strong {
+  overflow-wrap: anywhere;
+  font-size: calc(var(--av-text-scale) * clamp(1rem, 1.25vw, 1.28rem));
+  line-height: 1.15;
+}
+
+.admin-jac-summary-copy > span:not(.admin-section-kicker) {
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.82rem);
+  line-height: 1.4;
+}
+
+.admin-jac-summary-count {
+  display: grid;
+  min-width: 4.2rem;
+  justify-items: center;
+  gap: 0.08rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--dorado) 24%, var(--card));
+  padding: 0.38rem 0.55rem;
+  color: var(--bosque-oscuro);
+  text-align: center;
+}
+
+.admin-jac-summary-count strong {
+  font-size: calc(var(--av-text-scale) * 1.08rem);
+  line-height: 1.1;
+}
+
+.admin-jac-summary-count small {
+  font-size: calc(var(--av-text-scale) * 0.66rem);
+  line-height: 1.2;
+}
+
+.admin-jac-summary-arrow {
+  color: var(--bosque);
+}
+
+.admin-jac-summary-stale {
+  color: var(--terracota);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+}
+
+.admin-operation-local {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.admin-operation-local > .admin-jac-summary,
+.admin-operation-local > .admin-jac-operation-reviewed,
+.admin-operation-local > .admin-operation-note {
+  grid-column: 1 / -1;
+}
+
+.admin-operation-local > .admin-jac-operation-pending,
+.admin-operation-local > .admin-jac-operation-active {
+  min-width: 0;
+}
+
+.admin-jac-operation-pending,
+.admin-jac-operation-active,
+.admin-jac-operation-reviewed {
+  scroll-margin-top: 5rem;
+}
+
+.admin-jac-query-error,
+.admin-jac-query-stale {
+  border: 1px solid var(--admin-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--admin-surface) 88%, var(--kraft));
+  padding: 0.8rem 0.9rem;
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.84rem);
+}
+
+.admin-jac-query-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.admin-jac-query-error p,
+.admin-jac-query-stale {
+  margin: 0;
+}
+
+.admin-jac-query-error[role="alert"] {
+  border-color: color-mix(in srgb, var(--terracota) 35%, var(--admin-border));
+}
+
 .mi-perfil-admin-identity input[readonly],
 .reportar-name-readonly {
   background: color-mix(in srgb, var(--card) 78%, var(--kraft));
@@ -17453,6 +17620,407 @@ body [class~="text-[0.8rem]"] {
   margin-top: 0.35rem;
   color: var(--admin-muted, var(--tinta-suave));
   font-size: calc(var(--av-text-scale) * 0.78rem);
+}
+
+@media (max-width: 760px) {
+  .admin-jac-territory-banner {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .admin-jac-territory-banner .admin-territory-lock {
+    margin-left: 0;
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .admin-jac-summary,
+  .admin-operation-local {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-operation-local > .admin-jac-operation-pending,
+  .admin-operation-local > .admin-jac-operation-active,
+  .admin-operation-local > .admin-jac-operation-reviewed,
+  .admin-operation-local > .admin-jac-summary,
+  .admin-operation-local > .admin-operation-note {
+    grid-column: 1;
+  }
+
+  .admin-jac-summary-card {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.7rem;
+  }
+
+  .admin-jac-summary-icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .admin-jac-summary-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .admin-jac-summary-count {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    width: fit-content;
+    min-width: 0;
+    align-items: baseline;
+    justify-items: start;
+    gap: 0.3rem;
+  }
+
+  .admin-jac-summary-arrow {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .admin-jac-query-error {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-jac-summary-card[href]:hover {
+    transform: none;
+  }
+}
+
+/* Ajustes de cabecera y bienvenida exclusivos del Panel JAC. */
+.admin-jac-workspace-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(12rem, auto);
+  align-items: center;
+  gap: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+
+.admin-jac-header-community-icon {
+  display: grid;
+  width: 3.55rem;
+  height: 3.55rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--bosque) 24%, var(--admin-border));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 90%, #13875d);
+  color: #f5fff8;
+}
+
+.admin-jac-header-copy {
+  min-width: 0;
+}
+
+.admin-jac-header-copy .admin-workspace-title {
+  margin: 0;
+  font-size: calc(var(--av-text-scale) * clamp(1.85rem, 3vw, 2.8rem));
+  line-height: 1.05;
+}
+
+.admin-jac-header-copy .admin-workspace-subtitle {
+  margin-top: 0.3rem;
+  font-size: calc(var(--av-text-scale) * 0.9rem);
+}
+
+.admin-jac-header-assignment {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 17rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  padding: 0.55rem 0.75rem;
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+}
+
+.admin-jac-header-assignment > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+
+.admin-jac-header-assignment strong,
+.admin-jac-header-assignment small {
+  overflow-wrap: anywhere;
+}
+
+.admin-jac-header-assignment strong {
+  color: var(--admin-ink);
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+}
+
+.admin-jac-header-assignment small {
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.7rem);
+}
+
+.admin-area-link-upcoming {
+  gap: 0.42rem;
+  background: color-mix(in srgb, var(--card) 76%, transparent);
+  cursor: default;
+}
+
+.admin-area-link-upcoming:hover {
+  background: color-mix(in srgb, var(--card) 76%, transparent);
+  color: var(--admin-muted);
+  transform: none;
+}
+
+.admin-area-link-upcoming small {
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  padding: 0.12rem 0.42rem;
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.64rem);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-jac-map-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.admin-jac-map-description {
+  font-size: calc(var(--av-text-scale) * 0.7rem);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.role-welcome-jac {
+  grid-template-columns: minmax(10rem, 0.76fr) minmax(0, 1.35fr) minmax(12rem, 0.92fr);
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+}
+
+.role-welcome-jac .role-welcome-jac-landscape {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 8.5rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+  object-fit: contain;
+}
+
+.role-welcome-jac .role-welcome-copy {
+  align-self: center;
+  min-width: 0;
+  padding-block: 0.35rem;
+}
+
+.role-welcome-jac .role-welcome-copy h2 {
+  overflow-wrap: anywhere;
+  font-size: calc(var(--av-text-scale) * clamp(1.5rem, 2.7vw, 2.25rem));
+  line-height: 1.08;
+}
+
+.role-welcome-jac .role-welcome-copy > p:not(.role-welcome-eyebrow) {
+  max-width: 25rem;
+  font-size: calc(var(--av-text-scale) * 0.9rem);
+}
+
+.role-welcome-jac .role-welcome-continue {
+  margin-top: 0.65rem;
+}
+
+.role-welcome-jac-message {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin-top: 1.4rem;
+  border-left: 1px solid var(--admin-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bosque) 6%, var(--card));
+  padding: 0.75rem;
+  color: var(--admin-ink);
+}
+
+.role-welcome-jac-leaf {
+  display: grid;
+  width: 2.65rem;
+  height: 2.65rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  color: var(--bosque);
+}
+
+.role-welcome-jac-message strong {
+  display: block;
+  font-size: calc(var(--av-text-scale) * 0.88rem);
+  line-height: 1.25;
+}
+
+.role-welcome-jac-message p {
+  margin: 0.35rem 0 0;
+  color: var(--admin-muted);
+  font-size: calc(var(--av-text-scale) * 0.78rem);
+  line-height: 1.4;
+}
+
+.role-welcome-jac .role-welcome-skip {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.75rem;
+}
+
+@media (max-width: 1050px) and (min-width: 761px) {
+  .role-welcome-jac {
+    grid-template-columns: minmax(9rem, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .role-welcome-jac-message {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr);
+    margin-top: 0;
+  }
+
+  .role-welcome-jac .role-welcome-skip {
+    top: 0.55rem;
+    right: 0.75rem;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 900px) {
+  .admin-jac-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .role-welcome-jac {
+    grid-template-columns: minmax(4.75rem, 5.75rem) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .admin-jac-workspace-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .admin-jac-header-community-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .admin-jac-header-copy .admin-workspace-title {
+    font-size: calc(var(--av-text-scale) * clamp(1.65rem, 7vw, 2.15rem));
+  }
+
+  .admin-jac-header-copy .admin-workspace-subtitle {
+    margin-top: 0.22rem;
+    font-size: calc(var(--av-text-scale) * 0.8rem);
+  }
+
+  .admin-jac-header-assignment {
+    grid-column: 1 / -1;
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  .role-welcome-jac {
+    gap: 0.75rem;
+  }
+
+  .role-welcome-jac .role-welcome-jac-landscape {
+    grid-column: 1;
+    grid-row: 1;
+    height: 5.75rem;
+    min-height: 0;
+    padding: 0.2rem;
+  }
+
+  .role-welcome-jac .role-welcome-copy {
+    grid-column: 2;
+    grid-row: 1;
+    padding-block: 0;
+  }
+
+  .role-welcome-jac .role-welcome-copy h2 {
+    font-size: calc(var(--av-text-scale) * clamp(1.25rem, 5.2vw, 1.65rem));
+  }
+
+  .role-welcome-jac-message {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  .role-welcome-jac .role-welcome-skip {
+    position: static;
+    justify-self: start;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-area-link-upcoming:hover {
+    transform: none;
+  }
+}
+
+.admin-jac-subview-nav {
+  display: flex;
+  align-items: center;
+  margin-block: 0.15rem 0.4rem;
+}
+
+.admin-jac-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  padding: 0.52rem 0.78rem;
+  color: var(--admin-ink);
+  font-size: calc(var(--av-text-scale) * 0.82rem);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease-out,
+    transform 160ms ease-out;
+}
+
+.admin-jac-back-link:hover {
+  background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+  transform: translateX(-1px);
+}
+
+.admin-jac-back-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--bosque) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.admin-operation-local-view > .admin-jac-operation-pending,
+.admin-operation-local-view > .admin-jac-operation-active,
+.admin-operation-local-view > .admin-jac-operation-reviewed {
+  grid-column: 1 / -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-jac-back-link {
+    transition: none;
+  }
 }
 
 /* Aviso de publicación administrativa del flujo público Reportar. */

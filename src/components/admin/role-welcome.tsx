@@ -1,14 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, Shield, Trees } from "lucide-react";
+import { ArrowRight, CheckCircle2, Leaf, Shield, Trees } from "lucide-react";
 import { useAuth, type Rol } from "@/hooks/use-auth";
+import {
+  ilustracionDeVeredaPorNombre,
+  recursosVisualesDeTerritorio,
+} from "@/lib/reportar/territory-visuals";
+
+function imagenDeBienvenidaJACPorTerritorio(nombre: string | null) {
+  if (!nombre) return null;
+
+  const nombreNormalizado = nombre
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+
+  // Ambos nombres existentes representan la cabecera, no una vereda adicional.
+  if (nombreNormalizado === "ebejico centro" || nombreNormalizado === "cabecera municipal") {
+    return recursosVisualesDeTerritorio("cabecera-municipal")?.ilustracion3d ?? null;
+  }
+  if (nombreNormalizado === "sevilla") {
+    return recursosVisualesDeTerritorio("sevilla")?.fotografiaReferencia ?? null;
+  }
+
+  return ilustracionDeVeredaPorNombre(nombre);
+}
 
 export function RoleWelcome({
   role,
   veredaLabel,
+  veredaLoading = false,
   onContinue,
 }: {
   role: Rol;
   veredaLabel?: string | null;
+  veredaLoading?: boolean;
   onContinue?: () => void;
 }) {
   const { session } = useAuth();
@@ -20,15 +48,19 @@ export function RoleWelcome({
   );
 
   useEffect(() => {
+    if (role === "admin_vereda") return;
+
     try {
       if (sessionStorage.getItem(sessionKey) !== "1") setVisible(true);
     } catch {
       setVisible(true);
     }
     setReady(true);
-  }, [sessionKey]);
+  }, [role, sessionKey]);
 
   function dismiss() {
+    if (role === "admin_vereda") return;
+
     try {
       sessionStorage.setItem(sessionKey, "1");
     } catch {
@@ -38,7 +70,10 @@ export function RoleWelcome({
     onContinue?.();
   }
 
-  if (!ready || !visible) return null;
+  if (role !== "admin_vereda" && (!ready || !visible)) return null;
+
+  const imagenTerritorial =
+    role === "admin_vereda" ? imagenDeBienvenidaJACPorTerritorio(veredaLabel ?? null) : null;
 
   const copy =
     role === "superadmin"
@@ -51,11 +86,9 @@ export function RoleWelcome({
       : role === "admin_vereda"
         ? {
             eyebrow: "Tu territorio, tu cartelera",
-            title: "Bienvenido, administrador",
-            body: veredaLabel
-              ? `Tu Panel JAC está listo para ${veredaLabel}.`
-              : "Tu Panel JAC está listo para la vereda que tienes asignada.",
-            action: "Revisar mi Panel JAC",
+            title: veredaLabel || "Tu vereda asignada",
+            body: "Trabajando juntos por una vereda más segura.",
+            action: null,
           }
         : {
             eyebrow: "Solicitud recibida",
@@ -66,7 +99,7 @@ export function RoleWelcome({
 
   return (
     <section
-      className={`role-welcome role-welcome-${role}`}
+      className={`role-welcome role-welcome-${role}${role === "admin_vereda" ? " role-welcome-jac" : ""}`}
       aria-live="polite"
       aria-label="Bienvenida de la sesión"
     >
@@ -130,33 +163,19 @@ export function RoleWelcome({
             />
           </svg>
         ) : role === "admin_vereda" ? (
-          <svg viewBox="0 0 160 120" className="role-welcome-svg" focusable="false">
-            <path d="M10 94H150" stroke="currentColor" strokeOpacity="0.35" />
-            <path d="M18 94L44 59L66 80L91 39L143 94Z" fill="currentColor" fillOpacity="0.11" />
-            <path
-              className="welcome-sun"
-              d="M116 27a13 13 0 1 0 0 26a13 13 0 1 0 0-26Z"
-              fill="currentColor"
-              fillOpacity="0.22"
+          veredaLoading ? (
+            <span
+              className="role-welcome-jac-landscape role-welcome-jac-landscape-loading"
+              aria-hidden="true"
             />
-            <path
-              d="M46 94V67H62V94M88 94V59H103V94M122 94V73H135V94"
-              stroke="currentColor"
-              strokeWidth="2"
+          ) : (
+            <img
+              className="role-welcome-jac-landscape"
+              src={imagenTerritorial?.src ?? "/images/reportar/territory/vereda.webp"}
+              alt=""
+              aria-hidden="true"
             />
-            <path
-              className="welcome-leaf"
-              d="M36 93C34 72 39 60 53 51C55 72 50 84 36 93Z"
-              fill="currentColor"
-              fillOpacity="0.6"
-            />
-            <path
-              className="welcome-leaf welcome-leaf-two"
-              d="M132 93C131 77 137 66 149 61C149 77 143 87 132 93Z"
-              fill="currentColor"
-              fillOpacity="0.45"
-            />
-          </svg>
+          )
         ) : (
           <svg viewBox="0 0 160 120" className="role-welcome-svg" focusable="false">
             <path d="M19 86H141" stroke="currentColor" strokeOpacity="0.35" />
@@ -198,14 +217,29 @@ export function RoleWelcome({
         </p>
         <h2>{copy.title}</h2>
         <p>{copy.body}</p>
-        <button type="button" className="role-welcome-continue" onClick={dismiss}>
-          {copy.action}
-          <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        {copy.action !== null && (
+          <button type="button" className="role-welcome-continue" onClick={dismiss}>
+            {copy.action}
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        )}
       </div>
-      <button type="button" className="role-welcome-skip" onClick={dismiss}>
-        Omitir bienvenida
-      </button>
+      {role === "admin_vereda" && (
+        <aside className="role-welcome-jac-message" aria-label="Mensaje comunitario">
+          <span className="role-welcome-jac-leaf" aria-hidden="true">
+            <Leaf size={25} strokeWidth={1.7} />
+          </span>
+          <div>
+            <strong>La comunidad es nuestra fuerza</strong>
+            <p>“Porque donde hay unidad, hay progreso.”</p>
+          </div>
+        </aside>
+      )}
+      {role !== "admin_vereda" && (
+        <button type="button" className="role-welcome-skip" onClick={dismiss}>
+          Omitir bienvenida
+        </button>
+      )}
     </section>
   );
 }

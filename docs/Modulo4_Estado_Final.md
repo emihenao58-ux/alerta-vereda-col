@@ -4,9 +4,9 @@
 
 ## 1. Alcance y decisiones vigentes
 
-El Módulo 4 integra Mi Perfil, Mis reportes, Acerca de, Configuración y Acceso administrativo. El trabajo es frontend y local. No implementa recepción oficial de reportes, publicación, sincronización, SMS, backend o persistencia remota. Las llamadas existentes de autenticación y consulta no se sustituyen ni amplían: durante las pruebas se interceptaron íntegramente mediante respuestas simuladas.
+El Módulo 4 integra Mi Perfil, Mis reportes, Acerca de, Configuración, Acceso administrativo y el Panel JAC. El trabajo es frontend y local. No implementa recepción oficial de reportes, publicación, sincronización, SMS, backend o persistencia remota. Las llamadas existentes de autenticación, consulta y RPC no se sustituyen ni amplían: durante las pruebas se interceptaron íntegramente mediante respuestas simuladas.
 
-La aclaración vigente identifica como JAC los reportes creados en `/reportar` por una cuenta `admin_vereda`. No se necesita una nueva acción de creación dentro del Panel JAC. `AdminReportarFlow`, Superadmin y las modificaciones independientes del Panel JAC no forman parte de esta corrección ni del commit candidato.
+Los reportes creados en `/reportar` por una cuenta `admin_vereda` conservan origen e identidad JAC; no se añade una acción de creación dentro del Panel JAC. `AdminReportarFlow` y las funcionalidades propias de Superadmin/Módulo 5 quedan fuera de este complemento.
 
 ## 2. Identidad y perfil
 
@@ -15,6 +15,14 @@ Nombre y apellido comparten una única fuente de datos local en `use-perfil-loca
 Para JAC se conserva en el registro de IndexedDB una instantánea de la cuenta creadora: identificador de perfil y nombre completo. El nombre administrativo continúa proviniendo del perfil autenticado, con su comportamiento de solo lectura existente. El origen es `jac`; para ciudadanos es `comunitario`. La instantánea no contiene correo, teléfono, tokens ni credenciales y no constituye una certificación remota. Los registros antiguos sin esa instantánea siguen siendo legibles; no se inventa una identidad retrospectiva.
 
 Las opciones de avatar público y fotografía personal privada permanecen informativas. No hay selección, procesamiento o almacenamiento de imágenes del perfil. No se confunden con evidencias de reportes.
+
+### Panel JAC — complemento del Módulo 4
+
+El acceso sigue usando el `AdminGate` local y el rol/asignación existentes. La cabecera identifica Panel JAC, la bienvenida territorial no se puede omitir y permanece visible en el resumen y en las tres vistas operativas. El resumen presenta conteos y accesos a reportes pendientes, publicaciones activas y reportes revisados; los parámetros `vista` inválidos vuelven al resumen.
+
+La interfaz presenta carga, error, reintento y conteos disponibles. Permite aprobar/rechazar reportes y cerrar/retirar publicaciones mediante las RPC existentes, sin cambiar sus contratos. El JAC no recibe controles de purga; estos solo se renderizan en alcance global cuando la cuenta es Superadmin. El filtro de vereda del frontend orienta la vista y **no es una garantía de autorización**: no se modificaron RLS, permisos ni backend.
+
+La bienvenida consume 34 ilustraciones 3D de veredas, una ilustración separada de la cabecera municipal Ebéjico centro y la fotografía de referencia de Sevilla. Son 36 recursos/rutas únicos; Sevilla no se cuenta como vereda y Ebéjico centro es cabecera, no una vereda adicional. La fotografía de referencia de Ebéjico centro no tiene consumidor aprobado y queda excluida.
 
 ## 3. Historial y multimedia local
 
@@ -54,48 +62,55 @@ La sanitización en Auth, `use-auth`, AppShell y el boundary conserva informaci�
 
 Todas las pruebas de navegador utilizaron perfiles, datos y respuestas efímeras. No se creó una cuenta ni se escribió en Supabase real. Las imágenes sintéticas de prueba y capturas están fuera del repositorio y no se integraron a la aplicación.
 
-| Comprobación                                                                                      | Resultado                                                                                                                                      |
-| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| TypeScript `tsc --noEmit` del checkout                                                            | Correcto                                                                                                                                       |
-| ESLint completo `npm run lint`                                                                    | Cero errores; nueve advertencias de Fast Refresh no bloqueantes                                                                                |
-| Prettier de todo `src/` y archivos intervenidos                                                   | Correcto                                                                                                                                       |
-| `git diff --check`                                                                                | Correcto                                                                                                                                       |
-| Suite `test:photo-processor`                                                                      | 11/11                                                                                                                                          |
-| Suite `test:mi-vereda`                                                                            | 16/16                                                                                                                                          |
-| Build del árbol actual en copia temporal                                                          | Correcto                                                                                                                                       |
-| TypeScript y build de una copia candidata sin assets territoriales ni archivos independientes JAC | Correctos; no constituye aprobación final de su delimitación                                                                                   |
-| Autor con nombre y apellido, edición aislada y doble clic                                         | Correctos; un único registro comunitario                                                                                                       |
-| Lote de fotos ralentizado y segunda selección concurrente                                         | Avance/selección bloqueados; aviso visible; primer lote conservado y tres fotos guardadas                                                      |
-| JAC mediante `/reportar`                                                                          | Origen e identidad de cuenta conservados; foto persistida tras recarga y ampliable                                                             |
-| Público y JAC con tres fotos y un video                                                           | Procesamiento fallido conserva borrador; transacción fallida sin fila parcial; reintento crea un registro y conserva todos los medios          |
-| Fotografía v2                                                                                     | Sigue ampliable; registro original no se reescribe                                                                                             |
-| Video después de cerrar y reabrir todo Chromium                                                   | Persiste y se reproduce desde IndexedDB; video de más de 15 segundos rechazado                                                                 |
-| GPS con reloj virtual                                                                             | Primera lectura inmediata, separación de cinco minutos, pausa/reanudación, rechazo, petición manual bajo Nunca y fallo honesto de persistencia |
-| Registro con código DEV visible                                                                   | Alta simulada correcta; no añade teléfono/cargo al payload; once cargos, selección única y 34 veredas                                          |
-| Rutas públicas                                                                                    | 36 combinaciones: nueve pantallas, escritorio/móvil y Día/Noche; sin desbordamiento horizontal en los casos probados                           |
-| Acerca de a 125 %, 130 %, 135 % y 140 %                                                           | 16 combinaciones de tamaño/tema/dispositivo correctas                                                                                          |
-| Detalle público compartido                                                                        | DOM y RPC simulada idénticos al baseline en las cuatro combinaciones; sin errores de página en ese test                                        |
-| Restablecimiento de contraseña simulado                                                           | Éxito, actualización fallida, cierre de sesión fallido y sesión inválida tratados correctamente                                                |
+| Comprobación                                                                                      | Resultado                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript `tsc --noEmit` del checkout                                                            | Correcto                                                                                                                                              |
+| ESLint completo `npm run lint`                                                                    | Cero errores; nueve advertencias de Fast Refresh no bloqueantes                                                                                       |
+| Prettier de todo `src/` y archivos intervenidos                                                   | Correcto                                                                                                                                              |
+| `git diff --check`                                                                                | Correcto                                                                                                                                              |
+| Suite `test:photo-processor`                                                                      | 11/11                                                                                                                                                 |
+| Suite `test:mi-vereda`                                                                            | 16/16                                                                                                                                                 |
+| Build del árbol actual en copia temporal                                                          | Correcto                                                                                                                                              |
+| TypeScript y build de una copia candidata sin assets territoriales ni archivos independientes JAC | Correctos; no constituye aprobación final de su delimitación                                                                                          |
+| Autor con nombre y apellido, edición aislada y doble clic                                         | Correctos; un único registro comunitario                                                                                                              |
+| Lote de fotos ralentizado y segunda selección concurrente                                         | Avance/selección bloqueados; aviso visible; primer lote conservado y tres fotos guardadas                                                             |
+| JAC mediante `/reportar`                                                                          | Origen e identidad de cuenta conservados; foto persistida tras recarga y ampliable                                                                    |
+| Público y JAC con tres fotos y un video                                                           | Procesamiento fallido conserva borrador; transacción fallida sin fila parcial; reintento crea un registro y conserva todos los medios                 |
+| Fotografía v2                                                                                     | Sigue ampliable; registro original no se reescribe                                                                                                    |
+| Video después de cerrar y reabrir todo Chromium                                                   | Persiste y se reproduce desde IndexedDB; video de más de 15 segundos rechazado                                                                        |
+| GPS con reloj virtual                                                                             | Primera lectura inmediata, separación de cinco minutos, pausa/reanudación, rechazo, petición manual bajo Nunca y fallo honesto de persistencia        |
+| Registro con código DEV visible                                                                   | Alta simulada correcta; no añade teléfono/cargo al payload; once cargos, selección única y 34 veredas                                                 |
+| Rutas públicas                                                                                    | 36 combinaciones: nueve pantallas, escritorio/móvil y Día/Noche; sin desbordamiento horizontal en los casos probados                                  |
+| Acerca de a 125 %, 130 %, 135 % y 140 %                                                           | 16 combinaciones de tamaño/tema/dispositivo correctas                                                                                                 |
+| Detalle público compartido                                                                        | DOM y RPC simulada idénticos al baseline en las cuatro combinaciones; sin errores de página en ese test                                               |
+| Restablecimiento de contraseña simulado                                                           | Éxito, actualización fallida, cierre de sesión fallido y sesión inválida tratados correctamente                                                       |
+| Matriz de acceso JAC                                                                              | Invitado, solicitud pendiente, cuenta suspendida y cuenta sin asignación denegados; JAC no entra a `/admin/jac-superadmin` ni `/admin/gestion`        |
+| Vistas y parámetros JAC                                                                           | Resumen y tres vistas; `vista` inválida se normaliza a resumen; conteos mock 3/4/2                                                                    |
+| Carga, errores y reintentos JAC                                                                   | Carga demorada observada; errores terminales de reportes/publicaciones y recuperación mediante reintento                                              |
+| Acciones JAC                                                                                      | Aprobación, rechazo, cierre y retiro probados con RPC mock; motivo vacío no invoca RPC; sin escrituras reales                                         |
+| Purga y regresión Superadmin                                                                      | Cero controles de purga JAC; seis en operación global Superadmin. Snapshots de shell, bienvenida y operación global idénticos al baseline normalizado |
+| Catálogo visual territorial                                                                       | 34 veredas más Ebéjico centro y Sevilla; 36 rutas/IDs únicos, todos presentes y sin hashes de imagen duplicados                                       |
+| Responsivo JAC                                                                                    | 16 combinaciones de resumen/vistas, Día/Noche y escritorio/móvil (1440/390 px); sin overflow horizontal                                               |
 
 El formato global continúa señalando dos documentos preexistentes, `docs/modulo-2-auditoria-reportar-dependencias.md` y `docs/pendientes-backend.md`. No se corrigieron ni forman parte del commit candidato. El build conserva advertencias no bloqueantes de dependencias (`use client`) y de Nitro `inlineDynamicImports`/`codeSplitting`; no se cambiaron presets ni infraestructura.
 
-Los arneses temporales corrigieron algunas expectativas antiguas o nombres de campo de su comparación; los resultados de la tabla corresponden a las ejecuciones finales correctas, no a esos intentos iniciales.
+Los arneses temporales corrigieron expectativas de carga/error y normalizan únicamente el atributo de instrumentación `data-tsd-source` y espacios en `class` al comparar DOM de desarrollo. Los resultados de la tabla corresponden a las ejecuciones finales correctas, no a intentos iniciales del arnés.
 
-## 7. Alcance Git y punto pendiente antes del commit
+## 7. Delimitación Git y commits locales
 
-**Rama:** `pr-4-1-territory-catalog-assets`. **HEAD de partida y de esta revisión:** `648b7c4e4dae26889d7c8e1e524e7b97292830ba`. No hay cambios staged ni commits nuevos. No hubo push, PR, merge o despliegue.
+**Rama:** `pr-4-1-territory-catalog-assets`. **Commit base M4 preservado:** `6e66b608bbe7af173bd0cb0e3b24eeb6dcb7abac` (`feat: complete module 4 profile and local reports`), con 42 archivos. El complemento JAC se incorpora en un commit local hijo con el mensaje exacto `feat: complete JAC admin panel for module 4`. No se reescribe el commit base y no se hace push, PR, merge ni despliegue.
 
-Se corrigieron trece archivos fuente en esta intervención, además de incorporar este documento. Los archivos de Supabase, dependencias/bloqueos, recursos territoriales y componentes independientes del Panel JAC conservaron sus huellas de la línea base. El listado siguiente incluye también el trabajo M4 acumulado; no significa que todos esos archivos se hayan editado ahora.
+La lista base de 42 archivos permanece asociada exclusivamente al commit M4 anterior. El complemento se delimita aparte a ocho archivos fuente, este informe y los 36 recursos territoriales consumidos. No incluye tablas, migraciones, políticas, funciones Supabase, dependencias, bloqueos ni archivos ajenos al Módulo 4.
 
 ### Punto separado obligatorio — AppShell e Inicio
 
-`src/components/app-shell.tsx` contiene el menú de cuenta M4 aprobado, el refinamiento de chevrons, las etiquetas accesibles y la sanitización del error de cierre. Las sesiones Superadmin conservan el control de cuenta anterior (icono «Salir» en vistas públicas y botón rotulado dentro del layout administrativo); el menú personal M4 queda disponible para los demás roles. Se mantiene oculta la navegación pública en el layout Superadmin y su barra lateral no cambia. Es un componente compartido y su alcance debe señalarse por separado en cualquier resumen futuro. `src/routes/index.tsx` y sus arreglos `MODULOS`/`ATAJOS` siguen intactos.
+El commit base M4 contiene los cambios aprobados de `src/components/app-shell.tsx` para el menú de cuenta, chevrons, etiquetas accesibles y sanitización del cierre; ese alcance se mantiene como punto separado. **Este complemento JAC no modifica `app-shell.tsx`.** `src/routes/index.tsx` y sus arreglos `MODULOS`/`ATAJOS` tampoco se modifican. El layout y el control de cuenta Superadmin del commit base se conservaron; los snapshots comparados para este complemento son idénticos al baseline normalizado.
 
-### Separación de estilos y trabajos independientes
+### Delimitación JAC, Superadmin y recursos territoriales
 
-El candidato temporal excluye los 37 recursos territoriales, `territory-visuals.ts`, los archivos independientes del Panel JAC y 83 reglas CSS exclusivas de esos elementos. Conserva las clases M4 que presentan el territorio seleccionado en Reportar y la escala tipográfica global confirmada. Los estilos independientes de JAC permanecen intactos en el worktree, fuera del índice.
+Los selectores agregados a `src/styles.css` quedan acotados a `.admin-jac`, `.admin-operation-local`, `.role-welcome-jac` y `.admin-area-link-upcoming`; no añaden reglas generales para Superadmin. Se integran 36 recursos usados: 34 ilustraciones de vereda, la ilustración de Ebéjico centro y la foto de referencia de Sevilla. De los 37 archivos físicos del catálogo disponible, `public/images/territorios/catalogo/cabecera/fotografia-referencia-ebejico-centro.png` queda sin uso y fuera del commit. Las tres imágenes generales de Reportar no se modifican.
 
-Los documentos backend anteriores se conservan como requisitos/propuestas, no como implementación ni aprobación de cambios Supabase. Este documento describe el estado frontend actual y prevalece como informe de ejecución, sin reescribir decisiones históricas.
+El cambio de AdminOperation se limita a vistas y estados locales; las consultas/RPC globales se compararon con el baseline. Los controles de purga permanecen bajo `scope === "global" && esSuperadmin`; no se invocaron en pruebas. El filtro territorial en cliente no sustituye seguridad de servidor. Los documentos backend anteriores siguen siendo requisitos/propuestas, no implementación ni aprobación de cambios Supabase.
 
 ### Decisión de alcance resuelta
 
@@ -103,9 +118,9 @@ El proveedor de preferencias está montado globalmente en `__root.tsx`, por lo q
 
 La decisión no implica aislamiento por rol ni cambios en el proveedor; se mantienen las preferencias globales confirmadas. La build candidata final y el test de shell Superadmin cubren esa delimitación.
 
-### Lista exacta del commit M4 delimitado
+### Lista del commit base M4 (42 archivos)
 
-Los siguientes 42 archivos corresponden al commit local del Módulo 4. `src/styles.css` se prepara desde la base de Git con los estilos independientes del Panel JAC excluidos y las reglas M4 de Reportar conservadas. AppShell se mantiene como un punto separado en este resumen.
+La siguiente lista coincide exactamente con los 42 archivos del commit base `6e66b608bbe7af173bd0cb0e3b24eeb6dcb7abac`. Ese commit no se reescribe. Los estilos JAC y los recursos territoriales se registran únicamente en el complemento independiente que sigue.
 
 ```text
 docs/Modulo4_Estado_Final.md
@@ -152,7 +167,59 @@ src/routes/servicios.css
 src/styles.css
 ```
 
-Quedan fuera, conservados sin descartar: `src/components/admin/admin-operation.tsx`, `admin-shell.tsx`, `role-welcome.tsx`, `src/routes/admin/jac.tsx`, `src/components/admin/admin-jac-summary.tsx`, `src/lib/admin-jac-navigation.ts`, `src/lib/reportar/territory-visuals.ts`, sus estilos exclusivos y `public/images/territorios/catalogo/`. También quedan fuera cambios de Superadmin y el adaptador `AdminReportarFlow`; solo se incluyen cambios M4 en componentes compartidos y se preserva el control anterior dentro del layout Superadmin.
+### Lista exacta del complemento JAC (45 archivos)
+
+Incluye este informe, ocho archivos fuente y solo los 36 recursos consumidos por la bienvenida JAC. La fotografía de referencia de Ebéjico centro indicada arriba queda fuera.
+
+```text
+docs/Modulo4_Estado_Final.md
+public/images/territorios/catalogo/cabecera/ilustracion-3d-ebejico-centro.png
+public/images/territorios/catalogo/referencias/fotografia-sevilla.png
+public/images/territorios/catalogo/veredas/L1-F1-C4.webp
+public/images/territorios/catalogo/veredas/L1-F2-C1.webp
+public/images/territorios/catalogo/veredas/L1-F2-C4.webp
+public/images/territorios/catalogo/veredas/L1-F3-C1.webp
+public/images/territorios/catalogo/veredas/L1-F3-C4.webp
+public/images/territorios/catalogo/veredas/L2-F1-C1.webp
+public/images/territorios/catalogo/veredas/L2-F1-C2.webp
+public/images/territorios/catalogo/veredas/L2-F1-C4.webp
+public/images/territorios/catalogo/veredas/L2-F2-C1.webp
+public/images/territorios/catalogo/veredas/L2-F2-C4.webp
+public/images/territorios/catalogo/veredas/L2-F3-C2.webp
+public/images/territorios/catalogo/veredas/L2-F3-C3.webp
+public/images/territorios/catalogo/veredas/L2-F3-C4.webp
+public/images/territorios/catalogo/veredas/L3-F1-C3.webp
+public/images/territorios/catalogo/veredas/L3-F2-C1.webp
+public/images/territorios/catalogo/veredas/L3-F4-C3.webp
+public/images/territorios/catalogo/veredas/L4-F1-C3.webp
+public/images/territorios/catalogo/veredas/L4-F2-C2.webp
+public/images/territorios/catalogo/veredas/L4-F2-C3.webp
+public/images/territorios/catalogo/veredas/L4-F3-C1.webp
+public/images/territorios/catalogo/veredas/L4-F3-C2.webp
+public/images/territorios/catalogo/veredas/L4-F3-C3.webp
+public/images/territorios/catalogo/veredas/L4-F4-C1.webp
+public/images/territorios/catalogo/veredas/L4-F4-C2.webp
+public/images/territorios/catalogo/veredas/L4-F4-C3.webp
+public/images/territorios/catalogo/veredas/altos-del-brasil-v02.png
+public/images/territorios/catalogo/veredas/guayabal-transicion-v02.png
+public/images/territorios/catalogo/veredas/ilustracion_blanquizal_parcela_cafetera.png
+public/images/territorios/catalogo/veredas/ilustracion_el_cedro_finca_cafetera.png
+public/images/territorios/catalogo/veredas/ilustracion_el_socorro_porcicultura.png
+public/images/territorios/catalogo/veredas/ilustracion_la_suiza_escuela_rural.png
+public/images/territorios/catalogo/veredas/ilustracion_los_arenales_escuela_rural.png
+public/images/territorios/catalogo/veredas/ilustracion_narino_escuela_rural.png
+public/images/territorios/catalogo/veredas/ilustracion_sagua_escuela_rural.png
+src/components/admin/admin-jac-summary.tsx
+src/components/admin/admin-operation.tsx
+src/components/admin/admin-shell.tsx
+src/components/admin/role-welcome.tsx
+src/lib/admin-jac-navigation.ts
+src/lib/reportar/territory-visuals.ts
+src/routes/admin/jac.tsx
+src/styles.css
+```
+
+Los cambios de Superadmin, `AdminReportarFlow`, `app-shell.tsx`, `src/routes/index.tsx`, Supabase, dependencias y bloqueos permanecen fuera del complemento. El archivo territorial sin consumidor aprobado se conserva sin staging ni descarte.
 
 ## 8. Limitaciones conocidas
 
