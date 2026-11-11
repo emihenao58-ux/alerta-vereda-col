@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthSplash } from "@/components/admin/auth-splash";
@@ -16,6 +16,7 @@ import { LogoutTransition } from "@/components/logout-transition";
 import { NavegacionSesionProvider } from "@/components/navegacion-sesion";
 import { ThemeTransitionLayers } from "@/components/theme-transition-layers";
 import { Toaster } from "@/components/ui/sonner";
+import { PreferenciasM4Provider } from "@/hooks/use-m4-preferences";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import {
@@ -45,18 +46,15 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
-  console.error(error);
+function ErrorComponent({ reset }: { error: unknown; reset: () => void }) {
+  console.error("Error en el boundary de la ruta raíz.");
   const router = useRouter();
-  const normalizedError = useMemo(() => {
-    if (error instanceof Error) return error;
-    if (typeof error === "string") return new Error(error);
-    return new Error("Unknown error");
-  }, [error]);
 
   useEffect(() => {
-    reportLovableError(normalizedError, { boundary: "tanstack_root_error_component" });
-  }, [normalizedError]);
+    reportLovableError(new Error("Error en el boundary de la ruta raíz."), {
+      boundary: "tanstack_root_error_component",
+    });
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -148,15 +146,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavegacionSesionProvider>
-        <AppStartupSplash />
-        {/* The splash stays mounted across route changes so login never reveals a blank frame. */}
-        <AuthSplash />
-        <LogoutTransition />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" />
-      </NavegacionSesionProvider>
+      <PreferenciasM4Provider>
+        <NavegacionSesionProvider>
+          <AppStartupSplash />
+          {/* The splash stays mounted across route changes so login never reveals a blank frame. */}
+          <AuthSplash />
+          <LogoutTransition />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-center" />
+        </NavegacionSesionProvider>
+      </PreferenciasM4Provider>
     </QueryClientProvider>
   );
 }

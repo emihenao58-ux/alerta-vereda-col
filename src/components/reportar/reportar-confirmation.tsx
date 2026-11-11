@@ -87,7 +87,9 @@ export function ReportarConfirmation({
         <p className="reportar-confirmation-kicker">Confirmación local</p>
         <h2 id="reportar-confirmation-title">Tu reporte está listo</h2>
         <p>
-          La información quedó preparada en este dispositivo. Todavía no se ha enviado ni publicado.
+          {result.localId
+            ? "Los datos de tu reporte quedaron guardados en Mis reportes en este dispositivo. Todavía no se ha enviado ni publicado."
+            : "La información quedó preparada en este dispositivo. Todavía no se ha enviado ni publicado."}
         </p>
       </div>
 
@@ -226,7 +228,9 @@ export function ReportarConfirmation({
 
       <p className="reportar-confirmation-local-note">
         <ShieldCheck size={16} aria-hidden="true" />
-        La información y las evidencias permanecieron en este dispositivo durante el recorrido.
+        {result.localId
+          ? "El historial conserva los datos y, si adjuntaste evidencias, sus versiones procesadas. Los archivos originales no se guardaron."
+          : "La información y las evidencias permanecieron en este dispositivo durante el recorrido."}
       </p>
 
       {pendienteRevision && (
@@ -246,6 +250,11 @@ export function ReportarConfirmation({
         <Button type="button" variant="outline" onClick={onReset}>
           Crear otro reporte
         </Button>
+        {result.localId && (
+          <Button asChild type="button">
+            <Link to="/mis-reportes">Ver Mis reportes</Link>
+          </Button>
+        )}
         <Button asChild type="button">
           <Link to="/">
             <Home size={16} /> Volver a Inicio
@@ -256,7 +265,9 @@ export function ReportarConfirmation({
       <p className="reportar-confirmation-tagline">Juntos cuidamos nuestra comunidad</p>
 
       <span className="sr-only">
-        Modo: {result.mode}. Preparado: {result.submittedAt}. Identificador definitivo pendiente.
+        {result.localId
+          ? `Modo: ${result.mode}. Guardado localmente: ${result.submittedAt}. ID local: ${result.localId}. Identificador público pendiente.`
+          : `Modo: ${result.mode}. Preparado: ${result.submittedAt}. Identificador definitivo pendiente.`}
       </span>
     </section>
   );

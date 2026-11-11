@@ -23,6 +23,7 @@ import {
   videoListoParaCaptura,
   videoDisponible,
 } from "@/lib/reportar/media";
+import type { ReporteUbicacion } from "@/lib/reportar/types";
 
 export function ReportarMediaCapture({
   open,
@@ -31,13 +32,25 @@ export function ReportarMediaCapture({
   onPhoto,
   onVideo,
   onPermissionState,
+  onSolicitarUbicacionCaptura,
 }: {
   open: boolean;
   mode: "foto" | "video";
   onOpenChange: (open: boolean) => void;
-  onPhoto: (file: File, capturedAt: string) => void | Promise<void>;
-  onVideo: (file: File, durationSeconds: number, capturedAt: string) => void;
+  onPhoto: (
+    file: File,
+    capturedAt: string,
+    ubicacionCaptura: Promise<ReporteUbicacion | null>,
+  ) => void | Promise<void>;
+  onVideo: (
+    file: File,
+    durationSeconds: number,
+    capturedAt: string,
+    ubicacionCaptura: Promise<ReporteUbicacion | null>,
+  ) => void;
   onPermissionState: (state: "concedido" | "denegado" | "no-disponible") => void;
+  // Opt-in. El flujo administrativo conserva la conducta anterior si no pasa esta prop.
+  onSolicitarUbicacionCaptura?: () => Promise<ReporteUbicacion | null>;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -48,6 +61,7 @@ export function ReportarMediaCapture({
   const timerRef = useRef<number | null>(null);
   const sessionRef = useRef(0);
   const recordingStartAbortRef = useRef<AbortController | null>(null);
+  const ubicacionVideoRef = useRef<Promise<ReporteUbicacion | null> | null>(null);
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [facingMode, setFacingMode] = useState<CameraFacingMode>("environment");
   const [canSwitchCamera, setCanSwitchCamera] = useState(false);
@@ -67,6 +81,15 @@ export function ReportarMediaCapture({
     videoRef.current = node;
     setVideoElement(node);
   }, []);
+
+  const iniciarLecturaUbicacion = useCallback(() => {
+    if (!onSolicitarUbicacionCaptura) return Promise.resolve(null);
+    try {
+      return onSolicitarUbicacionCaptura().catch(() => null);
+    } catch {
+      return Promise.resolve(null);
+    }
+  }, [onSolicitarUbicacionCaptura]);
 
   const stopTimer = () => {
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
@@ -108,6 +131,7 @@ export function ReportarMediaCapture({
     setSeconds(0);
     setCanRetryCamera(false);
     setAudioAvailable(false);
+    ubicacionVideoRef.current = null;
     setTorchSupported(false);
     setTorchEnabled(false);
     setCanSwitchCamera(false);
@@ -185,8 +209,9 @@ export function ReportarMediaCapture({
     setCapturingPhoto(true);
     try {
       const capturedAt = new Date().toISOString();
+      const ubicacionCaptura = iniciarLecturaUbicacion();
       const file = await capturarFotoDesdeVideo(videoRef.current);
-      await onPhoto(file, capturedAt);
+      await onPhoto(file, capturedAt, ubicacionCaptura);
       closeMedia();
     } catch (cause) {
       releaseStream();
@@ -353,9 +378,12 @@ export function ReportarMediaCapture({
           },
         );
         const capturedAt = new Date(startedAtRef.current ?? Date.now()).toISOString();
-        onVideo(file, duration, capturedAt);
+        const ubicacionCaptura = ubicacionVideoRef.current ?? Promise.resolve(null);
+        ubicacionVideoRef.current = null;
+        onVideo(file, duration, capturedAt, ubicacionCaptura);
         closeMedia();
       };
+      ubicacionVideoRef.current = iniciarLecturaUbicacion();
       recorder.start();
       timerRef.current = window.setInterval(() => {
         const elapsed = Math.floor((Date.now() - (startedAtRef.current ?? Date.now())) / 1000);

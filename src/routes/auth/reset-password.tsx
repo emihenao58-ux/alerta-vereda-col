@@ -13,7 +13,7 @@ export const Route = createFileRoute("/auth/reset-password")({
 const campo =
   "mt-1 w-full rounded-md border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2 text-sm";
 
-type Estado = "cargando" | "listo" | "guardado" | "invalido";
+type Estado = "cargando" | "listo" | "guardado" | "actualizada-sin-cierre" | "invalido";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -63,16 +63,26 @@ function ResetPassword() {
     }
 
     setGuardando(true);
+    let contrasenaActualizada = false;
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
+      const { error: errorActualizacion } = await supabase.auth.updateUser({ password });
+      if (errorActualizacion) throw errorActualizacion;
+      contrasenaActualizada = true;
 
-      await supabase.auth.signOut();
+      const { error: errorCierreSesion } = await supabase.auth.signOut();
+      if (errorCierreSesion) throw errorCierreSesion;
       setEstado("guardado");
     } catch (error) {
-      setMensajeError(
-        error instanceof Error ? error.message : "No pudimos actualizar la contraseña.",
-      );
+      if (contrasenaActualizada) {
+        setEstado("actualizada-sin-cierre");
+        setMensajeError(
+          "La contraseña se actualizó correctamente, pero no se pudo completar el cierre de sesión. Tu sesión actual podría seguir abierta.",
+        );
+      } else {
+        setMensajeError(
+          error instanceof Error ? error.message : "No pudimos actualizar la contraseña.",
+        );
+      }
     } finally {
       setGuardando(false);
     }
@@ -140,11 +150,19 @@ function ResetPassword() {
             </form>
           )}
 
-          {estado === "guardado" && (
+          {(estado === "guardado" || estado === "actualizada-sin-cierre") && (
             <>
-              <p className="text-sm text-[color:var(--tinta-suave)]">
-                Contraseña actualizada correctamente. Ahora puedes iniciar sesión con tu nueva
-                contraseña.
+              <p
+                className={
+                  estado === "actualizada-sin-cierre"
+                    ? "text-sm text-[color:var(--terracota)]"
+                    : "text-sm text-[color:var(--tinta-suave)]"
+                }
+                role={estado === "actualizada-sin-cierre" ? "alert" : undefined}
+              >
+                {estado === "actualizada-sin-cierre"
+                  ? mensajeError
+                  : "Contraseña actualizada correctamente. Ahora puedes iniciar sesión con tu nueva contraseña."}
               </p>
               <button
                 type="button"

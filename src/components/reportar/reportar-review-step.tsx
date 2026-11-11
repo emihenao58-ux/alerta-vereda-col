@@ -32,6 +32,9 @@ export function ReportarReviewStep({
   onEdit,
   onPreview,
   onConfirm,
+  guardando = false,
+  procesandoEvidencia = false,
+  errorGuardado = null,
 }: {
   draft: ReporteDraft;
   onEdit: (
@@ -39,6 +42,9 @@ export function ReportarReviewStep({
   ) => void;
   onPreview: (id: string) => void;
   onConfirm: () => void;
+  guardando?: boolean;
+  procesandoEvidencia?: boolean;
+  errorGuardado?: string | null;
 }) {
   const categoria = categoriaConfig(draft.categoria);
   const subcategoria = subcategoriaPorId(draft.categoria, draft.subcategoria);
@@ -336,14 +342,40 @@ export function ReportarReviewStep({
         </p>
       </div>
 
+      {procesandoEvidencia && (
+        <p className="reportar-evidence-limit" role="status" aria-live="polite">
+          Preparando tus evidencias… Podrás confirmar cuando termine el procesamiento.
+        </p>
+      )}
+
+      {errorGuardado && (
+        <p className="reportar-error" role="alert">
+          {errorGuardado}
+        </p>
+      )}
+
       <ReportarStepActions>
-        <Button type="button" variant="outline" onClick={() => onEdit("evidencias")}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={guardando || procesandoEvidencia}
+          onClick={() => onEdit("evidencias")}
+        >
           <ArrowLeft size={16} aria-hidden="true" />
           Atrás
         </Button>
-        <Button type="button" className="reportar-review-confirm-button" onClick={onConfirm}>
+        <Button
+          type="button"
+          className="reportar-review-confirm-button"
+          disabled={guardando || procesandoEvidencia}
+          onClick={onConfirm}
+        >
           <Send size={16} aria-hidden="true" />
-          Confirmar reporte
+          {guardando
+            ? "Guardando en este dispositivo…"
+            : procesandoEvidencia
+              ? "Preparando evidencias…"
+              : "Confirmar reporte"}
         </Button>
       </ReportarStepActions>
     </ReportarStepShell>

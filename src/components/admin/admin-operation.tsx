@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Carta, Vacio } from "@/components/carta";
+import { AdminJacSummary } from "@/components/admin/admin-jac-summary";
 import {
   GaleriaEvidencia,
   PurgaPublicacion,
@@ -25,6 +26,7 @@ import {
   type MiVeredaPublicacionCerrada,
 } from "@/lib/mi-vereda-cartelera";
 import type { Database } from "@/integrations/supabase/types";
+import type { VistaPanelJac } from "@/lib/admin-jac-navigation";
 
 export type OperationScope = "local" | "global";
 
@@ -74,9 +76,11 @@ const campo =
 export function AdminOperation({
   scope,
   veredaId,
+  view = "todas",
 }: {
   scope: OperationScope;
   veredaId?: string | null;
+  view?: VistaPanelJac | "todas";
 }) {
   const { esAdmin, esAdminVereda, esSuperadmin } = useAuth();
   const qc = useQueryClient();
@@ -89,6 +93,7 @@ export function AdminOperation({
   const reportes = useQuery({
     queryKey: ["reportes-admin"],
     enabled: esAdmin,
+    ...(scope === "local" ? { retry: false } : {}),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reportes")
@@ -102,6 +107,7 @@ export function AdminOperation({
   const publicaciones = useQuery({
     queryKey: ["publicaciones-admin"],
     enabled: esAdmin,
+    ...(scope === "local" ? { retry: false } : {}),
     queryFn: async () => {
       const [emergencias, vias, servicios, avisos] = await Promise.all([
         supabase
@@ -261,181 +267,262 @@ export function AdminOperation({
 
   const pendientes = reportesVisibles.filter((reporte) => reporte.estado === "pendiente");
   const revisados = reportesVisibles.filter((reporte) => reporte.estado !== "pendiente");
+  const publicacionesActivas = publicacionesVisibles
+    ? Object.values(publicacionesVisibles).reduce(
+        (total, items) =>
+          total + items.filter((publicacion) => publicacion.cerrado_en === null).length,
+        0,
+      )
+    : null;
+  const estadoResumenReportes = reportes.error
+    ? "error"
+    : reportes.data === undefined
+      ? "loading"
+      : "ready";
+  const estadoResumenPublicaciones = publicaciones.error
+    ? "error"
+    : publicaciones.data === undefined
+      ? "loading"
+      : "ready";
+  const textoPendientes =
+    scope === "global" || reportes.data !== undefined
+      ? String(pendientes.length)
+      : reportes.error
+        ? "—"
+        : "…";
+  const etiquetaPendientes =
+    reportes.data !== undefined
+      ? `${pendientes.length} reportes pendientes`
+      : reportes.error
+        ? "Conteo de reportes no disponible"
+        : "Cargando conteo de reportes";
   const scopeLabel = scope === "global" ? "todas las veredas" : "tu vereda asignada";
 
   return (
-    <div className="admin-operation">
-      <section className="admin-section-intro">
-        <div>
-          <p className="admin-section-kicker">
-            {scope === "global" ? "Operación global" : "Alcance territorial"}
-          </p>
-          <h2>{scope === "global" ? "Reportes y publicaciones" : "Revisión de reportes"}</h2>
-          <p>
-            Trabajas sobre {scopeLabel}. Las decisiones se ejecutan con las funciones
-            transaccionales existentes.
-          </p>
-        </div>
-        <div className="admin-stat-pill" aria-label={`${pendientes.length} reportes pendientes`}>
-          <span className="admin-stat-number">{pendientes.length}</span>
-          <span>pendientes</span>
-        </div>
-      </section>
-
-      <section className="admin-panel-card">
-        <div className="admin-panel-heading">
+    <div
+      className={`admin-operation${scope === "local" ? " admin-operation-local" : ""}${scope === "local" && view !== "resumen" && view !== "todas" ? " admin-operation-local-view" : ""}`}
+    >
+      {scope === "global" && (
+        <section className="admin-section-intro">
           <div>
-            <p className="admin-section-kicker">Bandeja de entrada</p>
-            <h3>Reportes pendientes</h3>
+            <p className="admin-section-kicker">Operación global</p>
+            <h2>Reportes y publicaciones</h2>
+            <p>
+              Trabajas sobre {scopeLabel}. Las decisiones se ejecutan con las funciones
+              transaccionales existentes.
+            </p>
           </div>
-          <span className="admin-count-badge">{pendientes.length}</span>
-        </div>
-        {pendientes.length === 0 && <Vacio texto="No hay reportes pendientes en esta vista." />}
-        <div className="admin-card-stack">
-          {pendientes.map((reporte) => (
-            <Carta
-              key={reporte.id}
-              titulo={reporte.titulo}
-              meta={`${LABEL_CATEGORIA[reporte.categoria] ?? reporte.categoria} · ${reporte.veredas?.nombre ?? "Vereda"} · ${fecha(reporte.created_at)}`}
+          <div className="admin-stat-pill" aria-label={`${pendientes.length} reportes pendientes`}>
+            <span className="admin-stat-number">{pendientes.length}</span>
+            <span>pendientes</span>
+          </div>
+        </section>
+      )}
+
+      {scope === "local" && (view === "resumen" || view === "todas") && (
+        <AdminJacSummary
+          pendingCount={reportes.data ? pendientes.length : null}
+          activePublicationCount={publicaciones.data ? publicacionesActivas : null}
+          reviewedCount={reportes.data ? revisados.length : null}
+          reportState={estadoResumenReportes}
+          publicationState={estadoResumenPublicaciones}
+        />
+      )}
+
+      {(scope === "global" || view === "todas" || view === "reportes-pendientes") && (
+        <section
+          className={`admin-panel-card ${scope === "local" ? "admin-jac-operation-pending" : ""}`}
+          id={scope === "local" ? "jac-reportes-pendientes" : undefined}
+        >
+          <div className="admin-panel-heading">
+            <div>
+              <p className="admin-section-kicker">Bandeja de entrada</p>
+              <h3>Reportes pendientes</h3>
+            </div>
+            <span
+              className="admin-count-badge"
+              aria-label={scope === "local" ? etiquetaPendientes : undefined}
             >
-              <p>{reporte.descripcion}</p>
-              {reporte.lugar && <p className="mt-1">Lugar: {reporte.lugar}</p>}
-              {URL_FOTO(reporte.foto_url) && (
-                <img
-                  src={URL_FOTO(reporte.foto_url)!}
-                  alt="Foto del reporte"
-                  className="mt-2 max-h-64 rounded-md border object-cover"
-                />
-              )}
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <label className="text-sm font-medium">
-                  Nivel
-                  <select
-                    className={campo}
-                    value={niveles[reporte.id] ?? reporte.nivel ?? "normal"}
-                    onChange={(event) =>
-                      setNiveles((actual) => ({
-                        ...actual,
-                        [reporte.id]: event.target.value as Severidad,
-                      }))
-                    }
-                  >
-                    {(["urgente", "atencion", "normal"] as const).map((nivel) => (
-                      <option key={nivel} value={nivel}>
-                        {LABEL_SEVERIDAD[nivel]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {reporte.categoria === "emergencia" && (
+              {textoPendientes}
+            </span>
+          </div>
+          {scope === "local" && (
+            <EstadoConsultaLocal
+              etiqueta="los reportes"
+              cargando={reportes.isLoading}
+              error={reportes.error}
+              tieneDatos={reportes.data !== undefined}
+              reintentando={reportes.isFetching}
+              onReintentar={() => void reportes.refetch()}
+            />
+          )}
+          {pendientes.length === 0 &&
+            (scope === "global" || (reportes.isSuccess && !reportes.error)) && (
+              <Vacio texto="No hay reportes pendientes en esta vista." />
+            )}
+          <div className="admin-card-stack">
+            {pendientes.map((reporte) => (
+              <Carta
+                key={reporte.id}
+                titulo={reporte.titulo}
+                meta={`${LABEL_CATEGORIA[reporte.categoria] ?? reporte.categoria} · ${reporte.veredas?.nombre ?? "Vereda"} · ${fecha(reporte.created_at)}`}
+              >
+                <p>{reporte.descripcion}</p>
+                {reporte.lugar && <p className="mt-1">Lugar: {reporte.lugar}</p>}
+                {URL_FOTO(reporte.foto_url) && (
+                  <img
+                    src={URL_FOTO(reporte.foto_url)!}
+                    alt="Foto del reporte"
+                    className="mt-2 max-h-64 rounded-md border object-cover"
+                  />
+                )}
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="text-sm font-medium">
-                    Estado de emergencia
+                    Nivel
                     <select
                       className={campo}
-                      value={estadosEmergencia[reporte.id] ?? "Activa"}
+                      value={niveles[reporte.id] ?? reporte.nivel ?? "normal"}
                       onChange={(event) =>
-                        setEstadosEmergencia((actual) => ({
+                        setNiveles((actual) => ({
                           ...actual,
-                          [reporte.id]: event.target.value as EstadoEmergencia,
+                          [reporte.id]: event.target.value as Severidad,
                         }))
                       }
                     >
-                      <option value="Activa">Activa</option>
-                      <option value="En observación">En observación</option>
+                      {(["urgente", "atencion", "normal"] as const).map((nivel) => (
+                        <option key={nivel} value={nivel}>
+                          {LABEL_SEVERIDAD[nivel]}
+                        </option>
+                      ))}
                     </select>
                   </label>
-                )}
-                {reporte.categoria === "servicio" && (
-                  <>
+                  {reporte.categoria === "emergencia" && (
                     <label className="text-sm font-medium">
-                      Tipo de servicio
+                      Estado de emergencia
                       <select
                         className={campo}
-                        value={tiposServicio[reporte.id] ?? "agua"}
+                        value={estadosEmergencia[reporte.id] ?? "Activa"}
                         onChange={(event) =>
-                          setTiposServicio((actual) => ({
+                          setEstadosEmergencia((actual) => ({
                             ...actual,
-                            [reporte.id]: event.target.value as TipoServicio,
+                            [reporte.id]: event.target.value as EstadoEmergencia,
                           }))
                         }
                       >
-                        {(Object.keys(LABEL_TIPO_SERVICIO) as TipoServicio[]).map((tipo) => (
-                          <option key={tipo} value={tipo}>
-                            {LABEL_TIPO_SERVICIO[tipo]}
-                          </option>
-                        ))}
+                        <option value="Activa">Activa</option>
+                        <option value="En observación">En observación</option>
                       </select>
                     </label>
-                    <label className="text-sm font-medium">
-                      Estado del servicio
-                      <select
-                        className={campo}
-                        value={estadosServicio[reporte.id] ?? "Normal"}
-                        onChange={(event) =>
-                          setEstadosServicio((actual) => ({
-                            ...actual,
-                            [reporte.id]: event.target.value as EstadoServicio,
-                          }))
-                        }
-                      >
-                        <option value="Normal">Normal</option>
-                        <option value="Intermitente">Intermitente</option>
-                        <option value="Interrumpido">Interrumpido</option>
-                      </select>
-                    </label>
-                  </>
-                )}
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => aprobar.mutate(reporte)}
-                  disabled={aprobar.isPending}
-                  className="admin-primary-action"
-                >
-                  Verificar y publicar
-                </button>
-                <input
-                  className="min-w-52 flex-1 rounded-md border px-3 py-2 text-sm"
-                  placeholder="Motivo de rechazo"
-                  aria-label={`Motivo de rechazo para ${reporte.titulo}`}
-                  value={motivosRechazo[reporte.id] ?? ""}
-                  onChange={(event) =>
-                    setMotivosRechazo((actual) => ({ ...actual, [reporte.id]: event.target.value }))
-                  }
-                />
-                <button
-                  type="button"
-                  disabled={rechazar.isPending || !(motivosRechazo[reporte.id] ?? "").trim()}
-                  onClick={() =>
-                    rechazar.mutate({ reporte, motivo: (motivosRechazo[reporte.id] ?? "").trim() })
-                  }
-                  className="admin-secondary-action"
-                >
-                  Rechazar
-                </button>
-                <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
-              </div>
-            </Carta>
-          ))}
-        </div>
-      </section>
-
-      <section className="admin-panel-card">
-        <div className="admin-panel-heading">
-          <div>
-            <p className="admin-section-kicker">Historial vivo</p>
-            <h3>Publicaciones activas</h3>
+                  )}
+                  {reporte.categoria === "servicio" && (
+                    <>
+                      <label className="text-sm font-medium">
+                        Tipo de servicio
+                        <select
+                          className={campo}
+                          value={tiposServicio[reporte.id] ?? "agua"}
+                          onChange={(event) =>
+                            setTiposServicio((actual) => ({
+                              ...actual,
+                              [reporte.id]: event.target.value as TipoServicio,
+                            }))
+                          }
+                        >
+                          {(Object.keys(LABEL_TIPO_SERVICIO) as TipoServicio[]).map((tipo) => (
+                            <option key={tipo} value={tipo}>
+                              {LABEL_TIPO_SERVICIO[tipo]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="text-sm font-medium">
+                        Estado del servicio
+                        <select
+                          className={campo}
+                          value={estadosServicio[reporte.id] ?? "Normal"}
+                          onChange={(event) =>
+                            setEstadosServicio((actual) => ({
+                              ...actual,
+                              [reporte.id]: event.target.value as EstadoServicio,
+                            }))
+                          }
+                        >
+                          <option value="Normal">Normal</option>
+                          <option value="Intermitente">Intermitente</option>
+                          <option value="Interrumpido">Interrumpido</option>
+                        </select>
+                      </label>
+                    </>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => aprobar.mutate(reporte)}
+                    disabled={aprobar.isPending}
+                    className="admin-primary-action"
+                  >
+                    Verificar y publicar
+                  </button>
+                  <input
+                    className="min-w-52 flex-1 rounded-md border px-3 py-2 text-sm"
+                    placeholder="Motivo de rechazo"
+                    aria-label={`Motivo de rechazo para ${reporte.titulo}`}
+                    value={motivosRechazo[reporte.id] ?? ""}
+                    onChange={(event) =>
+                      setMotivosRechazo((actual) => ({
+                        ...actual,
+                        [reporte.id]: event.target.value,
+                      }))
+                    }
+                  />
+                  <button
+                    type="button"
+                    disabled={rechazar.isPending || !(motivosRechazo[reporte.id] ?? "").trim()}
+                    onClick={() =>
+                      rechazar.mutate({
+                        reporte,
+                        motivo: (motivosRechazo[reporte.id] ?? "").trim(),
+                      })
+                    }
+                    className="admin-secondary-action"
+                  >
+                    Rechazar
+                  </button>
+                  {scope === "global" && esSuperadmin && (
+                    <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
+                  )}
+                </div>
+              </Carta>
+            ))}
           </div>
-          <p className="admin-panel-note">Cerrar o retirar conserva la fila y la auditoría.</p>
-        </div>
-        <PublicacionesVigentes
-          publicaciones={publicacionesVisibles}
-          nombreVereda={nombreVereda}
-          onCerrar={cerrar.mutate}
-          cerrando={cerrar.isPending}
-        />
-      </section>
+        </section>
+      )}
+
+      {(scope === "global" || view === "todas" || view === "publicaciones-activas") && (
+        <section
+          className={`admin-panel-card ${scope === "local" ? "admin-jac-operation-active" : ""}`}
+          id={scope === "local" ? "jac-publicaciones-activas" : undefined}
+        >
+          <div className="admin-panel-heading">
+            <div>
+              <p className="admin-section-kicker">Historial vivo</p>
+              <h3>Publicaciones activas</h3>
+            </div>
+            <p className="admin-panel-note">Cerrar o retirar conserva la fila y la auditoría.</p>
+          </div>
+          <PublicacionesVigentes
+            publicaciones={publicacionesVisibles}
+            nombreVereda={nombreVereda}
+            onCerrar={cerrar.mutate}
+            cerrando={cerrar.isPending}
+            cargando={scope === "local" && publicaciones.isLoading}
+            error={scope === "local" ? publicaciones.error : null}
+            reintentando={publicaciones.isFetching}
+            onReintentar={() => void publicaciones.refetch()}
+          />
+        </section>
+      )}
 
       {scope === "global" && esSuperadmin && (
         <section className="admin-panel-card">
@@ -455,32 +542,50 @@ export function AdminOperation({
         </section>
       )}
 
-      <section className="admin-panel-card">
-        <div className="admin-panel-heading">
-          <div>
-            <p className="admin-section-kicker">Trazabilidad</p>
-            <h3>Reportes revisados</h3>
+      {(scope === "global" || view === "todas" || view === "reportes-revisados") && (
+        <section
+          className={`admin-panel-card ${scope === "local" ? "admin-jac-operation-reviewed" : ""}`}
+          id={scope === "local" ? "jac-reportes-revisados" : undefined}
+        >
+          <div className="admin-panel-heading">
+            <div>
+              <p className="admin-section-kicker">Trazabilidad</p>
+              <h3>Reportes revisados</h3>
+            </div>
           </div>
-        </div>
-        {revisados.length === 0 && (
-          <Vacio texto="Todavía no hay reportes revisados en esta vista." />
-        )}
-        <div className="admin-card-stack">
-          {revisados.map((reporte) => (
-            <Carta
-              key={reporte.id}
-              titulo={reporte.titulo}
-              meta={`${reporte.estado} · ${fecha(reporte.revisado_en)} · ${reporte.veredas?.nombre ?? "Vereda"}`}
-            >
-              <GaleriaEvidencia fotos={[reporte.foto_url]} />
-              {reporte.descripcion}
-              <div className="mt-3 flex flex-wrap gap-2">
-                <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
-              </div>
-            </Carta>
-          ))}
-        </div>
-      </section>
+          {scope === "local" && (
+            <EstadoConsultaLocal
+              etiqueta="el historial de reportes"
+              cargando={reportes.isLoading}
+              error={reportes.error}
+              tieneDatos={reportes.data !== undefined}
+              reintentando={reportes.isFetching}
+              onReintentar={() => void reportes.refetch()}
+            />
+          )}
+          {revisados.length === 0 &&
+            (scope === "global" || (reportes.isSuccess && !reportes.error)) && (
+              <Vacio texto="Todavía no hay reportes revisados en esta vista." />
+            )}
+          <div className="admin-card-stack">
+            {revisados.map((reporte) => (
+              <Carta
+                key={reporte.id}
+                titulo={reporte.titulo}
+                meta={`${reporte.estado} · ${fecha(reporte.revisado_en)} · ${reporte.veredas?.nombre ?? "Vereda"}`}
+              >
+                <GaleriaEvidencia fotos={[reporte.foto_url]} />
+                {reporte.descripcion}
+                {scope === "global" && esSuperadmin && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <PurgaReporte reporte={reporte as ReportePurgable} onDone={invalidar} />
+                  </div>
+                )}
+              </Carta>
+            ))}
+          </div>
+        </section>
+      )}
 
       {(scope === "global" || esAdminVereda || esSuperadmin) && (
         <p className="admin-operation-note">
@@ -490,6 +595,49 @@ export function AdminOperation({
       )}
     </div>
   );
+}
+
+function EstadoConsultaLocal({
+  etiqueta,
+  cargando,
+  error,
+  tieneDatos,
+  reintentando,
+  onReintentar,
+}: {
+  etiqueta: string;
+  cargando: boolean;
+  error: Error | null;
+  tieneDatos: boolean;
+  reintentando: boolean;
+  onReintentar: () => void;
+}) {
+  if (error && tieneDatos) {
+    return (
+      <p className="admin-jac-query-stale" role="status">
+        No fue posible actualizar {etiqueta}. Se muestran los datos cargados anteriormente.
+      </p>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-jac-query-error" role="alert">
+        <p>No pudimos cargar {etiqueta}. Intenta de nuevo.</p>
+        <button
+          type="button"
+          className="admin-secondary-action"
+          disabled={reintentando}
+          onClick={onReintentar}
+        >
+          {reintentando ? "Reintentando…" : "Reintentar"}
+        </button>
+      </div>
+    );
+  }
+
+  if (cargando && !tieneDatos) return <Vacio texto={`Cargando ${etiqueta}…`} />;
+  return null;
 }
 
 function PublicacionesCerradas({
@@ -542,11 +690,19 @@ function PublicacionesVigentes({
   nombreVereda,
   onCerrar,
   cerrando,
+  cargando,
+  error,
+  reintentando,
+  onReintentar,
 }: {
   publicaciones: Publicaciones | undefined;
   nombreVereda: Map<string, string>;
   onCerrar: (args: Cierre) => void;
   cerrando: boolean;
+  cargando: boolean;
+  error: Error | null;
+  reintentando: boolean;
+  onReintentar: () => void;
 }) {
   const [pendiente, setPendiente] = useState<{
     tabla: TablaPublicacion;
@@ -566,125 +722,156 @@ function PublicacionesVigentes({
     return todos.filter((p) => p.cerrado_en === null).sort((a, b) => b.id.localeCompare(a.id));
   }, [publicaciones]);
 
+  if (cargando && !publicaciones) return <Vacio texto="Cargando publicaciones activas…" />;
+  if (error && !publicaciones) {
+    return (
+      <EstadoConsultaLocal
+        etiqueta="las publicaciones"
+        cargando={cargando}
+        error={error}
+        tieneDatos={false}
+        reintentando={reintentando}
+        onReintentar={onReintentar}
+      />
+    );
+  }
+
   return (
-    <div className="admin-card-stack">
-      {vigentes.length === 0 && <Vacio texto="No hay publicaciones activas en esta vista." />}
-      {vigentes.map((publicacion) => {
-        const enEdicion = pendiente?.id === publicacion.id && pendiente.tabla === publicacion.tabla;
-        const tipoEtiqueta =
-          publicacion.tabla === "emergencias"
-            ? "emergencia"
-            : publicacion.tabla === "vias"
-              ? "via"
-              : publicacion.tabla === "servicios"
-                ? "servicio"
-                : "avisos";
-        const estadoVisual = ETIQUETA_ESTADO(
-          tipoEtiqueta,
-          publicacion.estado,
-          publicacion.resultado,
-          publicacion.razon_cierre,
-        );
-        return (
-          <Carta
-            key={`${publicacion.tabla}-${publicacion.id}`}
-            titulo={publicacion.titulo}
-            meta={`${nombreVereda.get(publicacion.vereda_id) ?? "Vereda"} · ${estadoVisual}`}
-          >
-            {enEdicion ? (
-              <form
-                className="space-y-2"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (!razon.trim()) {
-                    toast.error("Escribe una razón.");
-                    return;
-                  }
-                  onCerrar({
-                    tabla: pendiente.tabla,
-                    id: pendiente.id,
-                    resultado: pendiente.resultado,
-                    motivo: razon.trim(),
-                  });
-                  setPendiente(null);
-                  setRazon("");
-                }}
-              >
-                <textarea
-                  className="w-full rounded-md border p-2 text-sm"
-                  value={razon}
-                  onChange={(event) => setRazon(event.target.value)}
-                  placeholder="Motivo obligatorio"
-                  aria-label={`Motivo para actualizar ${publicacion.titulo}`}
-                  rows={2}
-                />
-                <div className="flex gap-2">
-                  <button type="submit" disabled={cerrando} className="admin-secondary-action">
-                    {pendiente.resultado === "retirado" ? "Retirar" : "Cerrar como no solucionado"}
+    <>
+      {error && publicaciones && (
+        <EstadoConsultaLocal
+          etiqueta="las publicaciones"
+          cargando={cargando}
+          error={error}
+          tieneDatos
+          reintentando={reintentando}
+          onReintentar={onReintentar}
+        />
+      )}
+      <div className="admin-card-stack">
+        {vigentes.length === 0 && !error && (
+          <Vacio texto="No hay publicaciones activas en esta vista." />
+        )}
+        {vigentes.map((publicacion) => {
+          const enEdicion =
+            pendiente?.id === publicacion.id && pendiente.tabla === publicacion.tabla;
+          const tipoEtiqueta =
+            publicacion.tabla === "emergencias"
+              ? "emergencia"
+              : publicacion.tabla === "vias"
+                ? "via"
+                : publicacion.tabla === "servicios"
+                  ? "servicio"
+                  : "avisos";
+          const estadoVisual = ETIQUETA_ESTADO(
+            tipoEtiqueta,
+            publicacion.estado,
+            publicacion.resultado,
+            publicacion.razon_cierre,
+          );
+          return (
+            <Carta
+              key={`${publicacion.tabla}-${publicacion.id}`}
+              titulo={publicacion.titulo}
+              meta={`${nombreVereda.get(publicacion.vereda_id) ?? "Vereda"} · ${estadoVisual}`}
+            >
+              {enEdicion ? (
+                <form
+                  className="space-y-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    if (!razon.trim()) {
+                      toast.error("Escribe una razón.");
+                      return;
+                    }
+                    onCerrar({
+                      tabla: pendiente.tabla,
+                      id: pendiente.id,
+                      resultado: pendiente.resultado,
+                      motivo: razon.trim(),
+                    });
+                    setPendiente(null);
+                    setRazon("");
+                  }}
+                >
+                  <textarea
+                    className="w-full rounded-md border p-2 text-sm"
+                    value={razon}
+                    onChange={(event) => setRazon(event.target.value)}
+                    placeholder="Motivo obligatorio"
+                    aria-label={`Motivo para actualizar ${publicacion.titulo}`}
+                    rows={2}
+                  />
+                  <div className="flex gap-2">
+                    <button type="submit" disabled={cerrando} className="admin-secondary-action">
+                      {pendiente.resultado === "retirado"
+                        ? "Retirar"
+                        : "Cerrar como no solucionado"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPendiente(null);
+                        setRazon("");
+                      }}
+                      className="admin-quiet-action"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={cerrando}
+                    onClick={() =>
+                      onCerrar({
+                        tabla: publicacion.tabla,
+                        id: publicacion.id,
+                        resultado: "solucionado",
+                      })
+                    }
+                    className="admin-primary-action"
+                  >
+                    Marcar solucionado
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setPendiente(null);
-                      setRazon("");
-                    }}
-                    className="admin-quiet-action"
+                    disabled={cerrando}
+                    onClick={() =>
+                      setPendiente({
+                        tabla: publicacion.tabla,
+                        id: publicacion.id,
+                        titulo: publicacion.titulo,
+                        resultado: "no_solucionado",
+                      })
+                    }
+                    className="admin-secondary-action"
                   >
-                    Cancelar
+                    No solucionado
+                  </button>
+                  <button
+                    type="button"
+                    disabled={cerrando}
+                    onClick={() =>
+                      setPendiente({
+                        tabla: publicacion.tabla,
+                        id: publicacion.id,
+                        titulo: publicacion.titulo,
+                        resultado: "retirado",
+                      })
+                    }
+                    className="admin-danger-action"
+                  >
+                    Retirar
                   </button>
                 </div>
-              </form>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={cerrando}
-                  onClick={() =>
-                    onCerrar({
-                      tabla: publicacion.tabla,
-                      id: publicacion.id,
-                      resultado: "solucionado",
-                    })
-                  }
-                  className="admin-primary-action"
-                >
-                  Marcar solucionado
-                </button>
-                <button
-                  type="button"
-                  disabled={cerrando}
-                  onClick={() =>
-                    setPendiente({
-                      tabla: publicacion.tabla,
-                      id: publicacion.id,
-                      titulo: publicacion.titulo,
-                      resultado: "no_solucionado",
-                    })
-                  }
-                  className="admin-secondary-action"
-                >
-                  No solucionado
-                </button>
-                <button
-                  type="button"
-                  disabled={cerrando}
-                  onClick={() =>
-                    setPendiente({
-                      tabla: publicacion.tabla,
-                      id: publicacion.id,
-                      titulo: publicacion.titulo,
-                      resultado: "retirado",
-                    })
-                  }
-                  className="admin-danger-action"
-                >
-                  Retirar
-                </button>
-              </div>
-            )}
-          </Carta>
-        );
-      })}
-    </div>
+              )}
+            </Carta>
+          );
+        })}
+      </div>
+    </>
   );
 }

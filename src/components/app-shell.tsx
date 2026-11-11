@@ -1,12 +1,17 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
+  ChevronRight,
   ClipboardList,
   House,
+  Info,
   LayoutDashboard,
+  LogOut,
   Map as MapIcon,
   Mountain,
   Plus,
+  Settings,
+  ShieldCheck,
   Trees,
   UserRound,
 } from "lucide-react";
@@ -15,12 +20,28 @@ import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useNavegacionSesion } from "@/components/navegacion-sesion";
 import { dispatchLogoutTransition } from "@/lib/logout-transition";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const MODULOS = [
   { to: "/", label: "Inicio", Icono: House },
   { to: "/reportes", label: "Reportes", Icono: ClipboardList },
   { to: "/mapa", label: "Mapa", Icono: MapIcon },
   { to: "/mi-vereda", label: "Veredas", Icono: Mountain },
+] as const;
+
+const OPCIONES_CUENTA = [
+  { to: "/mi-perfil", label: "Mi perfil", Icono: UserRound },
+  { to: "/mis-reportes", label: "Mis reportes", Icono: ClipboardList },
+  { to: "/acerca-de", label: "Acerca de AlertaVereda", Icono: Info },
+  { to: "/configuracion", label: "Configuración", Icono: Settings },
+  { to: "/acceso-administrativo", label: "Acceso administrativo", Icono: ShieldCheck },
 ] as const;
 
 export function BotonEmergencias() {
@@ -69,6 +90,7 @@ export function CuentaControl({
 }) {
   const { perfil } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [cerrandoSesion, setCerrandoSesion] = useState(false);
 
   const cerrarSesion = async () => {
@@ -93,7 +115,7 @@ export function CuentaControl({
       }
       if (rol) dispatchLogoutTransition({ phase: "success", role: rol });
       await navigate({ to: "/auth", replace: true });
-    } catch (error) {
+    } catch {
       if (rol) {
         dispatchLogoutTransition({
           phase: "error",
@@ -102,30 +124,83 @@ export function CuentaControl({
         });
       }
       setCerrandoSesion(false);
-      console.error("No se pudo cerrar la sesión:", error);
+      console.error("No se pudo cerrar la sesión.");
     }
   };
 
-  if (usuario) {
+  // El menú personal M4 no cambia el control de cuenta de una sesión Superadmin.
+  if (showLabel || perfil?.rol === "superadmin") {
+    if (usuario) {
+      return (
+        <button
+          type="button"
+          className="account-button"
+          aria-label="Salir"
+          title="Salir"
+          disabled={cerrandoSesion}
+          onClick={() => void cerrarSesion()}
+        >
+          <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
+          {showLabel && <span>Salir</span>}
+        </button>
+      );
+    }
+
     return (
-      <button
-        type="button"
-        className="account-button"
-        aria-label="Salir"
-        title="Salir"
-        disabled={cerrandoSesion}
-        onClick={() => void cerrarSesion()}
-      >
+      <Link to="/auth" className="account-button" aria-label="Entrar" title="Entrar">
         <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
-        {showLabel && <span>Salir</span>}
-      </button>
+      </Link>
     );
   }
 
   return (
-    <Link to="/auth" className="account-button" aria-label="Entrar" title="Entrar">
-      <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
-    </Link>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={`account-button${showLabel ? " account-button-with-label" : ""}`}
+          aria-label="Abrir menú de usuario"
+          title="Menú de usuario"
+        >
+          <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
+          {showLabel && <span>Cuenta</span>}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={8} className="account-menu-content">
+        <DropdownMenuLabel className="account-menu-heading">Tu espacio</DropdownMenuLabel>
+        {OPCIONES_CUENTA.map(({ to, label, Icono }) => (
+          <DropdownMenuItem key={to} asChild>
+            <Link
+              to={to}
+              className={`account-menu-link${pathname === to ? " is-active" : ""}`}
+              aria-current={pathname === to ? "page" : undefined}
+            >
+              <Icono size={17} strokeWidth={2.1} aria-hidden="true" />
+              <span>{label}</span>
+              <ChevronRight
+                size={14}
+                strokeWidth={1.8}
+                className="ml-auto opacity-50"
+                aria-hidden="true"
+              />
+            </Link>
+          </DropdownMenuItem>
+        ))}
+        {usuario && (
+          <>
+            <DropdownMenuSeparator className="account-menu-separator" />
+            <DropdownMenuItem
+              className="account-menu-logout"
+              disabled={cerrandoSesion}
+              onSelect={() => void cerrarSesion()}
+            >
+              <LogOut size={17} strokeWidth={2.1} aria-hidden="true" />
+              <span>{cerrandoSesion ? "Cerrando sesión…" : "Cerrar sesión"}</span>
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -167,6 +242,7 @@ export function AppShell({ children, wide = false, variant = "default" }: AppShe
                     <Link
                       to={to}
                       className="app-shell-nav-link"
+                      aria-label={label}
                       activeProps={{ className: "app-shell-nav-link app-shell-nav-link-active" }}
                     >
                       <Icono size={16} strokeWidth={2.2} aria-hidden="true" />

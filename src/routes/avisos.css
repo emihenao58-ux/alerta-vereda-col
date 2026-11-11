@@ -33,7 +33,7 @@
 .avisos-filter-group > h2 {
   margin: 0;
   color: var(--bosque-oscuro);
-  font-size: 0.79rem;
+  font-size: calc(var(--av-text-scale) * 0.79rem);
   font-weight: 850;
 }
 
@@ -52,7 +52,7 @@
   padding: 0.55rem 0.7rem;
   color: var(--tinta);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: calc(var(--av-text-scale) * 0.82rem);
 }
 
 .avisos-type-select:focus-visible {
@@ -85,7 +85,7 @@
   background: color-mix(in srgb, #e7a836 12%, var(--card));
   padding: 0.55rem 0.7rem;
   color: var(--tinta-suave);
-  font-size: 0.74rem;
+  font-size: calc(var(--av-text-scale) * 0.74rem);
   line-height: 1.45;
 }
 
@@ -112,7 +112,7 @@
   margin: 0.18rem 0 0;
   color: var(--bosque-oscuro);
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.6vw, 1.65rem);
+  font-size: calc(var(--av-text-scale) * clamp(1.15rem, 2.6vw, 1.65rem));
 }
 
 .dark .avisos-results-heading h2 {
@@ -122,7 +122,7 @@
 .avisos-results-count {
   flex: 0 0 auto;
   color: var(--tinta-suave);
-  font-size: 0.76rem;
+  font-size: calc(var(--av-text-scale) * 0.76rem);
   font-weight: 800;
 }
 
@@ -133,7 +133,7 @@
   background: color-mix(in srgb, #e7a836 10%, var(--card));
   padding: 0.55rem 0.7rem;
   color: var(--tinta-suave);
-  font-size: 0.74rem;
+  font-size: calc(var(--av-text-scale) * 0.74rem);
   line-height: 1.45;
 }
 
@@ -160,7 +160,7 @@
   background: color-mix(in srgb, #e7a836 15%, var(--card));
   padding: 0.25rem 0.55rem;
   color: #644910;
-  font-size: 0.72rem;
+  font-size: calc(var(--av-text-scale) * 0.72rem);
   font-weight: 800;
   line-height: 1.25;
   overflow-wrap: anywhere;

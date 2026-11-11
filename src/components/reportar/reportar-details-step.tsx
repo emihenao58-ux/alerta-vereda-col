@@ -63,6 +63,7 @@ export function ReportarDetailsStep({
   territorioId,
   territorioPadreId,
   nombre,
+  nombreSoloLectura = false,
   error,
   onChange,
   onBack,
@@ -72,6 +73,7 @@ export function ReportarDetailsStep({
   territorioId: string | null;
   territorioPadreId: string | null;
   nombre: string;
+  nombreSoloLectura?: boolean;
   error: string | null;
   onChange: (patch: Partial<ReporteDraft>) => void;
   onBack: () => void;
@@ -211,21 +213,24 @@ export function ReportarDetailsStep({
 
         {tipoLugar === "corregimiento" && !finalSeleccionado && (
           <div className="reportar-territory-options" role="radiogroup" aria-label="Corregimientos">
-            {corregimientos.map((territorio) => (
-              <button
-                key={territorio.id}
-                type="button"
-                className="reportar-territory-option"
-                style={estiloZona(colorDeTerritorio(territorio))}
-                onClick={() => elegirCorregimiento(territorio.id)}
-              >
-                <span>
-                  <strong>{territorio.nombre}</strong>
-                  <small>Corregimiento</small>
-                </span>
-                <ChevronRight size={20} aria-hidden="true" />
-              </button>
-            ))}
+            {corregimientos.map((territorio) => {
+              return (
+                <button
+                  key={territorio.id}
+                  type="button"
+                  className="reportar-territory-option"
+                  style={estiloZona(colorDeTerritorio(territorio))}
+                  onClick={() => elegirCorregimiento(territorio.id)}
+                  aria-label={`${territorio.nombre}. Corregimiento.`}
+                >
+                  <span>
+                    <strong>{territorio.nombre}</strong>
+                    <small>Corregimiento</small>
+                  </span>
+                  <ChevronRight size={20} aria-hidden="true" />
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -270,7 +275,7 @@ export function ReportarDetailsStep({
                     style={estiloZona(color)}
                     onClick={() => elegirVereda(territorio.id)}
                     role="option"
-                    aria-label={`${territorio.nombre}. Vereda · ${contexto}`}
+                    aria-label={`${territorio.nombre}. Vereda · ${contexto}.`}
                   >
                     <span>
                       <strong>{territorio.nombre}</strong>
@@ -341,10 +346,13 @@ export function ReportarDetailsStep({
             style={estiloZona(colorDeTerritorio(territorioSeleccionado))}
             role="status"
           >
-            <span className="reportar-location-type-icon" aria-hidden="true">
+            <span
+              className="reportar-location-type-icon reportar-territory-selected-icon"
+              aria-hidden="true"
+            >
               {tipoLugar === "vereda" ? <Leaf size={24} /> : <MapPin size={24} />}
             </span>
-            <div>
+            <div className="reportar-territory-selected-copy">
               <span>{etiquetaTipoLugar(tipoLugar)}</span>
               <strong>{territorioSeleccionado.nombre}</strong>
               {tipoLugar === "vereda" ? (
@@ -362,14 +370,20 @@ export function ReportarDetailsStep({
           <span className="reportar-name-label">
             <User size={18} strokeWidth={1.9} aria-hidden="true" />
             <span>
-              Tu nombre <em>(opcional)</em>
+              Tu nombre <em>{nombreSoloLectura ? "(solo lectura)" : "(opcional)"}</em>
             </span>
           </span>
           <input
-            className="reportar-input"
+            className={`reportar-input${nombreSoloLectura ? " reportar-name-readonly" : ""}`}
             value={nombre}
-            onChange={(event) => onChange({ nombre: event.target.value })}
-            placeholder="Escribe tu nombre"
+            onChange={
+              nombreSoloLectura ? undefined : (event) => onChange({ nombre: event.target.value })
+            }
+            placeholder={
+              nombreSoloLectura ? "Nombre de tu cuenta administrativa" : "Escribe tu nombre"
+            }
+            readOnly={nombreSoloLectura}
+            aria-readonly={nombreSoloLectura ? "true" : undefined}
           />
         </label>
       </div>

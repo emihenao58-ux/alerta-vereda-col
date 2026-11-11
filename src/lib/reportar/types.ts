@@ -37,6 +37,9 @@ export type ReporteEvidencia = {
   // Solo se define cuando se capturó directamente en la cámara o app.
   // En galería permanece null para no inventar fecha ni usar lastModified erróneo.
   capturadaEn: string | null;
+  // Solo para cámara dentro de la app; nunca se escribe dentro del archivo multimedia.
+  // La galería no recibe la ubicación actual del dispositivo ni se procesa EXIF.
+  ubicacionCaptura?: ReporteUbicacion | null;
   // Fecha exacta en que se incorporó al borrador local.
   incorporadaEn: string;
   duracionSegundos?: number;
