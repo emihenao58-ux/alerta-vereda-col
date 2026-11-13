@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ClipboardList, Megaphone } from "lucide-react";
-import { AppShell, BotonEmergencias, CuentaControl } from "@/components/app-shell";
+import { AppShell, BotonEmergencias } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -43,7 +43,7 @@ function Inicio() {
 }
 
 function PortadaEspecial() {
-  const { usuario, salir, esAdminVereda, esSuperadmin } = useAuth();
+  const { esAdminVereda, esSuperadmin } = useAuth();
   const { activarNavegacion } = useNavegacionSesion();
   const accesoAdministrativo = esSuperadmin
     ? { to: "/admin/gestion" as const, label: "Centro de Gestión" }
@@ -69,8 +69,6 @@ function PortadaEspecial() {
           )}
           <div className="portada-especial-controls">
             <ThemeToggle />
-            <span className="portada-control-separator" aria-hidden="true" />
-            <CuentaControl usuario={Boolean(usuario)} salir={salir} />
           </div>
         </div>
       </header>

@@ -13785,6 +13785,10 @@ body.logout-transition-active {
   color: #f8f6ea;
 }
 
+html[data-google-oauth-pending="true"] .app-startup-splash {
+  display: none !important;
+}
+
 .app-startup-splash::before {
   position: absolute;
   inset: 0;
