@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { AuthSplash } from "@/components/admin/auth-splash";
+import { AuthSplash, GOOGLE_LOGIN_PENDING_KEY } from "@/components/admin/auth-splash";
 import { AppStartupSplash } from "@/components/app-startup-splash";
 import { LogoutTransition } from "@/components/logout-transition";
 import { NavegacionSesionProvider } from "@/components/navegacion-sesion";
@@ -23,6 +23,14 @@ import {
   STARTUP_PHRASE_APPLY_SCRIPT,
   STARTUP_PHRASE_BOOTSTRAP_SCRIPT,
 } from "@/lib/startup-phrases";
+
+const GOOGLE_OAUTH_STARTUP_SPLASH_GUARD_SCRIPT = `try {
+  if (window.sessionStorage.getItem(${JSON.stringify(GOOGLE_LOGIN_PENDING_KEY)}) === "1") {
+    document.documentElement.setAttribute("data-google-oauth-pending", "true");
+  }
+} catch {
+  // Keep normal startup behavior if session storage is unavailable.
+}`;
 
 function NotFoundComponent() {
   return (
@@ -129,6 +137,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: STARTUP_PHRASE_BOOTSTRAP_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: GOOGLE_OAUTH_STARTUP_SPLASH_GUARD_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
