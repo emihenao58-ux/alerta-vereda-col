@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { AuthSplash, GOOGLE_LOGIN_PENDING_KEY } from "@/components/admin/auth-splash";
+import { AuthSplash } from "@/components/admin/auth-splash";
 import { AppStartupSplash } from "@/components/app-startup-splash";
 import { LogoutTransition } from "@/components/logout-transition";
 import { NavegacionSesionProvider } from "@/components/navegacion-sesion";
@@ -25,11 +25,14 @@ import {
 } from "@/lib/startup-phrases";
 
 const GOOGLE_OAUTH_STARTUP_SPLASH_GUARD_SCRIPT = `try {
-  if (window.sessionStorage.getItem(${JSON.stringify(GOOGLE_LOGIN_PENDING_KEY)}) === "1") {
+  const isGoogleOAuthCallback =
+    window.location.pathname === "/auth" &&
+    new URLSearchParams(window.location.hash.slice(1)).has("provider_token");
+  if (isGoogleOAuthCallback) {
     document.documentElement.setAttribute("data-google-oauth-pending", "true");
   }
 } catch {
-  // Keep normal startup behavior if session storage is unavailable.
+  // Preserve normal startup behavior if the callback URL cannot be parsed.
 }`;
 
 function NotFoundComponent() {
