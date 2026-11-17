@@ -1,6 +1,7 @@
 import { ilustracionDe } from "@/lib/reportar/illustrations";
 import {
   consultarCartelera,
+  consultarPublicacionPorIdentidad,
   type MiVeredaCategoria,
   type MiVeredaPublicacion,
 } from "@/lib/mi-vereda-cartelera";
@@ -211,29 +212,39 @@ export function fechaHoraPublica(valor: string | null | undefined) {
   return hora ? `${fecha} · ${hora}` : fecha;
 }
 
-export function detalleReporteHref(publicacionId: string) {
-  return `/reportes/${encodeURIComponent(publicacionId)}`;
+const TABLAS_PUBLICACION = ["emergencias", "vias", "servicios", "avisos"] as const;
+
+export function normalizarTablaPublicacion(
+  valor: unknown,
+): MiVeredaPublicacion["publicacion_tabla"] | undefined {
+  if (typeof valor !== "string") return undefined;
+  return TABLAS_PUBLICACION.includes(valor as (typeof TABLAS_PUBLICACION)[number])
+    ? (valor as MiVeredaPublicacion["publicacion_tabla"])
+    : undefined;
 }
 
-export async function consultarReportePublicoPorId(publicacionId: string) {
-  const categorias: MiVeredaCategoria[] = ["emergencia", "via", "servicio", "aviso"];
-  const respuestas = await Promise.all(
-    categorias.map((categoria) =>
-      consultarCartelera({
-        p_categoria: categoria,
-        p_limit: 100,
-        p_offset: 0,
-        p_excluir_nivel_normal: false,
-      }),
-    ),
-  );
+export function detalleReporteHref(
+  publicacionId: string,
+  publicacionTabla?: MiVeredaPublicacion["publicacion_tabla"],
+) {
+  const ruta = `/reportes/${encodeURIComponent(publicacionId)}`;
+  return publicacionTabla ? `${ruta}?tabla=${encodeURIComponent(publicacionTabla)}` : ruta;
+}
 
-  return (
-    respuestas
-      .flat()
-      .find(
-        (publicacion) =>
-          publicacion.publicacion_id === publicacionId && esPublicacionPublica(publicacion),
-      ) ?? null
-  );
+export async function consultarReportePublicoPorId(
+  publicacionId: string,
+  publicacionTabla?: MiVeredaPublicacion["publicacion_tabla"],
+) {
+  const coincidencias = await consultarPublicacionPorIdentidad(publicacionId, publicacionTabla);
+  const publicas = coincidencias.filter(esPublicacionPublica);
+
+  if (publicacionTabla) {
+    return (
+      publicas.find((publicacion) => publicacion.publicacion_tabla === publicacionTabla) ?? null
+    );
+  }
+
+  // Los enlaces antiguos solo contienen ID: resuélvelos únicamente si el ID
+  // identifica una sola publicación visible entre las cuatro tablas.
+  return publicas.length === 1 ? publicas[0] : null;
 }
