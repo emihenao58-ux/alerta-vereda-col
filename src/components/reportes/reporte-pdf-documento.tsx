@@ -466,13 +466,11 @@ function PaginaPrincipal({
       <Text style={[estilos.datoValor, zona(142, 385, 338, 30)]}>
         {datos.fecha || "Fecha no disponible"}
       </Text>
-      {autorDisponible ? (
+      {autorDisponible && (
         <>
           <Text style={[estilos.datoEtiqueta, zona(142, 424, 330, 27)]}>Autor</Text>
           <Text style={[estilos.datoValor, zona(142, 450, 330, 27)]}>{datos.autor}</Text>
         </>
-      ) : (
-        <View style={[estilos.mascaraBlanca, zona(61, 412, 446, 61)]} />
       )}
 
       {!ubicacionDisponible ? (
