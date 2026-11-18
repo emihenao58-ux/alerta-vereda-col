@@ -7,8 +7,12 @@ import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-pub
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavegacionSesion } from "@/components/navegacion-sesion";
-import { consultarCartelera, type MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
-import { esPublicacionPublica } from "@/lib/reportes-publicos";
+import {
+  consultarCartelera,
+  type MiVeredaCategoria,
+  type MiVeredaPublicacion,
+} from "@/lib/mi-vereda-cartelera";
+import { estadoPublicoDe, esPublicacionPublica } from "@/lib/reportes-publicos";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -130,31 +134,74 @@ function PortadaEspecial() {
   );
 }
 
+const TAMAÑO_PAGINA_INICIO = 10;
+const LIMITE_RESUMEN_INICIO = 2;
+
+function esEmergenciaElegibleParaInicio(publicacion: MiVeredaPublicacion) {
+  if (publicacion.categoria !== "emergencia" || publicacion.cerrado_en !== null) return false;
+
+  const estado = estadoPublicoDe(publicacion);
+  return estado === "en_revision" || estado === "verificado_activo" || estado === "en_atencion";
+}
+
+async function consultarDosPublicacionesRecientes(
+  categoria: MiVeredaCategoria | null,
+  elegible: (publicacion: MiVeredaPublicacion) => boolean,
+) {
+  const seleccionadas: MiVeredaPublicacion[] = [];
+  const idsIncluidos = new Set<string>();
+  let offset = 0;
+  let limitePagina = TAMAÑO_PAGINA_INICIO;
+
+  while (seleccionadas.length < LIMITE_RESUMEN_INICIO) {
+    const pagina = await consultarCartelera({
+      p_categoria: categoria,
+      p_limit: limitePagina,
+      p_offset: offset,
+      p_excluir_nivel_normal: false,
+    });
+
+    for (const publicacion of pagina) {
+      const clave = `${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`;
+      if (!esPublicacionPublica(publicacion) || !elegible(publicacion) || idsIncluidos.has(clave)) {
+        continue;
+      }
+
+      idsIncluidos.add(clave);
+      seleccionadas.push(publicacion);
+      if (seleccionadas.length === LIMITE_RESUMEN_INICIO) break;
+    }
+
+    if (seleccionadas.length === LIMITE_RESUMEN_INICIO || pagina.length < limitePagina) {
+      break;
+    }
+
+    offset += limitePagina;
+    limitePagina = 100;
+  }
+
+  return seleccionadas;
+}
+
 function InicioHabitual() {
-  const { data, isError, isLoading } = useQuery({
-    queryKey: ["portada-habitual"],
-    queryFn: async () => {
-      const [emergencias, ultimosReportes] = await Promise.all([
-        consultarCartelera({
-          p_categoria: "emergencia",
-          p_limit: 3,
-          p_excluir_nivel_normal: false,
-        }),
-        consultarCartelera({
-          p_categoria: null,
-          p_limit: 2,
-          p_excluir_nivel_normal: false,
-        }),
-      ]);
-      return {
-        emergencias: emergencias.filter(esPublicacionPublica),
-        ultimosReportes: ultimosReportes.filter(esPublicacionPublica),
-      };
-    },
+  const consultaEmergencias = useQuery({
+    queryKey: ["portada-habitual", "emergencias"],
+    queryFn: () => consultarDosPublicacionesRecientes("emergencia", esEmergenciaElegibleParaInicio),
+  });
+  const consultaUltimosReportes = useQuery({
+    queryKey: ["portada-habitual", "ultimos-reportes"],
+    queryFn: () => consultarDosPublicacionesRecientes(null, () => true),
   });
 
+  const emergencias = consultaEmergencias.data ?? [];
+  const ultimosReportes = consultaUltimosReportes.data ?? [];
   const sinNovedades =
-    !isLoading && data && data.emergencias.length === 0 && data.ultimosReportes.length === 0;
+    !consultaEmergencias.isLoading &&
+    !consultaUltimosReportes.isLoading &&
+    !consultaEmergencias.isError &&
+    !consultaUltimosReportes.isError &&
+    emergencias.length === 0 &&
+    ultimosReportes.length === 0;
 
   return (
     <AppShell wide>
@@ -174,9 +221,13 @@ function InicioHabitual() {
           </div>
         </section>
 
-        {isLoading && <Vacio texto="Cargando las novedades…" />}
-        {isError && (
-          <Vacio texto="No fue posible cargar las novedades. Intenta de nuevo más tarde." />
+        {consultaEmergencias.isLoading && <Vacio texto="Cargando las emergencias activas…" />}
+        {consultaEmergencias.isError && (
+          <Vacio texto="No fue posible cargar las emergencias activas. Intenta de nuevo más tarde." />
+        )}
+        {consultaUltimosReportes.isLoading && <Vacio texto="Cargando los últimos reportes…" />}
+        {consultaUltimosReportes.isError && (
+          <Vacio texto="No fue posible cargar los últimos reportes. Intenta de nuevo más tarde." />
         )}
         {sinNovedades && (
           <div className="inicio-status">
@@ -184,7 +235,7 @@ function InicioHabitual() {
           </div>
         )}
 
-        {data && data.emergencias.length > 0 && (
+        {emergencias.length > 0 && (
           <section className="inicio-emergency-section" aria-labelledby="inicio-emergencias-titulo">
             <div className="inicio-section-heading inicio-emergency-heading">
               <div>
@@ -197,8 +248,11 @@ function InicioHabitual() {
               </Link>
             </div>
             <div className="inicio-emergency-list">
-              {data.emergencias.slice(0, 2).map((publicacion) => (
-                <TarjetaInicio key={publicacion.publicacion_id} publicacion={publicacion} />
+              {emergencias.map((publicacion) => (
+                <TarjetaInicio
+                  key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+                  publicacion={publicacion}
+                />
               ))}
             </div>
           </section>
@@ -212,11 +266,14 @@ function InicioHabitual() {
             </div>
           </div>
 
-          {data?.ultimosReportes.map((publicacion) => (
-            <TarjetaInicio key={publicacion.publicacion_id} publicacion={publicacion} />
+          {ultimosReportes.map((publicacion) => (
+            <TarjetaInicio
+              key={`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`}
+              publicacion={publicacion}
+            />
           ))}
 
-          {data && data.ultimosReportes.length === 0 && (
+          {consultaUltimosReportes.data && ultimosReportes.length === 0 && (
             <Vacio texto="Aún no hay reportes recientes para mostrar." />
           )}
 

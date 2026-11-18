@@ -7,6 +7,7 @@ import {
   Image as ImageIcon,
   MapPin,
   Navigation,
+  Share2,
   Tag,
   TriangleAlert,
   UserRound,
@@ -19,7 +20,9 @@ import {
 import { EstadoPublicoChip } from "@/components/reportes/estado-publico";
 import { FotoEvidenciaPublica } from "@/components/reportes/evidencia-publica";
 import { InformacionPublicacion } from "@/components/reportes/metadatos-publicacion";
+import { DescargaReportePdf } from "@/components/reportes/descarga-reporte-pdf";
 import { ReportarEvidencePreview } from "@/components/reportar/reportar-evidence-preview";
+import { toast } from "sonner";
 import { etiquetaTipoAvisoDe } from "@/lib/avisos-publicos";
 import {
   categoriaConfig,
@@ -31,6 +34,7 @@ import { condicionOperativaServicioDe, etiquetaTipoServicioDe } from "@/lib/serv
 import { etiquetaCondicionViaDe } from "@/lib/vias-publicas";
 import {
   ETIQUETAS_CATEGORIA_PUBLICA,
+  ETIQUETAS_ESTADO_PUBLICO,
   ETIQUETAS_SEVERIDAD_PUBLICA,
   coordenadasPublicasDe,
   fechaHoraPublica,
@@ -39,6 +43,7 @@ import {
   type SeveridadPublica,
 } from "@/lib/reportes-publicos";
 import type { MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
+import { crearDatosReportePdfLocal, crearDatosReportePdfPublico } from "@/lib/reportes-pdf-datos";
 import type { ReporteLocal } from "@/lib/reportar/local-history";
 import type { ReporteEvidencia } from "@/lib/reportar/types";
 
@@ -77,6 +82,7 @@ type ReporteDetalleEstructuraProps = {
   metadatos?: ReactNode;
   descripcion?: ReactNode;
   notaUbicacion?: ReactNode;
+  accionPdf: ReactNode;
 };
 
 export function ReporteDetalleCompartido(props: ReporteDetalleCompartidoProps) {
@@ -98,6 +104,7 @@ function ReporteDetalleEstructura({
   metadatos,
   descripcion,
   notaUbicacion,
+  accionPdf,
 }: ReporteDetalleEstructuraProps) {
   return (
     <div className="report-detail-page">
@@ -133,6 +140,7 @@ function ReporteDetalleEstructura({
           {notaUbicacion}
         </section>
       </div>
+      {accionPdf}
     </div>
   );
 }
@@ -149,6 +157,30 @@ function DetallePublico(props: ReporteDetallePublicoProps) {
     procedenciaAviso,
     navegacion,
   } = props;
+  const coordenadas = coordenadasPublicasDe(publicacion);
+  const tipoPdf = publicacion.tipo?.trim()
+    ? publicacion.categoria === "emergencia"
+      ? (subcategoriaPorId("emergencia", publicacion.tipo)?.label ??
+        publicacion.tipo.replaceAll("_", " "))
+      : publicacion.categoria === "via"
+        ? etiquetaCondicionVia(publicacion)
+        : publicacion.categoria === "servicio"
+          ? etiquetaTipoServicio(publicacion)
+          : etiquetaTipoAviso(publicacion)
+    : null;
+  const datosPdf = crearDatosReportePdfPublico({
+    titulo: publicacion.titulo,
+    categoria: ETIQUETAS_CATEGORIA_PUBLICA[publicacion.categoria],
+    tipo: tipoPdf,
+    estado: ETIQUETAS_ESTADO_PUBLICO[estado],
+    fecha: fechaHoraPublica(fecha),
+    vereda: ubicacion,
+    referencia: publicacion.lugar,
+    descripcion: publicacion.descripcion,
+    emergenciaSinVerificar,
+    fotoUrl,
+    coordenadasPublicas: coordenadas,
+  });
 
   return (
     <ReporteDetalleEstructura
@@ -281,6 +313,26 @@ function DetallePublico(props: ReporteDetallePublicoProps) {
           </p>
         </div>
       }
+      accionPdf={
+        <DescargaReportePdf
+          reporte={datosPdf}
+          accionCompartir={
+            <button
+              type="button"
+              className="reporte-share-button"
+              onClick={() =>
+                toast.info("¡Estamos preparando esta función!", {
+                  description:
+                    "Muy pronto podrás compartir los reportes de AlertaVereda mediante un enlace.",
+                })
+              }
+            >
+              <Share2 size={17} aria-hidden="true" />
+              Compartir enlace
+            </button>
+          }
+        />
+      }
     />
   );
 }
@@ -315,6 +367,20 @@ function DetalleLocal({ reporte, onVolver }: ReporteDetalleLocalProps) {
     (evidencia) => evidencia.tipo === "video",
   ).length;
   const videosNoGuardados = Math.max(0, videosMencionados - reporte.videos.length);
+  const motivoSinEvidencia = datos.sinEvidencia
+    ? `${etiquetaMotivoSinEvidencia(datos.sinEvidencia.motivo)}${datos.sinEvidencia.detalle.trim() ? ` · ${datos.sinEvidencia.detalle}` : ""}`
+    : null;
+  const datosPdf = crearDatosReportePdfLocal({
+    reporte,
+    titulo,
+    categoria: categoria?.label ?? datos.categoria ?? "Reporte",
+    tipo: subcategoria?.label ?? null,
+    fecha,
+    vereda:
+      [tipoLugar, territorio?.nombre ?? datos.territorioId].filter(Boolean).join(" · ") || null,
+    referencia: datos.lugar.trim() || null,
+    motivoSinEvidencia,
+  });
 
   return (
     <ReporteDetalleEstructura
@@ -489,6 +555,7 @@ function DetalleLocal({ reporte, onVolver }: ReporteDetalleLocalProps) {
           </div>
         ) : undefined
       }
+      accionPdf={<DescargaReportePdf reporte={datosPdf} />}
     />
   );
 }

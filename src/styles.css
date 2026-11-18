@@ -12855,6 +12855,143 @@ body.logout-transition-active {
   line-height: 1.35;
 }
 
+.reporte-pdf-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 0.7rem 1rem;
+  margin-top: 0.2rem;
+  border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  padding: 0.85rem 1rem;
+}
+
+.reporte-pdf-actions-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.reporte-pdf-actions-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  color: var(--bosque);
+}
+
+.reporte-pdf-actions-copy h2,
+.reporte-pdf-actions-copy p {
+  margin: 0;
+}
+
+.reporte-pdf-actions-copy h2 {
+  color: var(--tinta);
+  font-size: calc(var(--av-text-scale) * 0.92rem);
+  font-weight: 800;
+}
+
+.reporte-pdf-actions-copy p {
+  margin-top: 0.18rem;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.73rem);
+  line-height: 1.4;
+}
+
+.reporte-pdf-actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.reporte-pdf-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.55rem;
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reporte-pdf-download-button {
+  border: 1px solid var(--bosque);
+  background: var(--bosque);
+  color: #fff;
+}
+
+.reporte-pdf-download-button:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.reporte-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, var(--bosque) 18%);
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--bosque-oscuro);
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    color 180ms ease-out;
+}
+
+.reporte-share-button:hover {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+}
+
+.reporte-share-button:focus-visible {
+  outline: 3px solid var(--bosque-oscuro);
+  outline-offset: 2px;
+}
+
+.reporte-pdf-feedback {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+  line-height: 1.35;
+}
+
+.reporte-pdf-feedback:empty {
+  display: none;
+}
+
+.reporte-pdf-feedback[role="alert"] {
+  color: #a12b22;
+}
+
+.reporte-pdf-spinner {
+  animation: reporte-pdf-spin 1s linear infinite;
+}
+
+@keyframes reporte-pdf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .reporte-video-frame {
   position: relative;
   overflow: hidden;
@@ -12953,6 +13090,21 @@ body.logout-transition-active {
   .reportes-todos-page,
   .report-detail-page {
     gap: 0.75rem;
+  }
+
+  .reporte-pdf-actions {
+    grid-template-columns: 1fr;
+    padding: 0.8rem;
+  }
+
+  .reporte-pdf-actions-buttons {
+    justify-content: stretch;
+  }
+
+  .reporte-pdf-download-button,
+  .reporte-share-button {
+    flex: 1 1 100%;
+    width: 100%;
   }
 
   .reportes-search-form {

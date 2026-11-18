@@ -67,7 +67,7 @@ export function TarjetaReportePublica({
       <Link
         to="/reportes/$id"
         params={{ id: publicacion.publicacion_id }}
-        search={{ origen: origenLista }}
+        search={{ origen: origenLista, tabla: publicacion.publicacion_tabla }}
         className="reporte-card-publico-hit-area"
         aria-label={`Abrir detalle del reporte: ${publicacion.titulo}`}
       >

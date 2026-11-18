@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarDays, ChevronDown, RotateCcw, Search } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronDown, ChevronUp, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
@@ -8,7 +8,8 @@ import { Vacio } from "@/components/carta";
 import { esPublicacionPublica } from "@/lib/reportes-publicos";
 import { consultarCartelera, type MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
 
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 10;
+const MAX_PAGES = 10;
 type OrdenReportes = "recientes" | "antiguos";
 
 export const Route = createFileRoute("/reportes/todos")({
@@ -47,9 +48,13 @@ function TodosLosReportes() {
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [orden, setOrden] = useState<OrdenReportes>("recientes");
+  const queryClient = useQueryClient();
+  const queryKey = ["reportes-publicos", termino] as const;
+  const [finOffsets, setFinOffsets] = useState<Map<string, number>>(() => new Map());
+  const [inicioOffsets, setInicioOffsets] = useState<Map<string, number>>(() => new Map());
 
   const consulta = useInfiniteQuery({
-    queryKey: ["reportes-publicos", termino],
+    queryKey,
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       consultarCartelera({
@@ -60,20 +65,58 @@ function TodosLosReportes() {
         p_offset: pageParam,
         p_excluir_nivel_normal: false,
       }),
-    getNextPageParam: (ultimaPagina, paginas) =>
-      ultimaPagina.length === PAGE_SIZE ? paginas.length * PAGE_SIZE : undefined,
+    getNextPageParam: (ultimaPagina, _paginas, ultimoOffset) =>
+      ultimaPagina.length === PAGE_SIZE ? ultimoOffset + PAGE_SIZE : undefined,
+    getPreviousPageParam: (_primeraPagina, _paginas, primerOffset) =>
+      primerOffset > 0 ? Math.max(0, primerOffset - PAGE_SIZE) : undefined,
+    maxPages: MAX_PAGES,
     retry: 1,
     retryDelay: 800,
   });
+
+  const primerOffset = Number(consulta.data?.pageParams.at(0) ?? 0);
+  const ultimoOffset = Number(consulta.data?.pageParams.at(-1) ?? 0);
+  const puedeCargarRecientes =
+    Boolean(consulta.hasPreviousPage) && inicioOffsets.get(termino) !== primerOffset;
+  const puedeCargarAntiguos =
+    Boolean(consulta.hasNextPage) && finOffsets.get(termino) !== ultimoOffset;
+
+  const cargarPaginaAnterior = async () => {
+    const datosAnteriores = consulta.data;
+    if (!datosAnteriores || !consulta.hasPreviousPage) return;
+
+    const offsetAnterior = Number(datosAnteriores.pageParams.at(0) ?? 0);
+    const resultado = await consulta.fetchPreviousPage();
+    if (resultado.data?.pages.at(0)?.length === 0) {
+      queryClient.setQueryData(queryKey, datosAnteriores);
+      setInicioOffsets((actuales) => new Map(actuales).set(termino, offsetAnterior));
+    }
+  };
+
+  const cargarPaginaSiguiente = async () => {
+    const datosAnteriores = consulta.data;
+    if (!datosAnteriores || !consulta.hasNextPage) return;
+
+    const offsetActual = Number(datosAnteriores.pageParams.at(-1) ?? 0);
+    const resultado = await consulta.fetchNextPage();
+    if (resultado.data?.pages.at(-1)?.length === 0) {
+      queryClient.setQueryData(queryKey, datosAnteriores);
+      setFinOffsets((actuales) => new Map(actuales).set(termino, offsetActual));
+    }
+  };
 
   const publicaciones = useMemo(() => {
     const terminoNormalizado = termino.trim().toLocaleLowerCase("es-CO");
     const desde = fechaDesde ? limiteInferior(fechaDesde) : null;
     const hasta = fechaHasta ? limiteSuperior(fechaHasta) : null;
     const paginas = (consulta.data?.pages.flat() ?? []) as MiVeredaPublicacion[];
+    const unicas = new Map<string, MiVeredaPublicacion>();
+    for (const publicacion of paginas) {
+      unicas.set(`${publicacion.publicacion_tabla}-${publicacion.publicacion_id}`, publicacion);
+    }
 
     return [
-      ...paginas
+      ...[...unicas.values()]
         .filter(esPublicacionPublica)
         .filter((publicacion) =>
           terminoNormalizado ? textoBuscable(publicacion).includes(terminoNormalizado) : true,
@@ -217,7 +260,7 @@ function TodosLosReportes() {
                 <p className="reportes-eyebrow">Resultados disponibles</p>
                 <h2>{publicaciones.length} reportes cargados</h2>
               </div>
-              {consulta.hasNextPage && <span>Hay más resultados disponibles</span>}
+              {puedeCargarAntiguos && <span>Hay más resultados disponibles</span>}
             </div>
             <div className="reportes-public-list">
               {publicaciones.map((publicacion) => (
@@ -232,15 +275,31 @@ function TodosLosReportes() {
           </section>
         )}
 
-        {!consulta.isError && consulta.hasNextPage && (
+        {!consulta.isError && puedeCargarRecientes && (
           <button
             type="button"
             className="reportes-load-more"
-            onClick={() => void consulta.fetchNextPage()}
-            disabled={consulta.isFetchingNextPage}
+            onClick={() => void cargarPaginaAnterior()}
+            disabled={consulta.isFetchingPreviousPage || consulta.isFetchingNextPage}
+          >
+            <ChevronUp size={18} aria-hidden="true" />
+            {consulta.isFetchingPreviousPage ? "Cargando…" : "Ver reportes más recientes"}
+          </button>
+        )}
+
+        {!consulta.isError && puedeCargarAntiguos && (
+          <button
+            type="button"
+            className="reportes-load-more"
+            onClick={() => void cargarPaginaSiguiente()}
+            disabled={consulta.isFetchingNextPage || consulta.isFetchingPreviousPage}
           >
             <ChevronDown size={18} aria-hidden="true" />
-            {consulta.isFetchingNextPage ? "Cargando…" : "Cargar más reportes"}
+            {consulta.isFetchingNextPage
+              ? "Cargando…"
+              : consulta.data?.pages.length === MAX_PAGES
+                ? "Ver reportes más antiguos"
+                : "Cargar 10 reportes más"}
           </button>
         )}
       </div>

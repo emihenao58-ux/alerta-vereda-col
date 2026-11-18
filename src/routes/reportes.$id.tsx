@@ -11,15 +11,22 @@ import { estadoGeneralViaDe, esPublicacionViasPublica } from "@/lib/vias-publica
 import {
   esEmergenciaEnRevision,
   estadoPublicoDe,
+  normalizarTablaPublicacion,
   severidadPublicaDe,
   consultarReportePublicoPorId,
 } from "@/lib/reportes-publicos";
 import { estadoGeneralServicioDe } from "@/lib/servicios-publicos";
 
+const TABLA_INVALIDA = "__tabla_invalida__" as const;
+
 export const Route = createFileRoute("/reportes/$id")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    origen: normalizarOrigenListaReporte(search["origen"]),
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const tabla = normalizarTablaPublicacion(search["tabla"]);
+    return {
+      origen: normalizarOrigenListaReporte(search["origen"]),
+      tabla: search["tabla"] === undefined ? undefined : (tabla ?? TABLA_INVALIDA),
+    };
+  },
   head: () => ({
     meta: [
       { title: "Detalle del reporte · AlertaVereda" },
@@ -34,11 +41,12 @@ export const Route = createFileRoute("/reportes/$id")({
 
 function ReporteDetalle() {
   const { id } = Route.useParams();
-  const { origen } = Route.useSearch();
+  const { origen, tabla } = Route.useSearch();
   const retorno = ORIGENES_LISTA_REPORTE[origen];
   const reporte = useQuery({
-    queryKey: ["reporte-publico-detalle", id],
-    queryFn: () => consultarReportePublicoPorId(decodeURIComponent(id)),
+    queryKey: ["reporte-publico-detalle", id, tabla ?? null],
+    queryFn: () =>
+      tabla === TABLA_INVALIDA ? null : consultarReportePublicoPorId(decodeURIComponent(id), tabla),
   });
 
   if (reporte.isLoading) {

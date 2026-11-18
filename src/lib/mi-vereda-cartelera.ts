@@ -101,6 +101,22 @@ type ClosedPublicationsClient = {
   from: (table: "mi_vereda_publicaciones") => ClosedPublicationsQuery;
 };
 
+type PublicPublicationLookupQuery = {
+  select: (columns: string) => PublicPublicationLookupQuery;
+  eq: (
+    column: "publicacion_id" | "publicacion_tabla",
+    value: string,
+  ) => PublicPublicationLookupQuery;
+  limit: (count: number) => Promise<{
+    data: unknown;
+    error: { message: string; code?: string } | null;
+  }>;
+};
+
+type PublicPublicationLookupClient = {
+  from: (table: "mi_vereda_publicaciones") => PublicPublicationLookupQuery;
+};
+
 const CONSULTA_PUBLICA_TIMEOUT_MS = 12_000;
 
 function conTiempoLimite<T>(promesa: Promise<T>, mensaje: string): Promise<T> {
@@ -187,6 +203,33 @@ export async function consultarPublicacionesCerradas(): Promise<MiVeredaPublicac
 
   if (error) throw error;
   return Array.isArray(data) ? (data as MiVeredaPublicacionCerrada[]) : [];
+}
+
+export async function consultarPublicacionPorIdentidad(
+  publicacionId: string,
+  publicacionTabla?: MiVeredaPublicacion["publicacion_tabla"],
+): Promise<MiVeredaPublicacion[]> {
+  if (!publicacionId.trim()) return [];
+
+  const viewClient = supabase as unknown as PublicPublicationLookupClient;
+  let query = viewClient
+    .from("mi_vereda_publicaciones")
+    .select(
+      "publicacion_tabla, publicacion_id, vereda_id, categoria, titulo, descripcion, lugar, estado_operativo, resultado, cerrado_en, foto_url, fecha_evento, created_at, nivel, tipo, vereda_nombre",
+    )
+    .eq("publicacion_id", publicacionId);
+
+  if (publicacionTabla) {
+    query = query.eq("publicacion_tabla", publicacionTabla);
+  }
+
+  const { data, error } = await conTiempoLimite(
+    query.limit(publicacionTabla ? 2 : 5),
+    "El detalle del reporte tardó demasiado en responder.",
+  );
+
+  if (error) throw error;
+  return Array.isArray(data) ? (data as MiVeredaPublicacion[]) : [];
 }
 
 export async function consultarVeredas(): Promise<MiVeredaVereda[]> {
