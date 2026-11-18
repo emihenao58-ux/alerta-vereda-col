@@ -7,6 +7,7 @@ import {
   Image as ImageIcon,
   MapPin,
   Navigation,
+  Share2,
   Tag,
   TriangleAlert,
   UserRound,
@@ -21,6 +22,7 @@ import { FotoEvidenciaPublica } from "@/components/reportes/evidencia-publica";
 import { InformacionPublicacion } from "@/components/reportes/metadatos-publicacion";
 import { DescargaReportePdf } from "@/components/reportes/descarga-reporte-pdf";
 import { ReportarEvidencePreview } from "@/components/reportar/reportar-evidence-preview";
+import { toast } from "sonner";
 import { etiquetaTipoAvisoDe } from "@/lib/avisos-publicos";
 import {
   categoriaConfig,
@@ -311,7 +313,26 @@ function DetallePublico(props: ReporteDetallePublicoProps) {
           </p>
         </div>
       }
-      accionPdf={<DescargaReportePdf reporte={datosPdf} />}
+      accionPdf={
+        <DescargaReportePdf
+          reporte={datosPdf}
+          accionCompartir={
+            <button
+              type="button"
+              className="reporte-share-button"
+              onClick={() =>
+                toast.info("¡Estamos preparando esta función!", {
+                  description:
+                    "Muy pronto podrás compartir los reportes de AlertaVereda mediante un enlace.",
+                })
+              }
+            >
+              <Share2 size={17} aria-hidden="true" />
+              Compartir enlace
+            </button>
+          }
+        />
+      }
     />
   );
 }

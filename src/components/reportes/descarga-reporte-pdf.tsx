@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Download, FileText, LoaderCircle } from "lucide-react";
 import {
   nombreArchivoReportePdf,
@@ -17,7 +17,13 @@ const LADOS_MINIATURA_PORTADA = [640, 480, 320] as const;
 const MAX_FOTOGRAMA_LADO = 640;
 const MAX_FOTOGRAMA_ESPERA_MS = 2500;
 
-export function DescargaReportePdf({ reporte }: { reporte: DatosReportePdf }) {
+export function DescargaReportePdf({
+  reporte,
+  accionCompartir,
+}: {
+  reporte: DatosReportePdf;
+  accionCompartir?: ReactNode;
+}) {
   const [generando, setGenerando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
@@ -93,6 +99,7 @@ export function DescargaReportePdf({ reporte }: { reporte: DatosReportePdf }) {
         </div>
       </div>
       <div className="reporte-pdf-actions-buttons">
+        {accionCompartir}
         <button
           type="button"
           className="reporte-pdf-download-button"

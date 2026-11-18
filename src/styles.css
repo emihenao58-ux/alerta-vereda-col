@@ -12857,8 +12857,8 @@ body.logout-transition-active {
 
 .reporte-pdf-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   gap: 0.7rem 1rem;
   margin-top: 0.2rem;
   border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
@@ -12933,6 +12933,37 @@ body.logout-transition-active {
 .reporte-pdf-download-button:disabled {
   cursor: progress;
   opacity: 0.75;
+}
+
+.reporte-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--border) 82%, var(--bosque) 18%);
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--bosque-oscuro);
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    color 180ms ease-out;
+}
+
+.reporte-share-button:hover {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 8%, var(--card));
+}
+
+.reporte-share-button:focus-visible {
+  outline: 3px solid var(--bosque-oscuro);
+  outline-offset: 2px;
 }
 
 .reporte-pdf-feedback {
@@ -13070,7 +13101,8 @@ body.logout-transition-active {
     justify-content: stretch;
   }
 
-  .reporte-pdf-download-button {
+  .reporte-pdf-download-button,
+  .reporte-share-button {
     flex: 1 1 100%;
     width: 100%;
   }
