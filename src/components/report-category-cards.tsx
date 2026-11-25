@@ -3,6 +3,7 @@ import type { ComponentType, CSSProperties } from "react";
 import type { LucideProps } from "lucide-react";
 import { AlertTriangle, Droplet, Megaphone } from "lucide-react";
 import { RoadIcon } from "@/components/road-icon";
+import type { ContextoAdminReportes } from "@/lib/reportes-contexto-admin";
 
 const CATEGORIAS_REPORTES = [
   {
@@ -44,7 +45,11 @@ const ICONOS_CATEGORIA: Record<CategoriaReportes["to"], ComponentType<LucideProp
   "/avisos": Megaphone,
 };
 
-export function TarjetasCategoriaReportes() {
+export function TarjetasCategoriaReportes({
+  contexto,
+}: {
+  contexto?: ContextoAdminReportes | undefined;
+}) {
   return (
     <nav
       className="inicio-category-grid reportes-category-grid"
@@ -57,6 +62,7 @@ export function TarjetasCategoriaReportes() {
           <Link
             key={categoria.to}
             to={categoria.to}
+            search={{ contexto }}
             className="inicio-category-card"
             style={{ backgroundColor: categoria.color, color: categoria.textColor }}
           >

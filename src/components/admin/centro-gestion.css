@@ -1,0 +1,1306 @@
+/* Etapa 2 · Centro de Gestión Superadmin: capas translúcidas sobre los fondos originales. */
+.gestion-dashboard,
+.gestion-report-list-page {
+  --gestion-card: color-mix(in srgb, var(--card) 90%, transparent);
+  --gestion-border: color-mix(in srgb, var(--bosque) 20%, var(--border));
+  --gestion-muted: var(--tinta-suave);
+  --gestion-shadow: 0 10px 28px color-mix(in srgb, var(--bosque-oscuro) 10%, transparent);
+  min-width: 0;
+  color: var(--tinta);
+}
+.gestion-dashboard {
+  display: grid;
+  gap: 0.85rem;
+}
+.gestion-dashboard-heading {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 1rem;
+  background: linear-gradient(
+    112deg,
+    color-mix(in srgb, var(--card) 90%, transparent),
+    color-mix(in srgb, var(--card) 70%, transparent)
+  );
+  padding: clamp(0.85rem, 1.8vw, 1.25rem);
+  box-shadow: var(--gestion-shadow);
+}
+.gestion-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.74rem);
+}
+.gestion-breadcrumb strong {
+  color: var(--bosque-oscuro);
+  font-weight: 750;
+}
+.gestion-dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.1rem 0.15rem;
+}
+.gestion-dashboard-timestamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  margin: 0 0 0 auto;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.67rem);
+}
+.gestion-mobile-recommendation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--dorado) 48%, var(--gestion-border));
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--dorado) 14%, var(--card));
+  padding: 0.7rem 0.85rem;
+  color: var(--tinta);
+  box-shadow: var(--gestion-shadow);
+}
+.gestion-mobile-recommendation-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+.gestion-mobile-recommendation p {
+  margin: 0;
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  line-height: 1.45;
+}
+.gestion-mobile-recommendation label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+  font-weight: 700;
+  cursor: pointer;
+}
+.gestion-mobile-recommendation input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--bosque);
+}
+.gestion-mobile-recommendation button {
+  flex: none;
+  min-height: 2.4rem;
+  border: 1px solid color-mix(in srgb, var(--bosque) 72%, var(--border));
+  border-radius: 0.65rem;
+  background: var(--bosque);
+  padding: 0.45rem 0.8rem;
+  color: #fff;
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+.gestion-mobile-recommendation button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ring) 75%, transparent);
+  outline-offset: 2px;
+}
+.gestion-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.gestion-heading-mark,
+.gestion-report-list-mark {
+  display: grid;
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--dorado), color-mix(in srgb, var(--dorado) 70%, white));
+  color: var(--bosque-oscuro);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--dorado) 24%, transparent);
+}
+.gestion-heading-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.gestion-kicker {
+  margin: 0 0 0.15rem;
+  color: var(--bosque);
+  font-size: calc(var(--av-text-scale) * 0.73rem);
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.gestion-heading-copy h1,
+.gestion-report-list-heading h1 {
+  margin: 0;
+  color: var(--bosque-oscuro);
+  font-family: var(--font-display);
+  font-size: calc(var(--av-text-scale) * clamp(1.65rem, 2.8vw, 2.4rem));
+  font-weight: 750;
+  line-height: 1.08;
+}
+.gestion-heading-subtitle,
+.gestion-report-list-heading > div > p:last-child {
+  margin: 0.3rem 0 0;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.82rem);
+  line-height: 1.45;
+}
+.gestion-select-label {
+  display: grid;
+  flex: 0 1 14rem;
+  gap: 0.28rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.7rem);
+  font-weight: 750;
+}
+.gestion-select {
+  width: 100%;
+  min-height: 2.6rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.7rem;
+  background: var(--gestion-card);
+  padding: 0.55rem 0.7rem;
+  color: var(--tinta);
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.78rem);
+}
+.gestion-select:focus-visible,
+.gestion-report-filters select:focus-visible,
+.gestion-search-control:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--ring) 70%, transparent);
+  outline-offset: 2px;
+}
+.gestion-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 0.29fr);
+  align-items: start;
+  gap: 0.8rem;
+}
+.gestion-primary-column,
+.gestion-aside {
+  display: grid;
+  min-width: 0;
+  gap: 0.75rem;
+}
+.gestion-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.gestion-stat-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 7.4rem;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.9rem;
+  background: var(--gestion-card);
+  padding: 0.8rem;
+  box-shadow: var(--gestion-shadow);
+  backdrop-filter: blur(8px);
+}
+.gestion-stat-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 3.05rem;
+  height: 3.05rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 13%, var(--card));
+  color: var(--bosque);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 50%),
+    0 5px 13px rgb(11 58 46 / 12%);
+}
+.gestion-stat-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.14rem;
+}
+.gestion-stat-label {
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.69rem);
+  font-weight: 750;
+  line-height: 1.25;
+}
+.gestion-stat-copy strong {
+  color: var(--bosque-oscuro);
+  font-family: var(--font-display);
+  font-size: calc(var(--av-text-scale) * clamp(1.3rem, 2vw, 1.8rem));
+  line-height: 1.05;
+}
+.gestion-stat-detail {
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.62rem);
+  line-height: 1.3;
+}
+.gestion-stat-pending .gestion-stat-icon {
+  background: color-mix(in srgb, #e9a51b 16%, var(--card));
+  color: #a66b00;
+}
+.gestion-stat-reports .gestion-stat-icon {
+  background: color-mix(in srgb, #1684e8 14%, var(--card));
+  color: #1684e8;
+}
+.gestion-stat-active .gestion-stat-icon {
+  background: color-mix(in srgb, #6b53bb 16%, var(--card));
+  color: #6b53bb;
+}
+.gestion-stat-territory .gestion-stat-icon {
+  background: linear-gradient(145deg, #d2f1df, #84c9a3);
+  color: #176642;
+}
+.gestion-stat-pending .gestion-stat-icon {
+  background: linear-gradient(145deg, #fff0c5, #f5c85d);
+}
+.gestion-stat-reports .gestion-stat-icon {
+  background: linear-gradient(145deg, #d7efff, #7fc6ef);
+}
+.gestion-stat-active .gestion-stat-icon {
+  background: linear-gradient(145deg, #e9e0ff, #b0a0ec);
+}
+.gestion-panel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.95fr);
+  gap: 0.7rem;
+}
+.gestion-lower-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.95fr);
+}
+.gestion-panel {
+  min-width: 0;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.95rem;
+  background: var(--gestion-card);
+  padding: 0.8rem;
+  box-shadow: var(--gestion-shadow);
+  backdrop-filter: blur(8px);
+}
+.gestion-panel-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.62rem;
+}
+.gestion-panel-heading > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.gestion-panel-heading h2 {
+  margin: 0;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.88rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+.gestion-panel-heading p {
+  margin: 0.12rem 0 0;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.66rem);
+  line-height: 1.35;
+}
+.gestion-panel-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 14%, var(--card));
+  color: var(--bosque);
+}
+.gestion-panel-link,
+.gestion-territory-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 78%, transparent);
+  padding: 0.35rem 0.58rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.gestion-panel-link:hover,
+.gestion-panel-link:focus-visible,
+.gestion-territory-link:hover,
+.gestion-territory-link:focus-visible,
+.gestion-action-link:hover,
+.gestion-action-link:focus-visible {
+  border-color: var(--bosque);
+  background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+  outline: 2px solid color-mix(in srgb, var(--ring) 60%, transparent);
+  outline-offset: 1px;
+}
+.gestion-territory-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(10rem, 0.9fr);
+  gap: 0.6rem;
+}
+.gestion-map-placeholder {
+  position: relative;
+  display: grid;
+  min-height: 10rem;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--bosque) 18%, var(--border));
+  border-radius: 0.8rem;
+  background:
+    radial-gradient(
+      ellipse at 18% 26%,
+      color-mix(in srgb, #7cbb8c 26%, transparent) 0 11%,
+      transparent 11.5%
+    ),
+    radial-gradient(
+      ellipse at 74% 65%,
+      color-mix(in srgb, #70ab80 27%, transparent) 0 15%,
+      transparent 15.5%
+    ),
+    repeating-linear-gradient(
+      136deg,
+      transparent 0 20px,
+      color-mix(in srgb, var(--bosque) 7%, transparent) 21px 22px
+    ),
+    color-mix(in srgb, #73a47a 17%, var(--card));
+}
+.gestion-map-contour {
+  position: absolute;
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--bosque) 18%, transparent);
+  border-radius: 48% 52% 45% 55% / 58% 41% 59% 42%;
+  transform: rotate(-18deg);
+}
+.gestion-map-contour-one {
+  inset: 12% 20% 22% 8%;
+}
+.gestion-map-contour-two {
+  inset: 22% 8% 12% 30%;
+  transform: rotate(23deg);
+}
+.gestion-map-contour-three {
+  inset: 31% 32% 29% 28%;
+  transform: rotate(-41deg);
+}
+.gestion-map-label {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--gestion-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  padding: 0.42rem 0.6rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.64rem);
+  font-weight: 750;
+  text-align: center;
+}
+.gestion-territory-summary {
+  display: grid;
+  align-content: start;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+  padding: 0.2rem 0.6rem;
+}
+.gestion-territory-summary > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--gestion-border);
+  padding: 0.66rem 0;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.66rem);
+}
+.gestion-territory-summary > div svg {
+  color: var(--bosque);
+}
+.gestion-territory-summary > div strong {
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.82rem);
+}
+.gestion-territory-link {
+  justify-self: end;
+  margin-top: 0.48rem;
+}
+.gestion-chart-content {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.9fr) minmax(8rem, 1fr);
+  align-items: center;
+  gap: 0.35rem;
+}
+.gestion-donut-wrap {
+  position: relative;
+  width: 100%;
+  height: 10rem;
+}
+.gestion-donut-total {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  pointer-events: none;
+}
+.gestion-donut-total strong {
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 1.2rem);
+}
+.gestion-donut-total span {
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.62rem);
+}
+.gestion-chart-legend,
+.gestion-recent-list,
+.gestion-activity-list,
+.gestion-report-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gestion-chart-legend {
+  display: grid;
+  gap: 0.48rem;
+}
+.gestion-chart-legend li {
+  display: grid;
+  grid-template-columns: 0.55rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+}
+.gestion-chart-legend li > span:first-child {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+.gestion-chart-legend strong {
+  color: var(--bosque-oscuro);
+}
+.gestion-panel-state,
+.gestion-panel-error {
+  margin: 0;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--card) 68%, transparent);
+  padding: 0.75rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.75rem);
+  line-height: 1.4;
+}
+.gestion-panel-error {
+  color: var(--urgente);
+}
+.gestion-recent-list {
+  display: grid;
+}
+.gestion-recent-list li {
+  border-top: 1px solid var(--gestion-border);
+}
+.gestion-recent-row-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+.gestion-recent-row-link:hover .gestion-recent-report-link,
+.gestion-recent-row-link:focus-visible .gestion-recent-report-link {
+  text-decoration: underline;
+}
+.gestion-recent-row-link:focus-visible {
+  border-radius: 0.4rem;
+  outline: 3px solid color-mix(in srgb, var(--ring) 65%, transparent);
+  outline-offset: 2px;
+}
+.gestion-report-type-icon {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bosque) 15%, var(--card));
+  color: var(--bosque);
+}
+.gestion-report-type-emergencia {
+  background: color-mix(in srgb, #ef4444 17%, var(--card));
+  color: #c83232;
+}
+.gestion-report-type-via {
+  background: color-mix(in srgb, #e9a51b 19%, var(--card));
+  color: #a66b00;
+}
+.gestion-report-type-servicio {
+  background: color-mix(in srgb, #1684e8 16%, var(--card));
+  color: #1473c6;
+}
+.gestion-report-type-aviso,
+.gestion-report-type-otro {
+  background: color-mix(in srgb, #0b9b7b 16%, var(--card));
+  color: #087a62;
+}
+.gestion-recent-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+.gestion-recent-copy strong {
+  overflow: hidden;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.69rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gestion-recent-copy .gestion-recent-report-link {
+  text-decoration: none;
+}
+.gestion-recent-copy span,
+.gestion-recent-copy small {
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.61rem);
+  line-height: 1.3;
+}
+.gestion-state-badge {
+  display: inline-flex;
+  max-width: 9rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gestion-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bosque) 10%, var(--card));
+  padding: 0.22rem 0.48rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.59rem);
+  font-weight: 750;
+  text-align: center;
+}
+.gestion-state-badge.is-pending {
+  border-color: color-mix(in srgb, #e9a51b 40%, var(--border));
+  background: color-mix(in srgb, #e9a51b 16%, var(--card));
+  color: #805500;
+}
+.gestion-activity-list {
+  display: grid;
+}
+.gestion-activity-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  border-top: 1px solid var(--gestion-border);
+  padding: 0.56rem 0;
+}
+.gestion-activity-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, #1684e8 17%, var(--card));
+  color: #1684e8;
+}
+.gestion-activity-mark-1 {
+  background: color-mix(in srgb, #0b9b7b 17%, var(--card));
+  color: #0b9b7b;
+}
+.gestion-activity-mark-2 {
+  background: color-mix(in srgb, #e9a51b 18%, var(--card));
+  color: #a66b00;
+}
+.gestion-activity-mark-3 {
+  background: color-mix(in srgb, #ef4444 16%, var(--card));
+  color: #c83232;
+}
+.gestion-activity-list li > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+.gestion-activity-list strong {
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.67rem);
+  text-transform: capitalize;
+}
+.gestion-activity-list span,
+.gestion-activity-list small {
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.61rem);
+}
+.gestion-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+.gestion-actions-grid .admin-pending-badge {
+  grid-column: 1 / -1;
+  align-self: stretch;
+  border-color: var(--gestion-border);
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  padding: 0.55rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.66rem);
+  text-decoration: none;
+}
+.gestion-actions-grid .admin-pending-badge:hover {
+  transform: none;
+}
+.gestion-actions-grid .admin-pending-icon {
+  background: color-mix(in srgb, var(--bosque) 14%, var(--card));
+  color: var(--bosque);
+}
+.gestion-action-link {
+  display: grid;
+  min-width: 0;
+  min-height: 3.25rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.34rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--card) 74%, transparent);
+  padding: 0.48rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.63rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+}
+.gestion-action-link > svg:first-child {
+  color: var(--bosque);
+}
+.gestion-action-link > svg:last-child {
+  color: var(--gestion-muted);
+}
+.gestion-capacity-list {
+  display: grid;
+  gap: 0.78rem;
+}
+.gestion-capacity-item {
+  display: grid;
+  gap: 0.3rem;
+}
+.gestion-capacity-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+.gestion-capacity-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.64rem);
+}
+.gestion-capacity-heading > span svg {
+  flex: 0 0 auto;
+  color: var(--bosque);
+}
+.gestion-capacity-heading strong {
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  text-align: right;
+}
+.gestion-capacity-track {
+  height: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+}
+.gestion-capacity-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #168d72, #42b78d);
+}
+.gestion-capacity-item small,
+.gestion-capacity-list > p {
+  margin: 0;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.59rem);
+  line-height: 1.35;
+}
+.gestion-system-status-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gestion-system-status-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.45rem;
+  border-bottom: 1px solid var(--gestion-border);
+  padding: 0.48rem 0;
+}
+.gestion-system-status-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.gestion-system-status-service {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+  line-height: 1.3;
+}
+.gestion-system-status-service svg {
+  flex: 0 0 auto;
+  color: var(--bosque);
+}
+.gestion-system-status-service > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.gestion-system-status-state {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  padding: 0.26rem 0.45rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.58rem);
+  font-weight: 750;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.gestion-system-status-state::before {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #8595a1;
+  content: "";
+}
+.gestion-system-status-note {
+  margin: 0.55rem 0 0;
+  border-top: 1px solid var(--gestion-border);
+  padding-top: 0.5rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.61rem);
+  line-height: 1.4;
+}
+.gestion-illustration-card {
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 0.95rem;
+  background: linear-gradient(180deg, #f6efe0 0%, #f1e8d6 50%, #ede2cd 100%);
+  padding: 0;
+  box-shadow: none;
+}
+.gestion-illustration-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.dark .gestion-illustration-card {
+  background: linear-gradient(180deg, #021d3f 0%, #011c41 50%, #021d3f 100%);
+}
+.dark .gestion-dashboard,
+.dark .gestion-report-list-page {
+  --gestion-card: color-mix(in srgb, #05263a 87%, transparent);
+  --gestion-border: color-mix(in srgb, #36bad1 28%, var(--border));
+  --gestion-muted: #a9d3df;
+  --gestion-shadow: 0 10px 28px rgb(0 0 0 / 18%);
+}
+.dark .gestion-dashboard-heading {
+  background: linear-gradient(112deg, rgb(4 35 53 / 86%), rgb(4 35 53 / 58%));
+}
+.dark .gestion-kicker {
+  color: #a8e2c2;
+}
+.dark .gestion-dashboard-timestamp {
+  border: 1px solid rgb(201 245 255 / 28%);
+  border-radius: 999px;
+  background: rgb(4 22 36 / 82%);
+  padding: 0.28rem 0.52rem;
+  color: #e3f8ff;
+}
+.dark .gestion-breadcrumb strong,
+.dark .gestion-heading-copy h1,
+.dark .gestion-report-list-heading h1,
+.dark .gestion-stat-label,
+.dark .gestion-stat-copy strong,
+.dark .gestion-panel-heading h2,
+.dark .gestion-territory-summary > div strong,
+.dark .gestion-donut-total strong,
+.dark .gestion-chart-legend strong,
+.dark .gestion-recent-copy strong,
+.dark .gestion-activity-list strong,
+.dark .gestion-capacity-heading strong,
+.dark .gestion-panel-link,
+.dark .gestion-territory-link,
+.dark .gestion-action-link {
+  color: #c9f5ff;
+}
+.dark .gestion-select,
+.dark .gestion-report-filters select,
+.dark .gestion-search-control,
+.dark .gestion-report-filters input {
+  color: #e3f8ff;
+}
+.dark .gestion-state-badge {
+  color: #c8f5e4;
+  background: rgb(12 111 89 / 32%);
+}
+.dark .gestion-state-badge.is-pending {
+  color: #ffe2a6;
+  background: rgb(151 101 0 / 28%);
+}
+.dark .gestion-stat-pending .gestion-stat-icon {
+  color: #ffd77b;
+}
+.dark .gestion-stat-reports .gestion-stat-icon {
+  color: #8bd4ff;
+}
+.dark .gestion-stat-active .gestion-stat-icon {
+  color: #c8b6ff;
+}
+.dark .gestion-stat-territory .gestion-stat-icon {
+  background: linear-gradient(145deg, #14584d, #08766c);
+  color: #9cf1c2;
+  box-shadow: 0 0 18px rgb(53 205 146 / 23%);
+}
+.dark .gestion-stat-pending .gestion-stat-icon {
+  background: linear-gradient(145deg, #6a4b0c, #92650e);
+  color: #ffe08a;
+  box-shadow: 0 0 18px rgb(245 180 42 / 22%);
+}
+.dark .gestion-stat-reports .gestion-stat-icon {
+  background: linear-gradient(145deg, #174c70, #126d92);
+  color: #a8e0ff;
+  box-shadow: 0 0 18px rgb(67 176 234 / 23%);
+}
+.dark .gestion-stat-active .gestion-stat-icon {
+  background: linear-gradient(145deg, #473773, #65519d);
+  color: #ddd0ff;
+  box-shadow: 0 0 18px rgb(155 125 236 / 22%);
+}
+
+.gestion-report-list-page {
+  display: grid;
+  gap: 0.75rem;
+}
+.gestion-report-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 1rem;
+  background: var(--gestion-card);
+  padding: clamp(0.9rem, 2vw, 1.2rem);
+  box-shadow: var(--gestion-shadow);
+}
+.gestion-report-list-heading > div {
+  display: grid;
+  flex: 1 1 auto;
+  justify-items: start;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.gestion-report-list-heading .gestion-back-link {
+  display: inline-flex;
+  margin: 0;
+}
+.gestion-report-list-heading > div > p:last-child {
+  margin: 0;
+}
+.gestion-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  color: var(--bosque);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+  font-weight: 750;
+  text-decoration: none;
+}
+.gestion-back-link:hover,
+.gestion-back-link:focus-visible {
+  text-decoration: underline;
+}
+.gestion-report-list-mark {
+  background: color-mix(in srgb, var(--bosque) 14%, var(--card));
+  color: var(--bosque);
+}
+.gestion-report-filters {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.6fr) repeat(5, minmax(8.5rem, 1fr));
+  align-items: end;
+  gap: 0.52rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.9rem;
+  background: var(--gestion-card);
+  padding: 0.72rem;
+  box-shadow: var(--gestion-shadow);
+}
+.gestion-report-filters label {
+  display: grid;
+  min-width: 0;
+  gap: 0.26rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.67rem);
+  font-weight: 750;
+}
+.gestion-report-filters select,
+.gestion-report-filters input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.5rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  padding: 0.42rem 0.55rem;
+  color: var(--tinta);
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+}
+.gestion-search-control {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  padding-inline: 0.55rem;
+  color: var(--gestion-muted);
+}
+.gestion-search-control input {
+  border: 0;
+  background: transparent;
+  padding-inline: 0;
+  outline: 0;
+}
+.gestion-report-list-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+}
+.gestion-report-list-summary span {
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+}
+.gestion-report-list {
+  display: grid;
+  gap: 0.45rem;
+}
+.gestion-report-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.65rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.85rem;
+  background: var(--gestion-card);
+  padding: 0.72rem;
+  box-shadow: var(--gestion-shadow);
+}
+.gestion-report-row-main {
+  min-width: 0;
+}
+.gestion-report-row h2 {
+  margin: 0;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.9rem);
+  font-weight: 800;
+  line-height: 1.3;
+}
+.gestion-report-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+.gestion-report-title-link:hover,
+.gestion-report-title-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+.gestion-report-title-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ring) 65%, transparent);
+  outline-offset: 2px;
+}
+.gestion-report-row-description {
+  margin: 0.2rem 0 0;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.74rem);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.gestion-report-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  margin-top: 0.42rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+}
+.gestion-report-row-meta > * + *::before {
+  content: "·";
+  margin-right: 0.45rem;
+  color: var(--gestion-muted);
+}
+.dark .gestion-report-row h2 {
+  color: #c9f5ff;
+}
+.gestion-list-message {
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.85rem;
+  background: var(--gestion-card);
+  padding: 1rem;
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.8rem);
+}
+.gestion-list-message.is-error {
+  color: var(--urgente);
+}
+.gestion-list-message p {
+  margin: 0.25rem 0 0.6rem;
+}
+.gestion-retry-button,
+.gestion-page-button {
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  border: 1px solid var(--gestion-border);
+  border-radius: 0.65rem;
+  background: var(--gestion-card);
+  padding: 0.42rem 0.72rem;
+  color: var(--bosque-oscuro);
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.74rem);
+  font-weight: 750;
+}
+.dark .gestion-retry-button,
+.dark .gestion-page-button {
+  color: #c9f5ff;
+}
+.gestion-page-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.gestion-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 0.3rem 0;
+}
+.gestion-pagination > span {
+  color: var(--gestion-muted);
+  font-size: calc(var(--av-text-scale) * 0.73rem);
+  font-weight: 700;
+}
+
+@media (min-width: 761px) {
+  .app-shell-superadmin > main:has(.gestion-dashboard),
+  .app-shell-superadmin > main:has(.gestion-report-list-page) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .superadmin-layout-main,
+  .app-shell-superadmin > main:has(.gestion-report-list-page) .superadmin-layout-main {
+    padding: 5.1rem clamp(0.7rem, 1.5vw, 1.5rem) 1.5rem;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .superadmin-surface,
+  .app-shell-superadmin > main:has(.gestion-report-list-page) .superadmin-surface {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .superadmin-surface .admin-workspace-content,
+  .app-shell-superadmin
+    > main:has(.gestion-report-list-page)
+    .superadmin-surface
+    .admin-workspace-content {
+    padding: 0;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .admin-workspace-header,
+  .app-shell-superadmin > main:has(.gestion-report-list-page) .admin-workspace-header {
+    display: none;
+  }
+}
+@media (max-width: 1150px) {
+  .gestion-stat-card {
+    padding: 0.62rem;
+  }
+  .gestion-stat-icon {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+  .gestion-report-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .gestion-report-search {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 980px) {
+  .gestion-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .app-shell-superadmin > main:has(.gestion-dashboard),
+  .app-shell-superadmin > main:has(.gestion-report-list-page) {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .superadmin-surface,
+  .app-shell-superadmin > main:has(.gestion-report-list-page) .superadmin-surface {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .app-shell-superadmin > main:has(.gestion-dashboard) .superadmin-surface .admin-workspace-content,
+  .app-shell-superadmin
+    > main:has(.gestion-report-list-page)
+    .superadmin-surface
+    .admin-workspace-content {
+    padding: 0.35rem;
+  }
+  .gestion-heading-row {
+    flex-wrap: wrap;
+  }
+  .gestion-dashboard-toolbar {
+    align-items: flex-start;
+  }
+  .gestion-select-label {
+    flex: 1 1 100%;
+  }
+  .gestion-panel-grid,
+  .gestion-lower-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gestion-stat-card {
+    min-height: 6rem;
+  }
+  .gestion-report-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gestion-report-search {
+    grid-column: 1 / -1;
+  }
+  .gestion-report-list-heading {
+    align-items: flex-start;
+  }
+  .gestion-report-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .gestion-report-row > .gestion-state-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .gestion-pagination {
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+  .gestion-pagination > span {
+    text-align: center;
+  }
+}
+@media (max-width: 480px) {
+  .gestion-heading-mark,
+  .gestion-report-list-mark {
+    width: 2.55rem;
+    height: 2.55rem;
+  }
+  .gestion-stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-stat-card {
+    min-height: 5.2rem;
+  }
+  .gestion-stat-icon {
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+  .gestion-dashboard-toolbar {
+    flex-wrap: wrap;
+  }
+  .gestion-territory-content,
+  .gestion-chart-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-map-placeholder {
+    min-height: 8.5rem;
+  }
+  .gestion-donut-wrap {
+    height: 9rem;
+  }
+  .gestion-chart-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gestion-recent-row-link {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .gestion-recent-row-link > .gestion-state-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .gestion-report-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gestion-report-search {
+    grid-column: auto;
+  }
+  .gestion-report-list-heading {
+    gap: 0.45rem;
+  }
+  .gestion-report-list-mark {
+    display: none;
+  }
+  .gestion-page-button {
+    min-height: 2.4rem;
+    padding-inline: 0.55rem;
+    font-size: calc(var(--av-text-scale) * 0.68rem);
+  }
+  .gestion-pagination > span {
+    font-size: calc(var(--av-text-scale) * 0.66rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gestion-dashboard *,
+  .gestion-report-list-page * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

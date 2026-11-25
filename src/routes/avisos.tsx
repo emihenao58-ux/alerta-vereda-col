@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, Megaphone } from "lucide-react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { CabeceraSeccionPublica } from "@/components/reportes/cabecera-seccion-publica";
+import { ReportesSurface } from "@/components/reportes/reportes-surface";
 import {
   EtiquetaProcedenciaAviso,
   type ProcedenciaAvisoPublica,
@@ -24,9 +24,11 @@ import {
   type TipoFiltroAviso,
 } from "@/lib/avisos-publicos";
 import type { EstadoPublico } from "@/lib/reportes-publicos";
+import { validarBusquedaReportesAdmin } from "@/lib/reportes-contexto-admin";
 import "./avisos.css";
 
 export const Route = createFileRoute("/avisos")({
+  validateSearch: validarBusquedaReportesAdmin,
   head: () => ({
     meta: [
       { title: "Avisos comunitarios · AlertaVereda" },
@@ -45,6 +47,7 @@ export const Route = createFileRoute("/avisos")({
 });
 
 function Avisos() {
+  const { contexto } = Route.useSearch();
   const [filtroTipo, setFiltroTipo] = useState<TipoFiltroAviso | "todos">("todos");
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoPublico>("todos");
   const { data, isLoading, isError } = useQueryAvisos();
@@ -94,9 +97,9 @@ function Avisos() {
   );
 
   return (
-    <AppShell wide>
+    <ReportesSurface contexto={contexto} wide>
       <div className="avisos-page">
-        <Link to="/reportes" className="reportes-back-link">
+        <Link to="/reportes" search={{ contexto }} className="reportes-back-link">
           <ArrowLeft size={17} aria-hidden="true" /> Volver a reportes
         </Link>
 
@@ -105,6 +108,7 @@ function Avisos() {
           Icon={Megaphone}
           titulo="Avisos"
           bajada="Reuniones, actividades y otra información útil para la comunidad."
+          etiqueta={contexto ? "Publicaciones visibles" : "Información pública"}
         />
 
         {!isLoading && !isError && (
@@ -129,7 +133,9 @@ function Avisos() {
             </div>
 
             <div className="avisos-filter-group">
-              <h2 id="avisos-state-filter-title">Estado general del aviso</h2>
+              <h2 id="avisos-state-filter-title">
+                {contexto ? "Estado de la publicación" : "Estado general del aviso"}
+              </h2>
               <FiltrosEstadoPublico
                 value={filtroEstado}
                 counts={conteosEstado}
@@ -176,12 +182,14 @@ function Avisos() {
           <section className="avisos-results" aria-labelledby="avisos-list-title">
             <div className="avisos-results-heading">
               <div>
-                <p className="reportes-eyebrow">Consulta pública</p>
+                <p className="reportes-eyebrow">
+                  {contexto ? "Publicaciones visibles" : "Consulta pública"}
+                </p>
                 <h2 id="avisos-list-title">Avisos de la comunidad</h2>
               </div>
               <span className="avisos-results-count">
                 {publicacionesFiltradas.length}{" "}
-                {publicacionesFiltradas.length === 1 ? "aviso" : "avisos"}
+                {publicacionesFiltradas.length === 1 ? "publicación" : "publicaciones"}
               </span>
             </div>
             <div className="reportes-public-list">
@@ -197,6 +205,7 @@ function Avisos() {
                     publicacion={publicacion}
                     mostrarCategoria={false}
                     origenLista="avisos"
+                    contextoSuperadmin={contexto}
                     estadoPublicoOverride={estado}
                     metadatosCategoria={
                       <div className="avisos-card-meta">
@@ -213,7 +222,7 @@ function Avisos() {
           </section>
         )}
       </div>
-    </AppShell>
+    </ReportesSurface>
   );
 }
 

@@ -4,6 +4,7 @@ import { ArrowLeft, LayoutDashboard, Map, Settings2, ShieldCheck, Trees } from "
 import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { SuperadminNotificationControl } from "@/components/admin/superadmin-notification-control";
 import { useAuth } from "@/hooks/use-auth";
 
 export type AdminArea = "local" | "governance" | "gestion";
@@ -44,7 +45,12 @@ export function AdminShell({
   // Si el usuario es Superadmin, proporcionamos la experiencia de layout con barra lateral dedicada
   if (esSuperadmin) {
     return (
-      <AppShell wide variant="superadmin">
+      <AppShell
+        wide
+        variant="superadmin"
+        adminPanelActive
+        headerActions={<SuperadminNotificationControl />}
+      >
         <div className="superadmin-layout-root">
           <AdminSidebar />
           <div className="superadmin-layout-main">
@@ -75,7 +81,7 @@ export function AdminShell({
   }
 
   return (
-    <AppShell wide>
+    <AppShell wide adminPanelActive>
       <div className={`admin-workspace admin-workspace-${area}`}>
         {headerContent ?? (
           <header className="admin-workspace-header">

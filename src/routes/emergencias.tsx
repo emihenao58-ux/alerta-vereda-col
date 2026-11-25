@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, MapPinned, PhoneCall, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
-import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { CabeceraSeccionPublica } from "@/components/reportes/cabecera-seccion-publica";
+import { ReportesSurface } from "@/components/reportes/reportes-surface";
 import {
   FiltrosEstadoPublico,
   type FiltroEstadoPublico,
@@ -12,8 +12,10 @@ import {
 import { TarjetaReportePublica } from "@/components/reportes/tarjeta-reporte-publica";
 import { consultarCartelera } from "@/lib/mi-vereda-cartelera";
 import { esPublicacionPublica, estadoPublicoDe } from "@/lib/reportes-publicos";
+import { validarBusquedaReportesAdmin } from "@/lib/reportes-contexto-admin";
 
 export const Route = createFileRoute("/emergencias")({
+  validateSearch: validarBusquedaReportesAdmin,
   head: () => ({
     meta: [
       { title: "Emergencias · AlertaVereda Ebéjico" },
@@ -33,6 +35,7 @@ export const Route = createFileRoute("/emergencias")({
 });
 
 function Emergencias() {
+  const { contexto } = Route.useSearch();
   const [filtro, setFiltro] = useState<FiltroEstadoPublico>("todos");
   const { data, isLoading, isError } = useQuery({
     queryKey: ["emergencias"],
@@ -59,9 +62,9 @@ function Emergencias() {
       : publicaciones.filter((publicacion) => estadoPublicoDe(publicacion) === filtro);
 
   return (
-    <AppShell>
+    <ReportesSurface contexto={contexto}>
       <div className="emergencias-page">
-        <Link to="/reportes" className="reportes-back-link">
+        <Link to="/reportes" search={{ contexto }} className="reportes-back-link">
           <ArrowLeft size={17} aria-hidden="true" /> Volver a reportes
         </Link>
         <CabeceraSeccionPublica
@@ -69,6 +72,7 @@ function Emergencias() {
           Icon={TriangleAlert}
           titulo="Emergencias"
           bajada="Situaciones que requieren atención inmediata en las veredas de Ebéjico."
+          etiqueta={contexto ? "Publicaciones visibles" : "Información pública"}
           accion={
             <a className="emergencias-cta-123" href="tel:123">
               <PhoneCall size={24} aria-hidden="true" />
@@ -82,11 +86,14 @@ function Emergencias() {
           <section className="emergencias-results" aria-labelledby="emergencias-list-title">
             <div className="emergencias-results-heading">
               <div>
-                <p className="reportes-eyebrow">Consulta pública</p>
+                <p className="reportes-eyebrow">
+                  {contexto ? "Publicaciones visibles" : "Consulta pública"}
+                </p>
                 <h2 id="emergencias-list-title">Situaciones reportadas</h2>
               </div>
               <span>
-                {publicaciones.length} {publicaciones.length === 1 ? "reporte" : "reportes"}
+                {publicaciones.length}{" "}
+                {publicaciones.length === 1 ? "publicación" : "publicaciones"}
               </span>
             </div>
             <FiltrosEstadoPublico value={filtro} counts={counts} onChange={setFiltro} />
@@ -118,6 +125,7 @@ function Emergencias() {
                 publicacion={publicacion}
                 mostrarCategoria={false}
                 origenLista="emergencias"
+                contextoSuperadmin={contexto}
               />
             ))}
           </div>
@@ -134,6 +142,6 @@ function Emergencias() {
           <ChevronRight size={24} aria-hidden="true" />
         </Link>
       </div>
-    </AppShell>
+    </ReportesSurface>
   );
 }
