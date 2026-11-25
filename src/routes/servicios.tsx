@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Droplet } from "lucide-react";
-import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { CabeceraSeccionPublica } from "@/components/reportes/cabecera-seccion-publica";
+import { ReportesSurface } from "@/components/reportes/reportes-surface";
 import {
   FiltrosEstadoPublico,
   type FiltroEstadoPublico,
@@ -21,9 +21,11 @@ import {
   TIPOS_SERVICIO,
   type TipoServicioCodigo,
 } from "@/lib/servicios-publicos";
+import { validarBusquedaReportesAdmin } from "@/lib/reportes-contexto-admin";
 import "./servicios.css";
 
 export const Route = createFileRoute("/servicios")({
+  validateSearch: validarBusquedaReportesAdmin,
   head: () => ({
     meta: [
       { title: "Servicios públicos · AlertaVereda Ebéjico" },
@@ -45,6 +47,7 @@ export const Route = createFileRoute("/servicios")({
 type FiltroTipoServicio = "todos" | TipoServicioCodigo;
 
 function Servicios() {
+  const { contexto } = Route.useSearch();
   const [filtroTipo, setFiltroTipo] = useState<FiltroTipoServicio>("todos");
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoPublico>("todos");
   const { data, isLoading, isError } = useQueryServicios();
@@ -114,9 +117,9 @@ function Servicios() {
   ).length;
 
   return (
-    <AppShell wide>
+    <ReportesSurface contexto={contexto} wide>
       <div className="servicios-page">
-        <Link to="/reportes" className="reportes-back-link">
+        <Link to="/reportes" search={{ contexto }} className="reportes-back-link">
           <ArrowLeft size={17} aria-hidden="true" /> Volver a reportes
         </Link>
 
@@ -125,6 +128,7 @@ function Servicios() {
           Icon={Droplet}
           titulo="Servicios"
           bajada="Consulta afectaciones en los servicios de las veredas de Ebéjico."
+          etiqueta={contexto ? "Publicaciones visibles" : "Información pública"}
         />
 
         {!isLoading && !isError && (
@@ -165,7 +169,7 @@ function Servicios() {
 
             <div className="servicios-filter-group">
               <h2 className="servicios-filter-title" id="servicios-state-filter-title">
-                Estado general del reporte
+                {contexto ? "Estado de la publicación" : "Estado general del reporte"}
               </h2>
               <FiltrosEstadoPublico
                 value={filtroEstado}
@@ -218,10 +222,10 @@ function Servicios() {
         {!isLoading && !isError && publicacionesFiltradas.length > 0 && (
           <>
             <div className="servicios-results-heading">
-              <h2>Reportes de servicios</h2>
+              <h2>{contexto ? "Publicaciones de servicios" : "Reportes de servicios"}</h2>
               <span className="servicios-results-count">
                 {publicacionesFiltradas.length}{" "}
-                {publicacionesFiltradas.length === 1 ? "reporte" : "reportes"}
+                {publicacionesFiltradas.length === 1 ? "publicación" : "publicaciones"}
               </span>
             </div>
             <div className="reportes-public-list">
@@ -240,6 +244,7 @@ function Servicios() {
                     publicacion={publicacion}
                     mostrarCategoria={false}
                     origenLista="servicios"
+                    contextoSuperadmin={contexto}
                     estadoPublicoOverride={estado}
                     metadatosCategoria={
                       <dl className="servicios-card-meta">
@@ -270,7 +275,7 @@ function Servicios() {
           </>
         )}
       </div>
-    </AppShell>
+    </ReportesSurface>
   );
 }
 

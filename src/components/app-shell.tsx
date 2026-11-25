@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
+  ChevronDown,
   ChevronRight,
   ClipboardList,
   House,
@@ -82,11 +83,13 @@ export function BotonReportarFlotante() {
 export function CuentaControl({
   usuario,
   salir,
-  showLabel = false,
+  adminPanelActive = false,
+  mostrarIdentidadSuperadmin = false,
 }: {
   usuario: boolean;
   salir: () => Promise<{ error: unknown | null }>;
-  showLabel?: boolean;
+  adminPanelActive?: boolean;
+  mostrarIdentidadSuperadmin?: boolean;
 }) {
   const { perfil } = useAuth();
   const navigate = useNavigate();
@@ -114,7 +117,7 @@ export function CuentaControl({
         return;
       }
       if (rol) dispatchLogoutTransition({ phase: "success", role: rol });
-      await navigate({ to: "/auth", replace: true });
+      await navigate({ to: rol === "superadmin" ? "/" : "/auth", replace: true });
     } catch {
       if (rol) {
         dispatchLogoutTransition({
@@ -128,24 +131,11 @@ export function CuentaControl({
     }
   };
 
-  // El menú personal M4 no cambia el control de cuenta de una sesión Superadmin.
-  if (showLabel || perfil?.rol === "superadmin") {
-    if (usuario) {
-      return (
-        <button
-          type="button"
-          className="account-button"
-          aria-label="Salir"
-          title="Salir"
-          disabled={cerrandoSesion}
-          onClick={() => void cerrarSesion()}
-        >
-          <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
-          {showLabel && <span>Salir</span>}
-        </button>
-      );
-    }
+  const opcionesCuenta = OPCIONES_CUENTA.filter(
+    ({ to }) => !(adminPanelActive && to === "/acceso-administrativo"),
+  );
 
+  if (!usuario) {
     return (
       <Link to="/auth" className="account-button" aria-label="Entrar" title="Entrar">
         <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
@@ -158,17 +148,34 @@ export function CuentaControl({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`account-button${showLabel ? " account-button-with-label" : ""}`}
+          className={`account-button${mostrarIdentidadSuperadmin ? " superadmin-account-trigger" : ""}`}
           aria-label="Abrir menú de usuario"
           title="Menú de usuario"
         >
-          <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
-          {showLabel && <span>Cuenta</span>}
+          {mostrarIdentidadSuperadmin ? (
+            <>
+              <span className="superadmin-account-avatar" aria-hidden="true">
+                <UserRound size={18} strokeWidth={2.3} />
+              </span>
+              <span className="superadmin-account-identity">
+                <strong>Superadministrador</strong>
+                <small>Administrador del sistema</small>
+              </span>
+              <ChevronDown
+                className="superadmin-account-chevron"
+                size={14}
+                strokeWidth={2.3}
+                aria-hidden="true"
+              />
+            </>
+          ) : (
+            <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="account-menu-content">
         <DropdownMenuLabel className="account-menu-heading">Tu espacio</DropdownMenuLabel>
-        {OPCIONES_CUENTA.map(({ to, label, Icono }) => (
+        {opcionesCuenta.map(({ to, label, Icono }) => (
           <DropdownMenuItem key={to} asChild>
             <Link
               to={to}
@@ -208,9 +215,17 @@ export interface AppShellProps {
   children: ReactNode;
   wide?: boolean;
   variant?: "default" | "superadmin";
+  adminPanelActive?: boolean;
+  headerActions?: ReactNode;
 }
 
-export function AppShell({ children, wide = false, variant = "default" }: AppShellProps) {
+export function AppShell({
+  children,
+  wide = false,
+  variant = "default",
+  adminPanelActive = false,
+  headerActions,
+}: AppShellProps) {
   const { usuario, esAdminVereda, esSuperadmin, salir } = useAuth();
   const { activarNavegacion } = useNavegacionSesion();
   const location = useLocation();
@@ -267,13 +282,21 @@ export function AppShell({ children, wide = false, variant = "default" }: AppShe
             </nav>
           )}
 
-          <div className="header-controls">
-            <ThemeToggle />
-            <span className="header-control-separator" aria-hidden="true" />
+          <div
+            className={`header-controls${isSuperadminLayout ? " superadmin-header-controls" : ""}`}
+          >
+            {headerActions}
+            {!isSuperadminLayout && (
+              <>
+                <ThemeToggle />
+                <span className="header-control-separator" aria-hidden="true" />
+              </>
+            )}
             <CuentaControl
               usuario={Boolean(usuario)}
               salir={salir}
-              showLabel={isSuperadminLayout}
+              adminPanelActive={adminPanelActive}
+              mostrarIdentidadSuperadmin={isSuperadminLayout}
             />
             {esSuperadmin && !isSuperadminLayout && (
               <Link

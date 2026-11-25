@@ -17,7 +17,7 @@ import {
   EtiquetaProcedenciaAviso,
   type ProcedenciaAvisoPublica,
 } from "@/components/reportes/etiqueta-procedencia-aviso";
-import { EstadoPublicoChip } from "@/components/reportes/estado-publico";
+import { EstadoAdministrativoChip, EstadoPublicoChip } from "@/components/reportes/estado-publico";
 import { FotoEvidenciaPublica } from "@/components/reportes/evidencia-publica";
 import { InformacionPublicacion } from "@/components/reportes/metadatos-publicacion";
 import { DescargaReportePdf } from "@/components/reportes/descarga-reporte-pdf";
@@ -42,7 +42,8 @@ import {
   type EstadoPublico,
   type SeveridadPublica,
 } from "@/lib/reportes-publicos";
-import type { MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
+import type { AdminReportDetail, AdminRejectedReportDetail } from "@/lib/admin-data";
+import type { MiVeredaCategoria, MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
 import { crearDatosReportePdfLocal, crearDatosReportePdfPublico } from "@/lib/reportes-pdf-datos";
 import type { ReporteLocal } from "@/lib/reportar/local-history";
 import type { ReporteEvidencia } from "@/lib/reportar/types";
@@ -58,6 +59,7 @@ type ReporteDetallePublicoProps = {
   ubicacion: string | null;
   procedenciaAviso: ProcedenciaAvisoPublica | null;
   navegacion: ReactNode;
+  acciones?: ReactNode;
 };
 
 type ReporteDetalleLocalProps = {
@@ -66,7 +68,17 @@ type ReporteDetalleLocalProps = {
   onVolver: () => void;
 };
 
-type ReporteDetalleCompartidoProps = ReporteDetallePublicoProps | ReporteDetalleLocalProps;
+type ReporteDetalleAdminProps = {
+  modo: "admin";
+  reporte: AdminRejectedReportDetail | AdminReportDetail;
+  estado: string;
+  fotoUrl: string | null;
+  navegacion: ReactNode;
+  acciones?: ReactNode;
+};
+
+type ReporteDetalleCompartidoProps =
+  ReporteDetallePublicoProps | ReporteDetalleLocalProps | ReporteDetalleAdminProps;
 
 type ReporteDetalleEstructuraProps = {
   navegacion: ReactNode;
@@ -87,6 +99,7 @@ type ReporteDetalleEstructuraProps = {
 
 export function ReporteDetalleCompartido(props: ReporteDetalleCompartidoProps) {
   if (props.modo === "publico") return <DetallePublico {...props} />;
+  if (props.modo === "admin") return <DetalleAdmin {...props} />;
   return <DetalleLocal {...props} />;
 }
 
@@ -156,6 +169,7 @@ function DetallePublico(props: ReporteDetallePublicoProps) {
     ubicacion,
     procedenciaAviso,
     navegacion,
+    acciones,
   } = props;
   const coordenadas = coordenadasPublicasDe(publicacion);
   const tipoPdf = publicacion.tipo?.trim()
@@ -314,27 +328,180 @@ function DetallePublico(props: ReporteDetallePublicoProps) {
         </div>
       }
       accionPdf={
-        <DescargaReportePdf
-          reporte={datosPdf}
-          accionCompartir={
-            <button
-              type="button"
-              className="reporte-share-button"
-              onClick={() =>
-                toast.info("¡Estamos preparando esta función!", {
-                  description:
-                    "Muy pronto podrás compartir los reportes de AlertaVereda mediante un enlace.",
-                })
-              }
-            >
-              <Share2 size={17} aria-hidden="true" />
-              Compartir enlace
-            </button>
-          }
-        />
+        <>
+          {acciones}
+          <DescargaReportePdf
+            reporte={datosPdf}
+            accionCompartir={
+              <button
+                type="button"
+                className="reporte-share-button"
+                onClick={() =>
+                  toast.info("¡Estamos preparando esta función!", {
+                    description:
+                      "Muy pronto podrás compartir los reportes de AlertaVereda mediante un enlace.",
+                  })
+                }
+              >
+                <Share2 size={17} aria-hidden="true" />
+                Compartir enlace
+              </button>
+            }
+          />
+        </>
       }
     />
   );
+}
+
+function DetalleAdmin({
+  reporte,
+  estado,
+  fotoUrl,
+  navegacion,
+  acciones,
+}: ReporteDetalleAdminProps) {
+  const categoria = categoriaPublicaParaAdmin(reporte.categoria);
+  const etiquetaCategoria = categoria
+    ? ETIQUETAS_CATEGORIA_PUBLICA[categoria]
+    : "Categoría no disponible";
+  const ubicacion = reporte.vereda_nombre ?? reporte.lugar;
+  const rechazado = estado === "rechazado";
+  const motivoDisponible = reporte.motivo_rechazo?.trim();
+
+  return (
+    <ReporteDetalleEstructura
+      navegacion={navegacion}
+      titulo={reporte.titulo}
+      tituloId="reporte-detalle-admin-title"
+      subtitulo={
+        rechazado
+          ? "Detalle administrativo de un reporte rechazado."
+          : "Detalle administrativo de un reporte enviado para revisión."
+      }
+      insigniaCategoria={
+        <span className={`report-detail-category report-detail-category-${categoria ?? "otro"}`}>
+          {etiquetaCategoria}
+        </span>
+      }
+      insigniaEstado={
+        rechazado ? (
+          <EstadoAdministrativoChip estado="rechazado" />
+        ) : (
+          <span className="report-detail-admin-state" data-state={estado}>
+            {etiquetaEstadoAdmin(estado)}
+          </span>
+        )
+      }
+      aviso={
+        <aside className="report-detail-unverified" role="note">
+          <TriangleAlert size={19} aria-hidden="true" />
+          <div>
+            <strong>{rechazado ? "Registro administrativo" : "Revisión de Superadmin"}</strong>
+            <p>
+              {rechazado
+                ? "Este reporte fue rechazado; el estado público de las publicaciones no se altera desde esta ficha."
+                : estado === "pendiente"
+                  ? "Este reporte aún no ha sido verificado ni publicado para la comunidad."
+                  : "El estado mostrado corresponde al registro administrativo del reporte."}
+            </p>
+          </div>
+        </aside>
+      }
+      multimedia={
+        fotoUrl ? (
+          <FotoEvidenciaPublica
+            src={fotoUrl}
+            alt={`Evidencia fotográfica del reporte rechazado: ${reporte.titulo}`}
+            contexto={{
+              vereda: reporte.vereda_nombre,
+              tomadaEn: null,
+              publicadaEn: reporte.created_at,
+              coordenadas: null,
+            }}
+            emergenciaSinVerificar={false}
+          />
+        ) : (
+          <div className="report-detail-fallback-media">
+            <ImageIcon size={42} strokeWidth={1.7} aria-hidden="true" />
+            <p>Este reporte no tiene evidencia fotográfica adjunta.</p>
+          </div>
+        )
+      }
+      notaMultimedia={
+        fotoUrl
+          ? "Evidencia visible únicamente dentro del contexto administrativo protegido."
+          : "No se adjuntó una fotografía a este reporte."
+      }
+      hechos={
+        <>
+          <div>
+            <dt>
+              <MapPin size={16} aria-hidden="true" /> Vereda o lugar
+            </dt>
+            <dd>{ubicacion ?? "Ubicación no disponible"}</dd>
+          </div>
+          <div>
+            <dt>
+              <CalendarDays size={16} aria-hidden="true" /> Fecha del reporte
+            </dt>
+            <dd>{fechaHoraPublica(reporte.created_at)}</dd>
+          </div>
+          {reporte.revisado_en && (
+            <div>
+              <dt>
+                <Clock3 size={16} aria-hidden="true" /> Fecha de revisión
+              </dt>
+              <dd>{fechaHoraPublica(reporte.revisado_en)}</dd>
+            </div>
+          )}
+        </>
+      }
+      metadatos={
+        rechazado && motivoDisponible ? (
+          <section className="report-detail-publication-info" aria-label="Motivo del rechazo">
+            <div>
+              <p className="reportes-eyebrow">Decisión administrativa</p>
+              <h2>Motivo del rechazo</h2>
+            </div>
+            <p>{motivoDisponible}</p>
+          </section>
+        ) : undefined
+      }
+      descripcion={
+        <div className="report-detail-description">
+          <h3>Descripción</h3>
+          <p>{reporte.descripcion || "No hay una descripción adicional disponible."}</p>
+        </div>
+      }
+      notaUbicacion={
+        <div className="report-detail-location-note">
+          <Navigation size={18} aria-hidden="true" />
+          <p>La ubicación se muestra desde el registro administrativo, sin inferir coordenadas.</p>
+        </div>
+      }
+      accionPdf={acciones ?? null}
+    />
+  );
+}
+
+function etiquetaEstadoAdmin(estado: string) {
+  if (estado === "pendiente") return "Pendiente de verificación";
+  if (estado === "verificado") return "Verificado";
+  if (estado === "rechazado") return "Rechazado";
+  return estado.replaceAll("_", " ");
+}
+
+function categoriaPublicaParaAdmin(categoria: string): MiVeredaCategoria | null {
+  if (
+    categoria === "emergencia" ||
+    categoria === "via" ||
+    categoria === "servicio" ||
+    categoria === "aviso"
+  ) {
+    return categoria;
+  }
+  return categoria === "otro" ? "aviso" : null;
 }
 
 function etiquetaCondicionVia(publicacion: MiVeredaPublicacion) {

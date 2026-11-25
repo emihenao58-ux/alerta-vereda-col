@@ -30,6 +30,7 @@ import { Route as AdminConfiguracionRouteImport } from './routes/admin/configura
 import { Route as AdminGestionRouteImport } from './routes/admin/gestion'
 import { Route as AdminJacRouteImport } from './routes/admin/jac'
 import { Route as AdminJacSuperadminRouteImport } from './routes/admin/jac-superadmin'
+import { Route as AdminReportesRouteImport } from './routes/admin/reportes'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as ReportesIdRouteImport } from './routes/reportes.$id'
 import { Route as ReportesTodosRouteImport } from './routes/reportes.todos'
@@ -140,6 +141,11 @@ const AdminJacSuperadminRoute = AdminJacSuperadminRouteImport.update({
   path: '/jac-superadmin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminReportesRoute = AdminReportesRouteImport.update({
+  id: '/reportes',
+  path: '/reportes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/admin/gestion': typeof AdminGestionRouteWithChildren
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin/reportes': typeof AdminReportesRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/reportes/$id': typeof ReportesIdRoute
   '/reportes/todos': typeof ReportesTodosRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/admin/gestion': typeof AdminGestionRouteWithChildren
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin/reportes': typeof AdminReportesRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/reportes/$id': typeof ReportesIdRoute
   '/reportes/todos': typeof ReportesTodosRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/admin/gestion': typeof AdminGestionRouteWithChildren
   '/admin/jac': typeof AdminJacRoute
   '/admin/jac-superadmin': typeof AdminJacSuperadminRoute
+  '/admin/reportes': typeof AdminReportesRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/reportes/$id': typeof ReportesIdRoute
   '/reportes/todos': typeof ReportesTodosRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/admin/reportes'
     | '/auth/reset-password'
     | '/reportes/$id'
     | '/reportes/todos'
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/admin/reportes'
     | '/auth/reset-password'
     | '/reportes/$id'
     | '/reportes/todos'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/gestion'
     | '/admin/jac'
     | '/admin/jac-superadmin'
+    | '/admin/reportes'
     | '/auth/reset-password'
     | '/reportes/$id'
     | '/reportes/todos'
@@ -493,6 +505,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminJacSuperadminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/reportes': {
+      id: '/admin/reportes'
+      path: '/reportes'
+      fullPath: '/admin/reportes'
+      preLoaderRoute: typeof AdminReportesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/auth/reset-password': {
       id: '/auth/reset-password'
       path: '/reset-password'
@@ -541,6 +560,7 @@ interface AdminRouteChildren {
   AdminGestionRoute: typeof AdminGestionRouteWithChildren
   AdminJacRoute: typeof AdminJacRoute
   AdminJacSuperadminRoute: typeof AdminJacSuperadminRoute
+  AdminReportesRoute: typeof AdminReportesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -549,6 +569,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGestionRoute: AdminGestionRouteWithChildren,
   AdminJacRoute: AdminJacRoute,
   AdminJacSuperadminRoute: AdminJacSuperadminRoute,
+  AdminReportesRoute: AdminReportesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

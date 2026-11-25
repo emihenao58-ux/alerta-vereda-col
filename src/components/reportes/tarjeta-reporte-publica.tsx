@@ -21,7 +21,11 @@ import {
 } from "@/lib/reportes-publicos";
 import type { MiVeredaPublicacion } from "@/lib/mi-vereda-cartelera";
 import type { OrigenListaReporte } from "@/lib/reportes-navegacion";
-import { EstadoPublicoChip } from "./estado-publico";
+import type {
+  ContextoAdminReportes,
+  TipoRegistroAdminHistorial,
+} from "@/lib/reportes-contexto-admin";
+import { EstadoAdministrativoChip, EstadoPublicoChip } from "./estado-publico";
 import { FotoEvidenciaPublica } from "./evidencia-publica";
 import { MetaPublicacionCompacta, type MetadatosPublicacion } from "./metadatos-publicacion";
 
@@ -33,17 +37,23 @@ export function TarjetaReportePublica({
   metadatosPublicacion,
   estadoPublicoOverride,
   metadatosCategoria,
+  contextoSuperadmin,
+  tipoRegistroAdmin,
+  estadoAdminOverride,
 }: {
   publicacion: MiVeredaPublicacion;
   mostrarCategoria: boolean;
   origenLista?: OrigenListaReporte;
   compacta?: boolean;
   metadatosPublicacion?: MetadatosPublicacion | null;
-  estadoPublicoOverride?: EstadoPublico;
+  estadoPublicoOverride?: EstadoPublico | undefined;
   metadatosCategoria?: ReactNode;
+  contextoSuperadmin?: ContextoAdminReportes | undefined;
+  tipoRegistroAdmin?: TipoRegistroAdminHistorial;
+  estadoAdminOverride?: "rechazado" | undefined;
 }) {
   const estado = estadoPublicoOverride ?? estadoPublicoDe(publicacion);
-  if (!estado) return null;
+  if (!estado && !estadoAdminOverride) return null;
 
   const fotoUrl = URL_FOTO(publicacion.foto_url);
   const fecha = publicacion.fecha_evento ?? publicacion.created_at;
@@ -61,17 +71,26 @@ export function TarjetaReportePublica({
   return (
     <article
       className={cardClassName}
-      data-estado-publico={estado}
+      data-estado-publico={estado ?? undefined}
+      data-estado-administrativo={estadoAdminOverride}
       data-categoria={publicacion.categoria}
     >
       <Link
         to="/reportes/$id"
         params={{ id: publicacion.publicacion_id }}
-        search={{ origen: origenLista, tabla: publicacion.publicacion_tabla }}
+        search={{
+          origen: origenLista,
+          tabla: publicacion.publicacion_tabla,
+          contexto: contextoSuperadmin,
+          registro: tipoRegistroAdmin,
+        }}
         className="reporte-card-publico-hit-area"
-        aria-label={`Abrir detalle del reporte: ${publicacion.titulo}`}
+        aria-label={`Abrir detalle ${contextoSuperadmin === "historial" ? "del registro" : "del reporte"}: ${publicacion.titulo}`}
       >
-        <span className="sr-only">Abrir detalle del reporte: {publicacion.titulo}</span>
+        <span className="sr-only">
+          Abrir detalle {contextoSuperadmin === "historial" ? "del registro" : "del reporte"}:{" "}
+          {publicacion.titulo}
+        </span>
       </Link>
 
       <div className="reporte-card-publico-media">
@@ -107,7 +126,11 @@ export function TarjetaReportePublica({
               {categoria}
             </span>
           )}
-          <EstadoPublicoChip estado={estado} />
+          {estadoAdminOverride ? (
+            <EstadoAdministrativoChip estado={estadoAdminOverride} />
+          ) : estado ? (
+            <EstadoPublicoChip estado={estado} />
+          ) : null}
         </div>
 
         <div className="reporte-card-publico-title-row">

@@ -9395,6 +9395,73 @@ html.theme-transition-no-blur .mi-vereda-board {
   background: color-mix(in srgb, var(--header-accent) 15%, var(--header-background));
 }
 
+.app-shell-superadmin .header-controls-superadmin {
+  gap: 0.35rem;
+}
+
+.app-shell-superadmin .account-button.superadmin-account-trigger {
+  width: auto;
+  min-width: 0;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding: 0.2rem 0.35rem;
+  border-color: transparent;
+  border-radius: 999px;
+  background: transparent;
+  text-align: left;
+}
+
+.app-shell-superadmin .account-button.superadmin-account-trigger:hover,
+.app-shell-superadmin .account-button.superadmin-account-trigger:focus-visible {
+  border-color: color-mix(in srgb, var(--header-accent) 72%, var(--border));
+  background: color-mix(in srgb, var(--header-accent) 15%, var(--header-background));
+}
+
+.app-shell-superadmin .superadmin-account-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--header-foreground) 55%, var(--border));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--header-accent) 22%, transparent);
+}
+
+.app-shell-superadmin .superadmin-account-identity {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+  color: var(--header-foreground);
+  line-height: 1.12;
+  white-space: nowrap;
+}
+
+.app-shell-superadmin .superadmin-account-identity strong {
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  font-weight: 800;
+}
+
+.app-shell-superadmin .superadmin-account-identity small {
+  color: color-mix(in srgb, var(--header-foreground) 80%, transparent);
+  font-size: calc(var(--av-text-scale) * 0.63rem);
+  font-weight: 550;
+}
+html:not(.dark) .app-shell-superadmin .superadmin-account-identity {
+  text-shadow:
+    0 0 2px var(--header-background),
+    0 0 6px var(--header-background);
+}
+html:not(.dark) .app-shell-superadmin .superadmin-account-identity small {
+  color: var(--header-foreground);
+}
+
+.app-shell-superadmin .superadmin-account-chevron {
+  flex: 0 0 auto;
+  margin-left: 0.05rem;
+  color: var(--header-foreground);
+}
+
 .superadmin-reportar-wizard {
   gap: 0.8rem;
 }
@@ -9469,6 +9536,29 @@ html.theme-transition-no-blur .mi-vereda-board {
     padding-inline: 0.62rem;
   }
 
+  .app-shell-superadmin .header-controls-superadmin {
+    gap: 0.2rem;
+  }
+
+  .app-shell-superadmin .account-button.superadmin-account-trigger {
+    min-height: 2.6rem;
+    gap: 0.3rem;
+    padding-inline: 0.2rem;
+  }
+
+  .app-shell-superadmin .superadmin-account-avatar {
+    width: 2.05rem;
+    height: 2.05rem;
+  }
+
+  .app-shell-superadmin .superadmin-account-identity strong {
+    font-size: calc(var(--av-text-scale) * 0.68rem);
+  }
+
+  .app-shell-superadmin .superadmin-account-identity small {
+    font-size: calc(var(--av-text-scale) * 0.57rem);
+  }
+
   .superadmin-reportar-step .reportar-step-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -9530,8 +9620,8 @@ html.theme-transition-no-blur .mi-vereda-board {
 
 /* Integración visual final del shell Superadmin: navegación vertical parte de la aplicación. */
 .app-shell-superadmin {
-  --superadmin-sidebar-bg: #073d32;
-  --superadmin-sidebar-bg-deep: #052f2b;
+  --superadmin-sidebar-bg: #0b4b3d;
+  --superadmin-sidebar-bg-deep: #08392f;
   --superadmin-sidebar-text: #f2faf2;
   --superadmin-sidebar-muted: #c9dfd3;
   --superadmin-sidebar-border: rgb(255 255 255 / 18%);
@@ -9539,8 +9629,8 @@ html.theme-transition-no-blur .mi-vereda-board {
 }
 
 .dark .app-shell-superadmin {
-  --superadmin-sidebar-bg: #062f2d;
-  --superadmin-sidebar-bg-deep: #041f26;
+  --superadmin-sidebar-bg: #0b2138;
+  --superadmin-sidebar-bg-deep: #061827;
   --superadmin-sidebar-text: #f2faf2;
   --superadmin-sidebar-muted: #c9dfd3;
   --superadmin-sidebar-border: rgb(213 239 224 / 22%);
@@ -9985,19 +10075,23 @@ html.theme-transition-no-blur .mi-vereda-board {
     overflow-wrap: anywhere;
   }
 
+  .app-shell-superadmin .admin-sidebar-management-menu > .admin-sidebar-group {
+    grid-column: 1 / -1;
+  }
+
   .app-shell-superadmin .admin-sidebar-submenu {
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    left: 0;
-    z-index: 4;
-    width: max-content;
-    min-width: 13rem;
-    margin: 0;
+    position: static;
+    top: auto;
+    left: auto;
+    z-index: auto;
+    width: 100%;
+    min-width: 0;
+    margin: 0.25rem 0 0;
     padding: 0.35rem;
     border: 1px solid var(--superadmin-sidebar-border);
     border-radius: 0.6rem;
     background: var(--superadmin-sidebar-bg-deep);
-    box-shadow: 0 12px 28px rgb(0 0 0 / 22%);
+    box-shadow: none;
   }
 
   .app-shell-superadmin .admin-sidebar-footer {
@@ -11298,6 +11392,16 @@ body.logout-transition-active {
   background: linear-gradient(135deg, #286f5d, #174e43);
 }
 
+/* Publicaciones Superadmin: el panel y su contenido siguen la altura y el ancho necesarios. */
+.app-shell-superadmin > main:has(.reportes-page) .superadmin-surface {
+  width: min(100%, 54rem);
+  min-height: 0;
+  margin-inline: auto;
+}
+.app-shell-superadmin > main:has(.reportes-page) .reportes-page {
+  width: min(100%, 50rem);
+}
+
 @media (max-width: 720px) {
   .portada-especial-page {
     background-image: var(--fondo-movil);
@@ -11388,6 +11492,10 @@ body.logout-transition-active {
   }
 
   .reportes-page {
+    width: min(100%, 34rem);
+  }
+
+  .app-shell-superadmin > main:has(.reportes-page) .reportes-page {
     width: min(100%, 34rem);
   }
 
@@ -14376,6 +14484,29 @@ html[data-google-oauth-pending="true"] .app-startup-splash {
 .reporte-estado-chip-cerrado_sin_solucion {
   background: #655371;
   color: #fff;
+}
+
+.reporte-estado-chip-rechazado {
+  background: #9b3434;
+  color: #fff;
+}
+
+.report-detail-admin-state {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--dorado) 42%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dorado) 16%, var(--card));
+  padding: 0.28rem 0.58rem;
+  color: var(--tinta);
+  font-size: calc(var(--av-text-scale) * 0.67rem);
+  font-weight: 800;
+}
+
+.dark .report-detail-admin-state {
+  border-color: color-mix(in srgb, var(--dorado) 48%, var(--border));
+  background: color-mix(in srgb, var(--dorado) 17%, var(--card));
+  color: var(--tinta);
 }
 
 .report-detail-publication-info {

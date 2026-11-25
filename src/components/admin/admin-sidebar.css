@@ -1,0 +1,164 @@
+/* Sidebar Superadmin · menú aprobado y selector de tema en el pie. */
+.app-shell-superadmin .admin-sidebar-section-label {
+  margin: 0.85rem 0 0.3rem;
+  padding: 0 0.7rem;
+  color: var(--superadmin-sidebar-muted);
+  font-size: calc(var(--av-text-scale) * 0.64rem);
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.app-shell-superadmin .admin-sidebar-management-menu {
+  margin: 0;
+}
+.app-shell-superadmin .admin-sidebar {
+  isolation: isolate;
+}
+.app-shell-superadmin .admin-sidebar::before,
+.app-shell-superadmin .admin-sidebar::after {
+  content: none !important;
+  display: none !important;
+}
+.app-shell-superadmin .admin-sidebar-landscape {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 10rem;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0.86;
+}
+.app-shell-superadmin .admin-sidebar-landscape-back {
+  fill: var(--superadmin-mountain-back);
+}
+.app-shell-superadmin .admin-sidebar-landscape-mid {
+  fill: var(--superadmin-mountain-mid);
+}
+.app-shell-superadmin .admin-sidebar-landscape-front {
+  fill: var(--superadmin-mountain-front);
+}
+.app-shell-superadmin .admin-sidebar-landscape-contour {
+  fill: none;
+  stroke: var(--superadmin-mountain-back);
+  stroke-linecap: round;
+  stroke-width: 1.4;
+  opacity: 0.26;
+}
+.app-shell-superadmin .admin-sidebar-subitem-disabled {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+.app-shell-superadmin .admin-sidebar-subitem-disabled small {
+  margin-left: auto;
+  font-size: calc(var(--av-text-scale) * 0.62rem);
+  white-space: nowrap;
+}
+.app-shell-superadmin .admin-sidebar-footer {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem 0.7rem 0.9rem;
+}
+.app-shell-superadmin .admin-sidebar-footer-message {
+  position: relative;
+  min-height: 5.3rem;
+  overflow: hidden;
+  border: 1px solid var(--superadmin-sidebar-border);
+  border-radius: 0.85rem;
+  background: rgb(0 31 37 / 20%);
+  padding: 0.65rem 0.7rem;
+}
+.app-shell-superadmin .admin-sidebar-community-tagline {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--superadmin-sidebar-text);
+  font-family: var(--font-sans);
+  font-size: calc(var(--av-text-scale) * 0.72rem);
+  font-style: normal;
+  font-weight: 650;
+  line-height: 1.38;
+  text-shadow: 0 1px 5px rgb(0 24 28 / 40%);
+}
+.app-shell-superadmin .admin-sidebar-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  border-top: 1px solid var(--superadmin-sidebar-border);
+  padding-top: 0.65rem;
+}
+.app-shell-superadmin .admin-sidebar-theme-label {
+  color: var(--superadmin-sidebar-muted);
+  font-size: calc(var(--av-text-scale) * 0.76rem);
+  font-weight: 700;
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle {
+  min-height: 2.5rem;
+  border-color: var(--superadmin-sidebar-border);
+  background: rgb(0 22 28 / 25%);
+  color: var(--superadmin-sidebar-muted);
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option {
+  width: 2.2rem;
+  min-width: 2.2rem;
+  height: 2.15rem;
+  min-height: 2.15rem;
+  color: var(--superadmin-sidebar-muted);
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option:hover,
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option:focus-visible {
+  background: rgb(255 255 255 / 12%);
+  color: var(--superadmin-sidebar-text);
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option.is-active[aria-label="Modo día"] {
+  background: color-mix(in srgb, var(--dorado) 24%, transparent);
+  color: #ffe08a;
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option.is-active[aria-label="Modo noche"] {
+  background: rgb(175 219 255 / 18%);
+  color: #d9efff;
+}
+.app-shell-superadmin .admin-sidebar-theme .theme-toggle-option:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--dorado) 80%, white);
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .app-shell-superadmin .admin-sidebar-landscape {
+    height: 6.5rem;
+    opacity: 0.64;
+  }
+  .app-shell-superadmin .admin-sidebar-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.45rem 0.65rem;
+  }
+  .app-shell-superadmin .admin-sidebar-footer-message {
+    min-height: 4.3rem;
+    padding-right: 3.7rem;
+  }
+  .app-shell-superadmin .admin-sidebar-theme {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+@media (max-width: 480px) {
+  .app-shell-superadmin .admin-sidebar-footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-shell-superadmin .admin-sidebar-theme {
+    grid-template-columns: 1fr auto;
+    justify-items: stretch;
+  }
+}

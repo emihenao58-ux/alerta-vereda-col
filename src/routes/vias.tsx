@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, MapPinned } from "lucide-react";
-import { AppShell } from "@/components/app-shell";
 import { Vacio } from "@/components/carta";
 import { CabeceraSeccionPublica } from "@/components/reportes/cabecera-seccion-publica";
+import { ReportesSurface } from "@/components/reportes/reportes-surface";
 import {
   FiltrosEstadoPublico,
   type FiltroEstadoPublico,
@@ -19,8 +19,10 @@ import {
   etiquetaCondicionViaDe,
 } from "@/lib/vias-publicas";
 import { useQuery } from "@tanstack/react-query";
+import { validarBusquedaReportesAdmin } from "@/lib/reportes-contexto-admin";
 
 export const Route = createFileRoute("/vias")({
+  validateSearch: validarBusquedaReportesAdmin,
   head: () => ({
     meta: [
       { title: "Estado de las vías · AlertaVereda Ebéjico" },
@@ -40,6 +42,7 @@ export const Route = createFileRoute("/vias")({
 });
 
 function Vias() {
+  const { contexto } = Route.useSearch();
   const [filtro, setFiltro] = useState<FiltroEstadoPublico>("todos");
   const { data, isLoading, isError } = useQuery({
     queryKey: ["vias"],
@@ -81,9 +84,9 @@ function Vias() {
   );
 
   return (
-    <AppShell>
+    <ReportesSurface contexto={contexto}>
       <div className="vias-page">
-        <Link to="/reportes" className="reportes-back-link">
+        <Link to="/reportes" search={{ contexto }} className="reportes-back-link">
           <ArrowLeft size={17} aria-hidden="true" /> Volver a reportes
         </Link>
         <CabeceraSeccionPublica
@@ -91,6 +94,7 @@ function Vias() {
           Icon={ViasRoadIcon}
           titulo="Vías"
           bajada="Reportes sobre el estado y las condiciones de las vías."
+          etiqueta={contexto ? "Publicaciones visibles" : "Información pública"}
           accion={
             <Link
               to="/reportar"
@@ -108,11 +112,16 @@ function Vias() {
           <section className="vias-results" aria-labelledby="vias-list-title">
             <div className="vias-results-heading">
               <div>
-                <p className="reportes-eyebrow">Consulta pública</p>
-                <h2 id="vias-list-title">Reportes viales</h2>
+                <p className="reportes-eyebrow">
+                  {contexto ? "Publicaciones visibles" : "Consulta pública"}
+                </p>
+                <h2 id="vias-list-title">
+                  {contexto ? "Publicaciones de vías" : "Reportes viales"}
+                </h2>
               </div>
               <span>
-                {publicaciones.length} {publicaciones.length === 1 ? "reporte" : "reportes"}
+                {publicaciones.length}{" "}
+                {publicaciones.length === 1 ? "publicación" : "publicaciones"}
               </span>
             </div>
             <FiltrosEstadoPublico
@@ -156,6 +165,7 @@ function Vias() {
                   publicacion={publicacion}
                   mostrarCategoria={false}
                   origenLista="vias"
+                  contextoSuperadmin={contexto}
                   estadoPublicoOverride={estado}
                   metadatosCategoria={
                     <p className="vias-card-condition">
@@ -182,6 +192,6 @@ function Vias() {
           <ChevronRight size={24} aria-hidden="true" />
         </Link>
       </div>
-    </AppShell>
+    </ReportesSurface>
   );
 }

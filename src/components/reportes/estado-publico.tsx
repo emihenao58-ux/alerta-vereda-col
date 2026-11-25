@@ -1,4 +1,4 @@
-import { Archive, CircleHelp, Clock3, HandHelping, ShieldCheck } from "lucide-react";
+import { Archive, CircleHelp, CircleX, Clock3, HandHelping, ShieldCheck } from "lucide-react";
 import { ETIQUETAS_ESTADO_PUBLICO, type EstadoPublico } from "@/lib/reportes-publicos";
 
 export function EstadoPublicoChip({ estado }: { estado: EstadoPublico }) {
@@ -20,6 +20,15 @@ export function EstadoPublicoChip({ estado }: { estado: EstadoPublico }) {
         <ShieldCheck size={14} strokeWidth={2.2} aria-hidden="true" />
       )}
       {ETIQUETAS_ESTADO_PUBLICO[estado]}
+    </span>
+  );
+}
+
+export function EstadoAdministrativoChip({ estado }: { estado: "rechazado" }) {
+  return (
+    <span className="reporte-estado-chip reporte-estado-chip-rechazado" data-estado={estado}>
+      <CircleX size={14} strokeWidth={2.2} aria-hidden="true" />
+      Rechazado
     </span>
   );
 }

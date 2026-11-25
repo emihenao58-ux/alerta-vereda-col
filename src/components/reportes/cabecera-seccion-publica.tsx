@@ -7,12 +7,14 @@ export function CabeceraSeccionPublica({
   titulo,
   bajada,
   accion,
+  etiqueta = "Información pública",
 }: {
   variante: string;
   Icon: LucideIcon;
   titulo: string;
   bajada: string;
   accion?: ReactNode;
+  etiqueta?: string;
 }) {
   return (
     <header className={`seccion-publica-hero seccion-publica-hero-${variante}`}>
@@ -21,7 +23,7 @@ export function CabeceraSeccionPublica({
           <Icon size={36} strokeWidth={2.1} />
         </span>
         <div>
-          <p className="reportes-eyebrow">Información pública</p>
+          <p className="reportes-eyebrow">{etiqueta}</p>
           <h1>{titulo}</h1>
           <p className="seccion-publica-hero-description">{bajada}</p>
         </div>

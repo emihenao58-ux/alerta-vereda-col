@@ -1,0 +1,598 @@
+.superadmin-notification-control {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.superadmin-notification-button {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--header-foreground) 28%, var(--border));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--header-background) 42%, transparent);
+  color: var(--header-foreground);
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.superadmin-notification-button:hover,
+.superadmin-notification-button:focus-visible {
+  border-color: color-mix(in srgb, var(--header-accent) 72%, var(--border));
+  background: color-mix(in srgb, var(--header-accent) 15%, var(--header-background));
+}
+
+.superadmin-notification-button:focus-visible,
+.superadmin-notification-scenario:focus-visible,
+.superadmin-notification-mark-all:focus-visible,
+.superadmin-notification-action:focus-visible,
+.superadmin-notification-card-link:focus-visible,
+.superadmin-notification-more:focus-visible,
+.superadmin-notification-dismiss:focus-visible,
+.superadmin-notification-remove-read:focus-visible,
+.superadmin-notification-mark-read:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ring) 65%, transparent);
+  outline-offset: 2px;
+}
+
+.superadmin-notification-count {
+  position: absolute;
+  top: -0.28rem;
+  right: -0.35rem;
+  display: grid;
+  min-width: 1.18rem;
+  height: 1.18rem;
+  place-items: center;
+  border: 2px solid var(--header-background);
+  border-radius: 999px;
+  background: #c83c35;
+  padding: 0 0.2rem;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.superadmin-notification-count[data-empty="true"] {
+  background: color-mix(in srgb, var(--header-foreground) 24%, var(--header-background));
+  color: var(--header-foreground);
+}
+
+.superadmin-notification-panel {
+  position: fixed;
+  top: 4rem;
+  right: auto;
+  left: 0.75rem;
+  z-index: 1000;
+  display: grid;
+  gap: 0.7rem;
+  width: min(29rem, calc(100vw - 1.5rem));
+  max-height: min(50rem, calc(100dvh - 4rem));
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--border));
+  border-radius: 0.95rem;
+  background: var(--popover);
+  padding: 1rem;
+  color: var(--tinta);
+  box-shadow: 0 16px 38px rgb(0 0 0 / 22%);
+}
+
+.superadmin-notification-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.superadmin-notification-kicker {
+  margin: 0 0 0.3rem;
+  color: var(--bosque);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.superadmin-notification-panel h2 {
+  margin: 0;
+  color: var(--tinta);
+  font-size: calc(var(--av-text-scale) * 1rem);
+}
+
+.superadmin-notification-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.superadmin-notification-actions-menu {
+  position: relative;
+}
+
+.superadmin-notification-more {
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--border));
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--bosque) 4%, var(--card));
+  color: var(--bosque-oscuro);
+  cursor: pointer;
+}
+
+.superadmin-notification-more:hover {
+  background: color-mix(in srgb, var(--bosque) 11%, var(--card));
+}
+
+.superadmin-notification-actions-popover {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  right: 0;
+  z-index: 5;
+  min-width: max-content;
+  border: 1px solid color-mix(in srgb, var(--bosque) 20%, var(--border));
+  border-radius: 0.7rem;
+  background: var(--popover);
+  padding: 0.3rem;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 18%);
+}
+
+.superadmin-notification-remove-read {
+  display: flex;
+  min-height: 2.55rem;
+  align-items: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  padding: 0.45rem 0.6rem;
+  color: var(--tinta);
+  cursor: pointer;
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  font-weight: 650;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.superadmin-notification-remove-read:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+}
+
+.superadmin-notification-remove-read:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.superadmin-notification-mark-all,
+.superadmin-notification-scenario,
+.superadmin-notification-mark-read {
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--bosque) 28%, var(--border));
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--bosque) 7%, var(--card));
+  padding: 0.35rem 0.55rem;
+  color: var(--bosque-oscuro);
+  cursor: pointer;
+  font: inherit;
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.superadmin-notification-mark-all:hover,
+.superadmin-notification-scenario:hover,
+.superadmin-notification-mark-read:hover {
+  background: color-mix(in srgb, var(--bosque) 13%, var(--card));
+}
+
+.superadmin-notification-mark-read {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  z-index: 2;
+}
+
+.superadmin-notification-demo-note,
+.superadmin-notification-technical-note {
+  margin: 0;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, #d7a530 13%, var(--card));
+  padding: 0.55rem 0.65rem;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  line-height: 1.4;
+}
+
+.superadmin-notification-technical-note {
+  border-inline-start: 3px solid #c78312;
+}
+
+.superadmin-notification-scenarios {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  padding: 0.4rem 0.5rem 0.5rem;
+}
+
+.superadmin-notification-scenarios legend {
+  padding: 0 0.25rem;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.65rem);
+  font-weight: 700;
+}
+
+.superadmin-notification-scenarios > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.superadmin-notification-scenario[aria-pressed="true"] {
+  border-color: var(--bosque);
+  background: var(--bosque);
+  color: #fff;
+}
+
+.superadmin-notification-summary {
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.7rem);
+  font-weight: 700;
+}
+
+.superadmin-notification-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.superadmin-notification-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.65rem;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--bosque);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--popover) 92%, var(--bosque));
+  padding: 0.7rem;
+}
+
+.superadmin-notification-card-link {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+.superadmin-notification-item-copy {
+  padding-right: 2.55rem;
+}
+
+.is-unread .superadmin-notification-item-copy {
+  padding-bottom: 2.75rem;
+}
+
+.superadmin-notification-dismiss {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  z-index: 2;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--tinta-suave) 16%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--popover) 86%, transparent);
+  color: var(--tinta-suave);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.superadmin-notification-dismiss:hover {
+  background: color-mix(in srgb, var(--bosque) 10%, var(--popover));
+  color: var(--tinta);
+}
+
+.superadmin-notification-item.is-unread {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bosque) 12%, transparent);
+}
+
+.superadmin-notification-item.is-solicitud {
+  border-inline-start-color: #238052;
+}
+
+.superadmin-notification-item.is-emergencia {
+  border-inline-start-color: #c83c35;
+}
+
+.superadmin-notification-item.is-tecnica {
+  border-inline-start-color: #bc7a13;
+}
+
+.superadmin-notification-item-icon {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--bosque) 12%, var(--card));
+  color: var(--bosque);
+}
+
+.is-solicitud .superadmin-notification-item-icon {
+  background: color-mix(in srgb, #238052 13%, var(--card));
+  color: #238052;
+}
+
+.is-emergencia .superadmin-notification-item-icon {
+  background: color-mix(in srgb, #c83c35 13%, var(--card));
+  color: #b6312b;
+}
+
+.is-tecnica .superadmin-notification-item-icon {
+  background: color-mix(in srgb, #bc7a13 14%, var(--card));
+  color: #905806;
+}
+
+.superadmin-notification-item-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.superadmin-notification-item-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.superadmin-notification-item h3,
+.superadmin-notification-empty h3 {
+  margin: 0;
+  color: var(--tinta);
+  font-size: calc(var(--av-text-scale) * 0.78rem);
+  line-height: 1.3;
+}
+
+.superadmin-notification-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bosque) 9%, var(--card));
+  padding: 0.15rem 0.4rem;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.58rem);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.is-unread .superadmin-notification-status {
+  background: color-mix(in srgb, #c78312 16%, var(--card));
+  color: #80510d;
+}
+
+.superadmin-notification-item-copy > p {
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.69rem);
+  line-height: 1.4;
+}
+
+.superadmin-notification-time {
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.63rem);
+  white-space: nowrap;
+}
+
+.superadmin-notification-item-footer {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.superadmin-notification-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.superadmin-notification-action {
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--bosque) 10%, var(--card));
+  padding: 0.35rem 0.6rem;
+  color: var(--bosque-oscuro);
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.superadmin-notification-action:hover {
+  background: color-mix(in srgb, var(--bosque) 17%, var(--card));
+  text-decoration: underline;
+}
+
+.superadmin-notification-empty {
+  display: grid;
+  min-height: 8rem;
+  justify-items: center;
+  align-content: center;
+  gap: 0.4rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.superadmin-notification-empty h3 {
+  font-size: calc(var(--av-text-scale) * 0.82rem);
+}
+
+.superadmin-notification-empty p {
+  max-width: 20rem;
+  margin: 0;
+  color: var(--tinta-suave);
+  font-size: calc(var(--av-text-scale) * 0.68rem);
+  line-height: 1.4;
+}
+
+.dark .superadmin-notification-kicker {
+  color: var(--dorado);
+}
+
+.dark .superadmin-notification-mark-all,
+.dark .superadmin-notification-scenario,
+.dark .superadmin-notification-mark-read {
+  border-color: color-mix(in srgb, #8acbd9 40%, var(--border));
+  background: color-mix(in srgb, #174050 65%, var(--card));
+  color: #d8f5ff;
+}
+
+.dark .superadmin-notification-mark-all:hover,
+.dark .superadmin-notification-scenario:hover,
+.dark .superadmin-notification-mark-read:hover {
+  background: color-mix(in srgb, #1f6174 68%, var(--card));
+}
+
+.dark .superadmin-notification-scenario[aria-pressed="true"] {
+  border-color: #31856f;
+  background: #176b5e;
+  color: #effffb;
+}
+
+.dark .superadmin-notification-demo-note,
+.dark .superadmin-notification-technical-note {
+  background: color-mix(in srgb, #72521c 34%, var(--card));
+  color: #f2e4c3;
+}
+
+.dark .superadmin-notification-item {
+  background: color-mix(in srgb, #0c3044 62%, var(--card));
+}
+
+.dark .superadmin-notification-item h3,
+.dark .superadmin-notification-empty h3 {
+  color: #e2f7ff;
+}
+
+.dark .superadmin-notification-status {
+  background: color-mix(in srgb, #8cbac4 16%, var(--card));
+  color: #d9edf2;
+}
+
+.dark .is-unread .superadmin-notification-status {
+  background: color-mix(in srgb, #966b22 42%, var(--card));
+  color: #ffe3a6;
+}
+
+.dark .is-solicitud .superadmin-notification-item-icon {
+  background: rgb(35 128 82 / 24%);
+  color: #8de2b6;
+}
+
+.dark .is-emergencia .superadmin-notification-item-icon {
+  background: rgb(200 60 53 / 22%);
+  color: #ffaaa4;
+}
+
+.dark .is-tecnica .superadmin-notification-item-icon {
+  background: rgb(188 122 19 / 23%);
+  color: #ffd184;
+}
+
+.dark .superadmin-notification-action {
+  background: color-mix(in srgb, #1d6571 48%, var(--card));
+  color: #d9f6ff;
+}
+
+.dark .superadmin-notification-action:hover {
+  background: color-mix(in srgb, #287e8c 57%, var(--card));
+}
+
+.dark .superadmin-notification-more {
+  border-color: color-mix(in srgb, #8acbd9 32%, var(--border));
+  background: color-mix(in srgb, #174050 45%, var(--card));
+  color: #d8f5ff;
+}
+
+.dark .superadmin-notification-more:hover {
+  background: color-mix(in srgb, #1f6174 68%, var(--card));
+}
+
+.dark .superadmin-notification-actions-popover {
+  border-color: color-mix(in srgb, #8acbd9 35%, var(--border));
+}
+
+.dark .superadmin-notification-remove-read {
+  color: #d9f6ff;
+}
+
+.dark .superadmin-notification-remove-read:hover:not(:disabled) {
+  background: color-mix(in srgb, #1f6174 55%, var(--card));
+}
+
+.dark .superadmin-notification-dismiss {
+  border-color: color-mix(in srgb, #d9f6ff 20%, transparent);
+  background: color-mix(in srgb, var(--popover) 88%, transparent);
+  color: #d9edf2;
+}
+
+.dark .superadmin-notification-dismiss:hover {
+  background: color-mix(in srgb, #1f6174 65%, var(--popover));
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .superadmin-notification-panel {
+    max-height: calc(100dvh - 4rem - env(safe-area-inset-bottom, 0px));
+    gap: 0.55rem;
+    padding: 0.8rem;
+  }
+
+  .superadmin-notification-item {
+    padding: 0.6rem 0.65rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .superadmin-notification-panel {
+    padding: 0.75rem;
+  }
+
+  .superadmin-notification-heading {
+    flex-direction: column;
+  }
+
+  .superadmin-notification-heading-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
