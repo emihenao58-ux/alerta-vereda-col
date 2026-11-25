@@ -132,16 +132,8 @@ export function CuentaControl({
   };
 
   const opcionesCuenta = OPCIONES_CUENTA.filter(
-    ({ to }) => !(adminPanelActive && to === "/acceso-administrativo"),
+    ({ to }) => !((usuario || adminPanelActive) && to === "/acceso-administrativo"),
   );
-
-  if (!usuario) {
-    return (
-      <Link to="/auth" className="account-button" aria-label="Entrar" title="Entrar">
-        <UserRound size={18} strokeWidth={2.3} aria-hidden="true" />
-      </Link>
-    );
-  }
 
   return (
     <DropdownMenu>
